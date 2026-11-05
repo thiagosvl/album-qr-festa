@@ -84,8 +84,7 @@ export function ConvidadoRevisaoView({
       .then((img) => {
         if (ativo) setMolduraImg(img);
       })
-      .catch((erro: unknown) => {
-        console.warn("[revisao] falha ao carregar moldura", url, erro);
+      .catch(() => {
         if (!ativo) return;
         setMolduraImg(null);
         if (!avisouErroMolduraRef.current) {
@@ -111,11 +110,6 @@ export function ConvidadoRevisaoView({
   }, [fonteCapturada, espelharCaptura, molduraImg, transformacao]);
 
   if (!fonteCapturada) return null;
-
-  const jaAjustou =
-    transformacao.scale !== 1 ||
-    transformacao.offsetX !== 0 ||
-    transformacao.offsetY !== 0;
 
   const aplicarNovoScale = (valorScale: number) => {
     const novoScale = Math.max(1, Math.min(3, valorScale));
@@ -306,11 +300,6 @@ export function ConvidadoRevisaoView({
               aria-label="Prévia da foto com moldura"
               className="pointer-events-none h-full w-full"
             />
-            {!jaAjustou && (
-              <p className="pointer-events-none absolute inset-x-0 bottom-3 mx-auto w-fit whitespace-nowrap rounded-full bg-black/55 px-3 py-1 text-[11px] font-semibold text-white/90">
-                Arraste para enquadrar · pinça = zoom
-              </p>
-            )}
           </div>
         </div>
 
