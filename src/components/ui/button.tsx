@@ -20,6 +20,8 @@ const buttonVariants = cva(
           "border border-input bg-background hover:bg-accent hover:text-foreground",
         ghost:
           "hover:bg-accent hover:text-foreground",
+        whatsapp:
+          "bg-whatsapp text-white shadow-sm hover:bg-whatsapp-escuro",
         destructive:
           "bg-destructive text-destructive-foreground shadow-sm hover:bg-destructive/90",
         link:

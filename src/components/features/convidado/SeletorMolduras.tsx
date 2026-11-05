@@ -42,7 +42,7 @@ export function SeletorMolduras({
 
   return (
     <div
-      className="no-scrollbar flex snap-x items-center gap-2.5 overflow-x-auto p-1"
+      className="no-scrollbar flex snap-x items-center gap-2.5 scroll-px-1.5 overflow-x-auto p-1.5"
       role="group"
       aria-label="Molduras"
     >

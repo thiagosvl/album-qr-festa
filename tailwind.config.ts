@@ -26,6 +26,7 @@ export default {
         rosa: { DEFAULT: "#e6007e", vivo: "#ff4f9a" },
         gema: "#ffd23f",
         papel: "#fdfbff",
+        whatsapp: { DEFAULT: "#25d366", escuro: "#1ebe5a" },
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",

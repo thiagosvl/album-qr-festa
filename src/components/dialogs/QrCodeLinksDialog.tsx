@@ -1,4 +1,5 @@
-import { Copy, ExternalLink, MessageCircle, QrCode } from "lucide-react";
+import { Copy, ExternalLink, QrCode } from "lucide-react";
+import { WhatsAppIcon } from "@/components/icons/WhatsAppIcon";
 import { toast } from "sonner";
 import { Banner } from "@/components/ui/Banner";
 import { BaseDialog } from "@/components/ui/BaseDialog";
@@ -150,9 +151,9 @@ export function QrCodeLinksDialog({
         >
           Fechar
         </Button>
-        <Button type="button" asChild>
+        <Button type="button" variant="whatsapp" asChild>
           <a href={linkWhats} target="_blank" rel="noopener noreferrer">
-            <MessageCircle className="w-4 h-4" />
+            <WhatsAppIcon className="w-4 h-4" />
             <span>Enviar Tudo no WhatsApp</span>
           </a>
         </Button>

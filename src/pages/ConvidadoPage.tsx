@@ -1,6 +1,7 @@
 import React from "react";
 import { useParams } from "react-router-dom";
 import { ConvidadoCameraView } from "@/components/features/convidado/ConvidadoCameraView";
+import { ConvidadoCtaOrcamento } from "@/components/features/convidado/ConvidadoCtaOrcamento";
 import {
   BotaoFlutuanteFoto,
   ConvidadoHeader,
@@ -91,6 +92,11 @@ export function ConvidadoPage() {
           />
 
           <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-4">
+            {evento.is_demo && (
+              <div className="mx-auto mb-4 max-w-sm">
+                <ConvidadoCtaOrcamento />
+              </div>
+            )}
             <ConvidadoMuralGrid
               midias={vm.midiasExibidas}
               isLoading={vm.isLoadingMidias}

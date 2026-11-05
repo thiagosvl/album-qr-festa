@@ -5,10 +5,13 @@ import {
   Plus,
   QrCode,
   Save,
-  Sparkles,
 } from "lucide-react";
 import { Link } from "react-router-dom";
-import { WHATSAPP_COMERCIAL } from "@/constants";
+import { WhatsAppIcon } from "@/components/icons/WhatsAppIcon";
+import {
+  WHATSAPP_MENSAGENS,
+  gerarLinkWhatsappComercial,
+} from "@/lib/whatsapp";
 import { ParceiroSidebar } from "@/components/features/parceiro/ParceiroSidebar";
 import { Banner } from "@/components/ui/Banner";
 import { Badge } from "@/components/ui/badge";
@@ -30,9 +33,9 @@ export function ParceiroB2bPlaceholderPage() {
   }
 
   const parceiro = vm.parceiro;
-  const linkWhatsappRecarga = `https://wa.me/${WHATSAPP_COMERCIAL}?text=${encodeURIComponent(
-    `Olá! Sou do parceiro B2B "${parceiro?.nome_empresa ?? ""}" e gostaria de adquirir mais créditos de eventos.`
-  )}`;
+  const linkWhatsappRecarga = gerarLinkWhatsappComercial(
+    WHATSAPP_MENSAGENS.RECARGA_CREDITOS_PARCEIRO(parceiro?.nome_empresa ?? "")
+  );
 
   return (
     <div className="min-h-screen flex flex-col lg:flex-row bg-background">
@@ -173,13 +176,13 @@ export function ParceiroB2bPlaceholderPage() {
                 <CardTitle className="text-lg">
                   Extrato de Créditos B2B
                 </CardTitle>
-                <Button size="sm" asChild>
+                <Button size="sm" variant="whatsapp" asChild>
                   <a
                     href={linkWhatsappRecarga}
                     target="_blank"
                     rel="noopener noreferrer"
                   >
-                    <Sparkles className="w-4 h-4" />
+                    <WhatsAppIcon className="w-4 h-4" />
                     <span>Comprar Mais Créditos</span>
                   </a>
                 </Button>

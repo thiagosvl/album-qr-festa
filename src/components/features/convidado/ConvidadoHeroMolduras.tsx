@@ -1,5 +1,6 @@
 import { useRef } from "react";
 import { Camera, ChevronRight, ImagePlus, Images, Info } from "lucide-react";
+import { ConvidadoCtaOrcamento } from "@/components/features/convidado/ConvidadoCtaOrcamento";
 import {
   SeletorMolduras,
   VARIANTE_SELETOR,
@@ -157,6 +158,12 @@ export function ConvidadoHeroMolduras({
           <ChevronRight className="h-4 w-4 shrink-0" />
         </button>
       </div>
+
+      {evento.is_demo && (
+        <div className="mt-2.5 px-5">
+          <ConvidadoCtaOrcamento />
+        </div>
+      )}
 
       {avisos.length > 0 ? (
         <ul className="mt-auto space-y-1.5 px-5 pb-6 pt-4">
