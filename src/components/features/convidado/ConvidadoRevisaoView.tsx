@@ -12,7 +12,8 @@ import { toast } from "sonner";
 import {
   limitarDeslocamentoCanvas,
   renderizarFotoComMoldura,
-  renderizarPreviewComMoldura,
+  carregarMoldura,
+  desenharPreviewNoCanvas,
   type TransformacaoFoto,
 } from "@/hooks/business/useComposicaoCanvas";
 import { useBloquearScrollCorpo } from "@/hooks/ui/useBloquearScrollCorpo";
@@ -35,6 +36,9 @@ interface ConvidadoRevisaoViewProps {
   progressoUpload: number;
 }
 
+const PREVIA_LARGURA = 540;
+const PREVIA_ALTURA = 960;
+
 const BOTAO_ICONE =
   "grid h-10 w-10 place-items-center rounded-full bg-white/10 text-white transition hover:bg-white/20 active:scale-95 disabled:pointer-events-none disabled:opacity-50";
 
@@ -54,7 +58,8 @@ export function ConvidadoRevisaoView({
   enviando,
   progressoUpload,
 }: ConvidadoRevisaoViewProps) {
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [molduraImg, setMolduraImg] = useState<HTMLImageElement | null>(null);
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const palcoRef = useRef<HTMLDivElement | null>(null);
   const ponteirosRef = useRef<Map<number, { x: number; y: number }>>(new Map());
   const ultimoPontoRef = useRef<{ x: number; y: number } | null>(null);
@@ -63,35 +68,46 @@ export function ConvidadoRevisaoView({
   useBloquearScrollCorpo();
 
   useEffect(() => {
-    if (!fonteCapturada) return;
-    let ativo = true;
-    let urlGerada: string | null = null;
+    molduras.forEach((m) => {
+      carregarMoldura(m.arquivo_url).catch(() => undefined);
+    });
+  }, [molduras]);
 
-    renderizarPreviewComMoldura(
-      fonteCapturada,
-      molduraSelecionada?.arquivo_url ?? null,
-      { ...transformacao, espelharHorizontal: espelharCaptura }
-    )
-      .then((url) => {
-        if (!ativo) {
-          URL.revokeObjectURL(url);
-          return;
-        }
-        urlGerada = url;
-        setPreviewUrl(url);
+  useEffect(() => {
+    const url = molduraSelecionada?.arquivo_url ?? null;
+    if (!url) {
+      setMolduraImg(null);
+      return;
+    }
+    let ativo = true;
+    carregarMoldura(url)
+      .then((img) => {
+        if (ativo) setMolduraImg(img);
       })
       .catch(() => {
+        if (!ativo) return;
+        setMolduraImg(null);
         if (!avisouErroMolduraRef.current) {
           avisouErroMolduraRef.current = true;
           toast.error("Não foi possível carregar a moldura. Tente outra.");
         }
       });
-
     return () => {
       ativo = false;
-      if (urlGerada) URL.revokeObjectURL(urlGerada);
     };
-  }, [fonteCapturada, espelharCaptura, molduraSelecionada, transformacao]);
+  }, [molduraSelecionada]);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas || !fonteCapturada) return;
+    const quadro = requestAnimationFrame(() => {
+      desenharPreviewNoCanvas(canvas, fonteCapturada, molduraImg, {
+        ...transformacao,
+        espelharHorizontal: espelharCaptura,
+      });
+    });
+    return () => cancelAnimationFrame(quadro);
+  }, [fonteCapturada, espelharCaptura, molduraImg, transformacao]);
 
   if (!fonteCapturada) return null;
 
@@ -282,13 +298,13 @@ export function ConvidadoRevisaoView({
               pincaInicialRef.current = null;
             }}
           >
-            {previewUrl && (
-              <img
-                src={previewUrl}
-                alt="Prévia da foto com moldura"
-                className="pointer-events-none h-full w-full object-contain"
-              />
-            )}
+            <canvas
+              ref={canvasRef}
+              width={PREVIA_LARGURA}
+              height={PREVIA_ALTURA}
+              aria-label="Prévia da foto com moldura"
+              className="pointer-events-none h-full w-full"
+            />
             {!jaAjustou && (
               <p className="pointer-events-none absolute inset-x-0 bottom-3 mx-auto w-fit whitespace-nowrap rounded-full bg-black/55 px-3 py-1 text-[11px] font-semibold text-white/90">
                 Arraste para enquadrar · pinça = zoom

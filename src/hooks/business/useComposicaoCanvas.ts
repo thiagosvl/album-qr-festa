@@ -102,28 +102,39 @@ function desenharFoto(
   ctx.restore();
 }
 
-export async function renderizarPreviewComMoldura(
+const cacheMolduras = new Map<string, Promise<HTMLImageElement>>();
+
+/** Carrega a moldura uma única vez por URL (evita novo download a cada ajuste). */
+export function carregarMoldura(url: string): Promise<HTMLImageElement> {
+  const emCache = cacheMolduras.get(url);
+  if (emCache) return emCache;
+  const promessa = carregarImagemCors(url).catch((erro: unknown) => {
+    cacheMolduras.delete(url);
+    throw erro;
+  });
+  cacheMolduras.set(url, promessa);
+  return promessa;
+}
+
+/** Desenho síncrono da prévia direto no canvas visível, sem blob nem recarga. */
+export function desenharPreviewNoCanvas(
+  canvas: HTMLCanvasElement,
   fonteFoto: ImageBitmap | HTMLImageElement,
-  molduraUrl: string | null,
-  transformacao: TransformacaoFoto,
-  escala = 0.4
-): Promise<string> {
-  const canvas = document.createElement("canvas");
-  canvas.width = Math.round(FESTA_CANVAS_CONFIG.FULL_WIDTH * escala);
-  canvas.height = Math.round(FESTA_CANVAS_CONFIG.FULL_HEIGHT * escala);
+  moldura: HTMLImageElement | null,
+  transformacao: TransformacaoFoto
+): void {
   const ctx = canvas.getContext("2d");
-  if (!ctx) {
-    throw new Error("Contexto 2D indisponível neste dispositivo");
-  }
+  if (!ctx) return;
+  const escala = canvas.width / FESTA_CANVAS_CONFIG.FULL_WIDTH;
+  ctx.imageSmoothingQuality = "high";
   ctx.fillStyle = "#111111";
   ctx.fillRect(0, 0, canvas.width, canvas.height);
   ctx.save();
   ctx.scale(escala, escala);
   desenharFoto(ctx, fonteFoto, fonteFoto.width, fonteFoto.height, transformacao);
-  if (molduraUrl) {
-    const molduraImg = await carregarImagemCors(molduraUrl);
+  if (moldura) {
     ctx.drawImage(
-      molduraImg,
+      moldura,
       0,
       0,
       FESTA_CANVAS_CONFIG.FULL_WIDTH,
@@ -131,8 +142,6 @@ export async function renderizarPreviewComMoldura(
     );
   }
   ctx.restore();
-  const blob = await converterCanvasParaBlob(canvas, "image/jpeg", 0.8);
-  return URL.createObjectURL(blob);
 }
 
 export async function renderizarFotoComMoldura(
@@ -163,7 +172,7 @@ export async function renderizarFotoComMoldura(
   desenharFoto(ctxFull, fonteFoto, sourceWidth, sourceHeight, transformacao);
 
   if (molduraUrl) {
-    const molduraImg = await carregarImagemCors(molduraUrl);
+    const molduraImg = await carregarMoldura(molduraUrl);
     ctxFull.drawImage(molduraImg, 0, 0, targetW, targetH);
   }
 
