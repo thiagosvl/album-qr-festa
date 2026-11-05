@@ -4,7 +4,6 @@ import {
   RotateCcw,
   Send,
   Share2,
-  Slash,
   ZoomIn,
   ZoomOut,
 } from "lucide-react";
@@ -17,6 +16,7 @@ import {
   type TransformacaoFoto,
 } from "@/hooks/business/useComposicaoCanvas";
 import { useBloquearScrollCorpo } from "@/hooks/ui/useBloquearScrollCorpo";
+import { SeletorMolduras } from "@/components/features/convidado/SeletorMolduras";
 import type { MolduraDto } from "@/types/festa.types";
 
 interface ConvidadoRevisaoViewProps {
@@ -84,7 +84,8 @@ export function ConvidadoRevisaoView({
       .then((img) => {
         if (ativo) setMolduraImg(img);
       })
-      .catch(() => {
+      .catch((erro: unknown) => {
+        console.warn("[revisao] falha ao carregar moldura", url, erro);
         if (!ativo) return;
         setMolduraImg(null);
         if (!avisouErroMolduraRef.current) {
@@ -314,44 +315,11 @@ export function ConvidadoRevisaoView({
         </div>
 
         <div className="shrink-0 space-y-3 rounded-t-[28px] bg-white/[0.08] px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-4">
-          <div className="no-scrollbar flex items-center gap-2 overflow-x-auto">
-            <button
-              type="button"
-              onClick={() => onSelectMoldura(null)}
-              aria-pressed={molduraSelecionadaId === null}
-              className={`flex h-10 shrink-0 items-center gap-1.5 rounded-full px-4 text-[13px] font-semibold transition ${
-                molduraSelecionadaId === null
-                  ? "bg-white text-ameixa"
-                  : "bg-white/10 text-white/80"
-              }`}
-            >
-              <Slash className="h-3.5 w-3.5" />
-              Sem moldura
-            </button>
-            {molduras.map((moldura) => {
-              const ativa = molduraSelecionadaId === moldura.id;
-              return (
-                <button
-                  key={moldura.id}
-                  type="button"
-                  onClick={() => onSelectMoldura(moldura.id)}
-                  aria-pressed={ativa}
-                  className={`flex h-10 shrink-0 items-center gap-2 rounded-full py-1 pl-1.5 pr-3.5 text-[13px] font-semibold transition ${
-                    ativa ? "bg-white text-ameixa" : "bg-white/10 text-white/80"
-                  }`}
-                >
-                  <span className="xadrez grid h-7 w-5 place-items-center overflow-hidden rounded">
-                    <img
-                      src={moldura.arquivo_url}
-                      alt=""
-                      className="h-full w-full object-contain"
-                    />
-                  </span>
-                  {moldura.nome}
-                </button>
-              );
-            })}
-          </div>
+          <SeletorMolduras
+            molduras={molduras}
+            molduraSelecionadaId={molduraSelecionadaId}
+            onSelectMoldura={onSelectMoldura}
+          />
 
           <div className="flex items-center gap-2">
             <ZoomOut className="h-4 w-4 shrink-0 text-white/70" aria-hidden="true" />

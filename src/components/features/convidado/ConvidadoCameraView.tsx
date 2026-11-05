@@ -1,7 +1,8 @@
 import { useRef } from "react";
-import { Flashlight, ImagePlus, RefreshCw, Slash, X } from "lucide-react";
+import { Flashlight, ImagePlus, RefreshCw, X } from "lucide-react";
 import { Banner } from "@/components/ui/Banner";
 import { useBloquearScrollCorpo } from "@/hooks/ui/useBloquearScrollCorpo";
+import { SeletorMolduras } from "@/components/features/convidado/SeletorMolduras";
 import type { MolduraDto } from "@/types/festa.types";
 
 interface ConvidadoCameraViewProps {
@@ -105,45 +106,11 @@ export function ConvidadoCameraView({
       </div>
 
       <div className="shrink-0 space-y-3 px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-3">
-        <div className="no-scrollbar flex items-center gap-2 overflow-x-auto">
-          <button
-            type="button"
-            onClick={() => onSelectMoldura(null)}
-            aria-pressed={molduraSelecionadaId === null}
-            className={`flex h-10 shrink-0 items-center gap-1.5 rounded-full px-4 text-[13px] font-semibold transition ${
-              molduraSelecionadaId === null
-                ? "bg-white text-ameixa"
-                : "bg-white/10 text-white/80"
-            }`}
-          >
-            <Slash className="h-3.5 w-3.5" />
-            Sem moldura
-          </button>
-
-          {molduras.map((moldura) => {
-            const ativa = molduraSelecionadaId === moldura.id;
-            return (
-              <button
-                key={moldura.id}
-                type="button"
-                onClick={() => onSelectMoldura(moldura.id)}
-                aria-pressed={ativa}
-                className={`flex h-10 shrink-0 items-center gap-2 rounded-full py-1 pl-1.5 pr-4 text-[13px] font-semibold transition ${
-                  ativa ? "bg-white text-ameixa" : "bg-white/10 text-white/80"
-                }`}
-              >
-                <span className="xadrez grid h-7 w-5 place-items-center overflow-hidden rounded">
-                  <img
-                    src={moldura.arquivo_url}
-                    alt=""
-                    className="h-full w-full object-contain"
-                  />
-                </span>
-                {moldura.nome}
-              </button>
-            );
-          })}
-        </div>
+        <SeletorMolduras
+          molduras={molduras}
+          molduraSelecionadaId={molduraSelecionadaId}
+          onSelectMoldura={onSelectMoldura}
+        />
 
         <div className="grid grid-cols-3 items-center justify-items-center">
           <input
