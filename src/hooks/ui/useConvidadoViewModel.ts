@@ -29,6 +29,7 @@ import {
   montarRestricoesVideo,
   type ModoCamera,
 } from "@/lib/cameraConstraints";
+import { useHistoricoNavegacao } from "@/hooks/ui/useHistoricoNavegacao";
 import { gerarUuidLocal } from "@/lib/utils";
 import type { MidiaDto, MolduraDto } from "@/types/festa.types";
 
@@ -106,6 +107,7 @@ export function useConvidadoViewModel(slug: string) {
   });
   const [progressoUpload, setProgressoUpload] = useState<number>(0);
   const [enviandoFoto, setEnviandoFoto] = useState(false);
+  const origemRevisaoRef = useRef<ModoConvidado>(MODO_CONVIDADO.GALERIA);
 
   const [curtidasIds, setCurtidasIds] = useState<Set<string>>(() =>
     lerSetStorage(STORAGE_KEYS.CONVIDADO_CURTIDAS)
@@ -251,6 +253,7 @@ export function useConvidadoViewModel(slug: string) {
     ctx.drawImage(video, 0, 0);
     const bitmap = await createImageBitmap(canvasTemp);
     const deveEspelhar = espelharPreview;
+    origemRevisaoRef.current = MODO_CONVIDADO.CAMERA;
     setFonteCapturada(bitmap);
     setEspelharCaptura(deveEspelhar);
     setTransformacao({
@@ -265,6 +268,7 @@ export function useConvidadoViewModel(slug: string) {
   const selecionarArquivoGaleria = async (file: File) => {
     try {
       const imagem = await carregarArquivoComExifCorrigido(file);
+      origemRevisaoRef.current = MODO_CONVIDADO.GALERIA;
       setFonteCapturada(imagem);
       setEspelharCaptura(false);
       setTransformacao({
@@ -407,6 +411,25 @@ export function useConvidadoViewModel(slug: string) {
       );
     }
   };
+
+  const profundidadeNavegacao =
+    (tela === TELA_CONVIDADO.MURAL ? 1 : 0) +
+    (modo === MODO_CONVIDADO.GALERIA ? 0 : 1);
+
+  const voltarUmNivel = () => {
+    if (modo === MODO_CONVIDADO.REVISAO) {
+      if (enviandoFoto) return;
+      setModo(origemRevisaoRef.current);
+      return;
+    }
+    if (modo === MODO_CONVIDADO.CAMERA) {
+      setModo(MODO_CONVIDADO.GALERIA);
+      return;
+    }
+    if (tela === TELA_CONVIDADO.MURAL) setTela(TELA_CONVIDADO.INICIO);
+  };
+
+  useHistoricoNavegacao(profundidadeNavegacao, voltarUmNivel);
 
   const todasMidias: MidiaDto[] = midiasQuery.data ?? [];
   const minhasMidias = useMemo(
