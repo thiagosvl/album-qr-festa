@@ -25,8 +25,9 @@ import {
   uploadBlobComProgresso,
 } from "@/hooks/business/useComposicaoCanvas";
 import {
-  aplicarZoomMinimo,
-  montarRestricoesVideo,
+  ESPERA_LIBERAR_CAMERA_MS,
+  abrirStreamComFallback,
+  esperar,
   type ModoCamera,
 } from "@/lib/cameraConstraints";
 import { useHistoricoNavegacao } from "@/hooks/ui/useHistoricoNavegacao";
@@ -171,14 +172,13 @@ export function useConvidadoViewModel(slug: string) {
       setCameraErro(null);
       const idRequisicao = ++requisicaoCameraRef.current;
       try {
-        const stream = await navigator.mediaDevices.getUserMedia({
-          audio: false,
-          video: montarRestricoesVideo(modoCamera),
-        });
-        if (idRequisicao !== requisicaoCameraRef.current) {
-          stream.getTracks().forEach((track) => track.stop());
-          return;
-        }
+        await esperar(ESPERA_LIBERAR_CAMERA_MS);
+        if (idRequisicao !== requisicaoCameraRef.current) return;
+        const stream = await abrirStreamComFallback(
+          modoCamera,
+          () => idRequisicao !== requisicaoCameraRef.current
+        );
+        if (!stream) return;
         streamRef.current = stream;
         const configuracao = stream.getVideoTracks()[0]?.getSettings();
         setEspelharPreview(
@@ -199,7 +199,6 @@ export function useConvidadoViewModel(slug: string) {
           await videoRef.current.play().catch(() => undefined);
         }
         const track = stream.getVideoTracks()[0];
-        if (track) await aplicarZoomMinimo(track);
         if (track && "getCapabilities" in track) {
           const caps = track.getCapabilities() as MediaTrackCapabilities & {
             torch?: boolean;
