@@ -1,6 +1,5 @@
 import { useRef } from "react";
-import { Camera, Check, ImagePlus, Slash } from "lucide-react";
-import { formatarDataBr } from "@/lib/utils";
+import { Camera, Check, ChevronRight, ImagePlus, Info, Slash } from "lucide-react";
 import type { EventoPublicoDto, MolduraDto } from "@/types/festa.types";
 
 interface ConvidadoHeroMoldurasProps {
@@ -10,10 +9,14 @@ interface ConvidadoHeroMoldurasProps {
   onSelectMoldura: (id: string | null) => void;
   onAbrirCamera: () => void;
   onSelecionarArquivo: (file: File) => void;
+  onVerMural: () => void;
   podeEnviar: boolean;
+  totalFotos: number;
+  avisos: string[];
 }
 
-const INCLINACOES = ["-rotate-2", "rotate-1", "-rotate-1", "rotate-2"] as const;
+const CARTAO_MOLDURA =
+  "relative flex w-[92px] shrink-0 snap-start flex-col items-center gap-1.5 rounded-2xl border-2 bg-white p-1.5 transition";
 
 export function ConvidadoHeroMolduras({
   evento,
@@ -22,7 +25,10 @@ export function ConvidadoHeroMolduras({
   onSelectMoldura,
   onAbrirCamera,
   onSelecionarArquivo,
+  onVerMural,
   podeEnviar,
+  totalFotos,
+  avisos,
 }: ConvidadoHeroMoldurasProps) {
   const inputGaleriaRef = useRef<HTMLInputElement | null>(null);
 
@@ -30,13 +36,16 @@ export function ConvidadoHeroMolduras({
     evento.subtitulo ||
     (evento.idade_aniversariante
       ? `${evento.nome_aniversariante ?? evento.titulo} faz ${evento.idade_aniversariante}`
-      : "Álbum oficial da festa");
+      : null);
+
+  const rotuloMural =
+    totalFotos > 0 ? `Ver as fotos da festa (${totalFotos})` : "Ver as fotos da festa";
 
   return (
-    <section className="relative overflow-hidden rounded-card bg-white shadow-palco">
-      <div className="relative flex min-h-[250px] items-end overflow-hidden sm:min-h-[300px]">
+    <div className="mx-auto flex min-h-dvh w-full max-w-md flex-col bg-papel sm:shadow-palco">
+      <section className="relative">
         <div
-          className="absolute inset-0 bg-cover bg-center"
+          className="h-[36dvh] min-h-[220px] max-h-[360px] bg-cover bg-center"
           style={
             evento.capa_url
               ? { backgroundImage: `url(${evento.capa_url})` }
@@ -49,163 +58,163 @@ export function ConvidadoHeroMolduras({
           className="absolute inset-0"
           style={{
             background:
-              "linear-gradient(to top, rgba(28,15,46,0.82) 6%, rgba(28,15,46,0.15) 70%)",
+              "linear-gradient(to top, #fdfbff 2%, rgba(253,251,255,0) 55%)",
           }}
+          aria-hidden="true"
         />
+        {evento.is_demo && (
+          <span className="absolute left-4 top-4 rounded-full bg-gema px-3 py-1 text-xs font-bold text-ameixa shadow-suave">
+            Demonstração
+          </span>
+        )}
+      </section>
 
-        <div className="relative z-10 flex w-full flex-col gap-4 p-6 text-white sm:flex-row sm:items-end sm:justify-between sm:p-8">
-          <div className="max-w-xl">
-            <p className="text-sm font-semibold text-white/85">{selo}</p>
-            <h2 className="mt-1 font-display text-[34px] font-extrabold leading-[1.02] tracking-tight sm:text-5xl">
-              {evento.titulo}
-            </h2>
-            <p className="mt-3 max-w-md text-sm leading-snug text-white/90">
-              {evento.boas_vindas ||
-                "Escolha uma moldura, tire a foto e veja ela aparecer no mural da festa."}
-            </p>
-          </div>
-
-          {evento.data_evento && (
-            <span className="shrink-0 -rotate-3 self-start rounded-xl bg-gema px-3.5 py-2 font-display text-base font-extrabold text-ameixa shadow-suave sm:self-end">
-              {formatarDataBr(evento.data_evento)}
-            </span>
-          )}
-        </div>
+      <div className="relative -mt-10 px-5">
+        {selo && (
+          <p
+            className="text-xs font-bold uppercase tracking-wider"
+            style={{ color: evento.cor_primaria }}
+          >
+            {selo}
+          </p>
+        )}
+        <h1 className="mt-1 font-display text-[32px] font-extrabold leading-[1.02] tracking-tight text-ameixa">
+          {evento.titulo}
+        </h1>
+        <p className="mt-2 text-sm leading-snug text-ameixa-suave">
+          {evento.boas_vindas ||
+            "Escolha uma moldura, tire a foto e veja ela aparecer no mural da festa."}
+        </p>
       </div>
 
       {podeEnviar && (
-        <>
-          <div className="relative text-ameixa/25" aria-hidden="true">
-            <span className="absolute -left-3.5 -top-3.5 h-7 w-7 rounded-full bg-background" />
-            <span className="absolute -right-3.5 -top-3.5 h-7 w-7 rounded-full bg-background" />
-            <div className="picotado mx-5" />
-          </div>
+        <section className="mt-5 min-w-0">
+          <h2 className="px-5 font-display text-base font-extrabold tracking-tight text-ameixa">
+            Escolha sua moldura
+          </h2>
 
-          <div className="space-y-5 p-5 sm:p-7">
-            <div>
-              <div className="flex flex-wrap items-baseline justify-between gap-x-4">
-                <h3 className="font-display text-xl font-extrabold tracking-tight">
-                  Escolha a moldura
-                </h3>
-                <p className="text-xs text-ameixa-suave">
-                  Dá para trocar depois de tirar a foto.
-                </p>
+          <div className="no-scrollbar mt-2 flex snap-x gap-2.5 overflow-x-auto px-5 pb-2 pt-3">
+            <button
+              type="button"
+              onClick={() => onSelectMoldura(null)}
+              aria-pressed={molduraSelecionadaId === null}
+              style={
+                molduraSelecionadaId === null
+                  ? { borderColor: evento.cor_primaria }
+                  : undefined
+              }
+              className={`${CARTAO_MOLDURA} ${
+                molduraSelecionadaId === null ? "" : "border-ameixa/10"
+              }`}
+            >
+              {molduraSelecionadaId === null && <Marca cor={evento.cor_primaria} />}
+              <div className="flex aspect-[9/13] w-full items-center justify-center rounded-xl bg-ameixa/[0.05] text-ameixa-suave">
+                <Slash className="h-6 w-6" />
               </div>
+              <span className="w-full truncate text-center text-[11px] font-bold text-ameixa">
+                Sem moldura
+              </span>
+            </button>
 
-              <div className="no-scrollbar -mx-5 mt-3 flex items-stretch gap-3 overflow-x-auto px-5 pb-3 pt-3 sm:-mx-7 sm:px-7">
+            {molduras.map((moldura) => {
+              const selecionada = molduraSelecionadaId === moldura.id;
+              return (
                 <button
+                  key={moldura.id}
                   type="button"
-                  onClick={() => onSelectMoldura(null)}
-                  aria-pressed={molduraSelecionadaId === null}
-                  style={
-                    molduraSelecionadaId === null
-                      ? { borderColor: evento.cor_primaria }
-                      : undefined
-                  }
-                  className={`relative flex w-24 shrink-0 flex-col items-center gap-2 rounded-2xl border-2 bg-white p-2 transition sm:w-28 ${
-                    molduraSelecionadaId === null
-                      ? "-translate-y-1 shadow-suave"
-                      : "border-ameixa/10 hover:border-ameixa/25"
-                  }`}
+                  onClick={() => onSelectMoldura(moldura.id)}
+                  aria-pressed={selecionada}
+                  style={selecionada ? { borderColor: evento.cor_primaria } : undefined}
+                  className={`${CARTAO_MOLDURA} ${selecionada ? "" : "border-ameixa/10"}`}
                 >
-                  {molduraSelecionadaId === null && (
-                    <Marca cor={evento.cor_primaria} />
-                  )}
-                  <div className="flex aspect-[9/13] w-full flex-col items-center justify-center gap-1 rounded-xl bg-ameixa/[0.05] text-ameixa-suave">
-                    <Slash className="h-6 w-6" />
-                    <span className="text-[11px] font-semibold">Foto limpa</span>
+                  {selecionada && <Marca cor={evento.cor_primaria} />}
+                  <div className="xadrez flex aspect-[9/13] w-full items-center justify-center overflow-hidden rounded-xl">
+                    <img
+                      src={moldura.arquivo_url}
+                      alt={moldura.nome}
+                      className="h-full w-full object-contain"
+                    />
                   </div>
-                  <span className="w-full truncate text-center text-xs font-bold">
-                    Sem moldura
+                  <span className="w-full truncate text-center text-[11px] font-bold text-ameixa">
+                    {moldura.nome}
                   </span>
                 </button>
-
-                {molduras.map((moldura, indice) => {
-                  const selecionada = molduraSelecionadaId === moldura.id;
-                  return (
-                    <button
-                      key={moldura.id}
-                      type="button"
-                      onClick={() => onSelectMoldura(moldura.id)}
-                      aria-pressed={selecionada}
-                      style={
-                        selecionada
-                          ? { borderColor: evento.cor_primaria }
-                          : undefined
-                      }
-                      className={`relative flex w-24 shrink-0 flex-col items-center gap-2 rounded-2xl border-2 bg-white p-2 transition sm:w-28 ${
-                        selecionada
-                          ? `-translate-y-1 shadow-suave ${INCLINACOES[indice % INCLINACOES.length]}`
-                          : "border-ameixa/10 hover:border-ameixa/25"
-                      }`}
-                    >
-                      {selecionada && <Marca cor={evento.cor_primaria} />}
-                      <div className="xadrez flex aspect-[9/13] w-full items-center justify-center overflow-hidden rounded-xl">
-                        <img
-                          src={moldura.arquivo_url}
-                          alt={moldura.nome}
-                          className="h-full w-full object-contain"
-                        />
-                      </div>
-                      <span className="w-full truncate text-center text-xs font-bold">
-                        {moldura.nome}
-                      </span>
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-
-            <input
-              ref={inputGaleriaRef}
-              type="file"
-              accept="image/*"
-              className="hidden"
-              onChange={(e) => {
-                const file = e.target.files?.[0];
-                e.target.value = "";
-                if (file) onSelecionarArquivo(file);
-              }}
-            />
-
-            <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
-              <button
-                type="button"
-                onClick={onAbrirCamera}
-                style={{ backgroundColor: evento.cor_primaria }}
-                className="flex h-14 items-center justify-center gap-2.5 rounded-full font-display text-lg font-extrabold text-white shadow-suave transition active:scale-[0.98]"
-              >
-                <Camera className="h-5 w-5" />
-                Tirar foto agora
-              </button>
-
-              <button
-                type="button"
-                onClick={() => inputGaleriaRef.current?.click()}
-                style={{
-                  borderColor: evento.cor_secundaria,
-                  color: evento.cor_secundaria,
-                }}
-                className="flex h-14 items-center justify-center gap-2.5 rounded-full border-2 bg-white font-display text-lg font-extrabold transition active:scale-[0.98]"
-              >
-                <ImagePlus className="h-5 w-5" />
-                Escolher do celular
-              </button>
-            </div>
+              );
+            })}
           </div>
-        </>
+
+          <input
+            ref={inputGaleriaRef}
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              e.target.value = "";
+              if (file) onSelecionarArquivo(file);
+            }}
+          />
+
+          <div className="mt-3 space-y-2.5 px-5">
+            <button
+              type="button"
+              onClick={onAbrirCamera}
+              style={{ backgroundColor: evento.cor_primaria }}
+              className="flex h-14 w-full items-center justify-center gap-2.5 rounded-full font-display text-lg font-extrabold text-white shadow-suave transition active:scale-[0.98]"
+            >
+              <Camera className="h-5 w-5" />
+              Tirar foto
+            </button>
+            <button
+              type="button"
+              onClick={() => inputGaleriaRef.current?.click()}
+              style={{ borderColor: evento.cor_secundaria, color: evento.cor_secundaria }}
+              className="flex h-12 w-full items-center justify-center gap-2.5 rounded-full border-2 bg-white font-display text-base font-extrabold transition active:scale-[0.98]"
+            >
+              <ImagePlus className="h-5 w-5" />
+              Escolher do celular
+            </button>
+          </div>
+        </section>
       )}
-    </section>
+
+      <div className="mt-2 px-5">
+        <button
+          type="button"
+          onClick={onVerMural}
+          className="flex h-12 w-full items-center justify-center gap-1 rounded-full text-sm font-bold text-ameixa transition hover:bg-ameixa/5"
+        >
+          {rotuloMural}
+          <ChevronRight className="h-4 w-4" />
+        </button>
+      </div>
+
+      {avisos.length > 0 ? (
+        <ul className="mt-auto space-y-1.5 px-5 pb-6 pt-4">
+          {avisos.map((aviso) => (
+            <li
+              key={aviso}
+              className="flex items-start gap-2 text-xs leading-snug text-ameixa-suave"
+            >
+              <Info className="mt-px h-3.5 w-3.5 shrink-0" />
+              {aviso}
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <div className="pb-6" />
+      )}
+    </div>
   );
 }
 
 function Marca({ cor }: { cor: string }) {
   return (
     <span
-      className="absolute -right-2 -top-2 z-10 flex h-6 w-6 items-center justify-center rounded-full text-white shadow-sm"
+      className="absolute -right-1.5 -top-1.5 z-10 flex h-5 w-5 items-center justify-center rounded-full text-white shadow-sm"
       style={{ backgroundColor: cor }}
     >
-      <Check className="h-3.5 w-3.5" />
+      <Check className="h-3 w-3" />
     </span>
   );
 }

@@ -15,6 +15,7 @@ import {
   renderizarPreviewComMoldura,
   type TransformacaoFoto,
 } from "@/hooks/business/useComposicaoCanvas";
+import { useBloquearScrollCorpo } from "@/hooks/ui/useBloquearScrollCorpo";
 import type { MolduraDto } from "@/types/festa.types";
 
 interface ConvidadoRevisaoViewProps {
@@ -34,8 +35,8 @@ interface ConvidadoRevisaoViewProps {
   progressoUpload: number;
 }
 
-const BOTAO_SUAVE =
-  "flex h-11 items-center justify-center gap-2 rounded-full bg-white/10 px-4 text-sm font-semibold text-white transition hover:bg-white/20 active:scale-[0.97] disabled:pointer-events-none disabled:opacity-50";
+const BOTAO_ICONE =
+  "grid h-10 w-10 place-items-center rounded-full bg-white/10 text-white transition hover:bg-white/20 active:scale-95 disabled:pointer-events-none disabled:opacity-50";
 
 export function ConvidadoRevisaoView({
   fonteCapturada,
@@ -59,6 +60,7 @@ export function ConvidadoRevisaoView({
   const ultimoPontoRef = useRef<{ x: number; y: number } | null>(null);
   const pincaInicialRef = useRef<{ dist: number; scale: number } | null>(null);
   const avisouErroMolduraRef = useRef(false);
+  useBloquearScrollCorpo();
 
   useEffect(() => {
     if (!fonteCapturada) return;
@@ -92,6 +94,11 @@ export function ConvidadoRevisaoView({
   }, [fonteCapturada, espelharCaptura, molduraSelecionada, transformacao]);
 
   if (!fonteCapturada) return null;
+
+  const jaAjustou =
+    transformacao.scale !== 1 ||
+    transformacao.offsetX !== 0 ||
+    transformacao.offsetY !== 0;
 
   const aplicarNovoScale = (valorScale: number) => {
     const novoScale = Math.max(1, Math.min(3, valorScale));
@@ -168,12 +175,49 @@ export function ConvidadoRevisaoView({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex flex-col overflow-y-auto bg-ameixa text-white">
-      <div className="mx-auto flex w-full max-w-4xl flex-1 flex-col items-center justify-center gap-6 p-4 lg:flex-row">
-        <div className="shrink-0">
+    <div className="fixed inset-0 z-50 flex flex-col overflow-hidden bg-ameixa text-white">
+      <div className="mx-auto flex h-full w-full max-w-md flex-col">
+        <div className="flex h-14 shrink-0 items-center justify-between px-3">
+          <button
+            type="button"
+            disabled={enviando}
+            onClick={onRefazer}
+            className="flex h-10 items-center gap-1.5 rounded-full bg-white/10 pl-2.5 pr-3 text-sm font-semibold transition hover:bg-white/20 active:scale-95 disabled:opacity-50"
+          >
+            <RotateCcw className="h-4 w-4" />
+            Refazer
+          </button>
+
+          <span className="whitespace-nowrap font-display text-base font-extrabold tracking-tight">
+            Ajuste a foto
+          </span>
+
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              disabled={enviando}
+              onClick={() => handleSalvarNoCelular()}
+              aria-label="Salvar no celular"
+              className={BOTAO_ICONE}
+            >
+              <Download className="h-[18px] w-[18px]" />
+            </button>
+            <button
+              type="button"
+              disabled={enviando}
+              onClick={handleCompartilhar}
+              aria-label="Compartilhar"
+              className={BOTAO_ICONE}
+            >
+              <Share2 className="h-[18px] w-[18px]" />
+            </button>
+          </div>
+        </div>
+
+        <div className="flex min-h-0 flex-1 items-center justify-center px-4 py-1">
           <div
             ref={palcoRef}
-            className="relative aspect-[9/16] h-[52vh] cursor-grab touch-none select-none overflow-hidden rounded-[28px] bg-black shadow-palco ring-4 ring-white active:cursor-grabbing sm:h-[62vh]"
+            className="relative aspect-[9/16] h-full max-h-full w-auto max-w-full cursor-grab touch-none select-none overflow-hidden rounded-[28px] bg-black shadow-palco ring-2 ring-white/70 active:cursor-grabbing"
             onPointerDown={(e) => {
               e.currentTarget.setPointerCapture(e.pointerId);
               ponteirosRef.current.set(e.pointerId, {
@@ -208,7 +252,7 @@ export function ConvidadoRevisaoView({
                   fonteCapturada.width,
                   fonteCapturada.height,
                   transformacao.scale,
-                  transformacao.offsetX + (espelharCaptura ? -dx : dx),
+                  transformacao.offsetX + dx,
                   transformacao.offsetY + dy
                 );
                 onChangeTransformacao({
@@ -245,163 +289,97 @@ export function ConvidadoRevisaoView({
                 className="pointer-events-none h-full w-full object-contain"
               />
             )}
+            {!jaAjustou && (
+              <p className="pointer-events-none absolute inset-x-0 bottom-3 mx-auto w-fit whitespace-nowrap rounded-full bg-black/55 px-3 py-1 text-[11px] font-semibold text-white/90">
+                Arraste para enquadrar · pinça = zoom
+              </p>
+            )}
           </div>
-          <p className="mt-3 text-center text-xs text-white/65">
-            Arraste para enquadrar. Use dois dedos para dar zoom.
-          </p>
         </div>
 
-        <div className="w-full max-w-md space-y-5 rounded-card bg-white/[0.07] p-5">
-          <div>
-            <p className="font-display text-lg font-extrabold tracking-tight">
-              Ajuste e publique
-            </p>
-            <div className="no-scrollbar mt-3 flex items-center gap-2 overflow-x-auto">
-              <button
-                type="button"
-                onClick={() => onSelectMoldura(null)}
-                aria-pressed={molduraSelecionadaId === null}
-                className={`flex h-10 shrink-0 items-center gap-1.5 rounded-full px-4 text-[13px] font-semibold transition ${
-                  molduraSelecionadaId === null
-                    ? "bg-white text-ameixa"
-                    : "bg-white/10 text-white/80"
-                }`}
-              >
-                <Slash className="h-3.5 w-3.5" />
-                Sem moldura
-              </button>
-              {molduras.map((moldura) => {
-                const ativa = molduraSelecionadaId === moldura.id;
-                return (
-                  <button
-                    key={moldura.id}
-                    type="button"
-                    onClick={() => onSelectMoldura(moldura.id)}
-                    aria-pressed={ativa}
-                    className={`flex h-10 shrink-0 items-center gap-2 rounded-full py-1 pl-1.5 pr-3.5 text-[13px] font-semibold transition ${
-                      ativa ? "bg-white text-ameixa" : "bg-white/10 text-white/80"
-                    }`}
-                  >
-                    <span className="xadrez grid h-7 w-5 place-items-center overflow-hidden rounded">
-                      <img
-                        src={moldura.arquivo_url}
-                        alt=""
-                        className="h-full w-full object-contain"
-                      />
-                    </span>
-                    {moldura.nome}
-                  </button>
-                );
-              })}
-            </div>
+        <div className="shrink-0 space-y-3 rounded-t-[28px] bg-white/[0.08] px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-4">
+          <div className="no-scrollbar flex items-center gap-2 overflow-x-auto">
+            <button
+              type="button"
+              onClick={() => onSelectMoldura(null)}
+              aria-pressed={molduraSelecionadaId === null}
+              className={`flex h-10 shrink-0 items-center gap-1.5 rounded-full px-4 text-[13px] font-semibold transition ${
+                molduraSelecionadaId === null
+                  ? "bg-white text-ameixa"
+                  : "bg-white/10 text-white/80"
+              }`}
+            >
+              <Slash className="h-3.5 w-3.5" />
+              Sem moldura
+            </button>
+            {molduras.map((moldura) => {
+              const ativa = molduraSelecionadaId === moldura.id;
+              return (
+                <button
+                  key={moldura.id}
+                  type="button"
+                  onClick={() => onSelectMoldura(moldura.id)}
+                  aria-pressed={ativa}
+                  className={`flex h-10 shrink-0 items-center gap-2 rounded-full py-1 pl-1.5 pr-3.5 text-[13px] font-semibold transition ${
+                    ativa ? "bg-white text-ameixa" : "bg-white/10 text-white/80"
+                  }`}
+                >
+                  <span className="xadrez grid h-7 w-5 place-items-center overflow-hidden rounded">
+                    <img
+                      src={moldura.arquivo_url}
+                      alt=""
+                      className="h-full w-full object-contain"
+                    />
+                  </span>
+                  {moldura.nome}
+                </button>
+              );
+            })}
           </div>
 
-          <div>
-            <div className="flex items-center justify-between text-sm font-semibold text-white/80">
-              <span>Zoom</span>
-              <span className="tabular-nums">
-                {Math.round(transformacao.scale * 100)}%
-              </span>
-            </div>
-            <div className="mt-2 flex items-center gap-2">
-              <button
-                type="button"
-                aria-label="Diminuir zoom"
-                onClick={() => aplicarNovoScale(transformacao.scale - 0.2)}
-                className="grid h-9 w-9 place-items-center rounded-full bg-white/10 transition hover:bg-white/20"
-              >
-                <ZoomOut className="h-4 w-4" />
-              </button>
-              <input
-                type="range"
-                min="1"
-                max="3"
-                step="0.02"
-                value={transformacao.scale}
-                onChange={(e) => aplicarNovoScale(Number(e.target.value))}
-                aria-label="Zoom da foto"
-                className="flex-1 cursor-pointer accent-rosa-vivo"
-              />
-              <button
-                type="button"
-                aria-label="Aumentar zoom"
-                onClick={() => aplicarNovoScale(transformacao.scale + 0.2)}
-                className="grid h-9 w-9 place-items-center rounded-full bg-white/10 transition hover:bg-white/20"
-              >
-                <ZoomIn className="h-4 w-4" />
-              </button>
-            </div>
-          </div>
-
-          <label className="block">
-            <span className="text-sm font-semibold text-white/80">
-              Seu nome (opcional)
-            </span>
+          <div className="flex items-center gap-2">
+            <ZoomOut className="h-4 w-4 shrink-0 text-white/70" aria-hidden="true" />
             <input
-              placeholder="Ex.: Tia Ana, Família Silva"
-              value={nomeConvidado}
-              onChange={(e) => onChangeNomeConvidado(e.target.value)}
-              maxLength={40}
-              className="mt-2 h-11 w-full rounded-full border border-white/15 bg-ameixa px-4 text-sm text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-rosa-vivo"
+              type="range"
+              min="1"
+              max="3"
+              step="0.02"
+              value={transformacao.scale}
+              onChange={(e) => aplicarNovoScale(Number(e.target.value))}
+              aria-label="Zoom da foto"
+              className="h-6 flex-1 cursor-pointer accent-rosa-vivo"
             />
-          </label>
-
-          <div className="grid grid-cols-2 gap-2">
-            <button
-              type="button"
-              disabled={enviando}
-              onClick={() => handleSalvarNoCelular()}
-              className={BOTAO_SUAVE}
-            >
-              <Download className="h-4 w-4" />
-              Salvar
-            </button>
-            <button
-              type="button"
-              disabled={enviando}
-              onClick={handleCompartilhar}
-              className={BOTAO_SUAVE}
-            >
-              <Share2 className="h-4 w-4" />
-              Compartilhar
-            </button>
+            <ZoomIn className="h-4 w-4 shrink-0 text-white/70" aria-hidden="true" />
           </div>
 
-          {enviando && (
-            <div>
-              <div className="h-2 w-full overflow-hidden rounded-full bg-white/10">
-                <div
-                  className="h-full rounded-full bg-rosa-vivo transition-all duration-200"
-                  style={{ width: `${progressoUpload}%` }}
-                />
-              </div>
-              <p className="mt-1.5 text-center text-xs text-white/70">
-                Publicando no mural, {progressoUpload}%
-              </p>
-            </div>
-          )}
+          <input
+            placeholder="Seu nome (opcional)"
+            aria-label="Seu nome (opcional)"
+            value={nomeConvidado}
+            onChange={(e) => onChangeNomeConvidado(e.target.value)}
+            maxLength={40}
+            className="h-11 w-full rounded-full border border-white/15 bg-ameixa px-4 text-sm text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-rosa-vivo"
+          />
 
-          <div className="flex items-center gap-2.5">
-            <button
-              type="button"
-              disabled={enviando}
-              onClick={onRefazer}
-              className={`${BOTAO_SUAVE} flex-1`}
-            >
-              <RotateCcw className="h-4 w-4" />
-              Outra foto
-            </button>
-            <button
-              type="button"
-              disabled={enviando}
-              onClick={onConfirmarEnvio}
-              style={{ backgroundColor: "var(--cor1, #e6007e)" }}
-              className="flex h-11 flex-[1.4] items-center justify-center gap-2 rounded-full font-display text-base font-extrabold text-white transition active:scale-[0.97] disabled:pointer-events-none disabled:opacity-60"
-            >
+          <button
+            type="button"
+            disabled={enviando}
+            onClick={onConfirmarEnvio}
+            style={{ backgroundColor: "var(--cor1, #e6007e)" }}
+            className="relative flex h-12 w-full items-center justify-center gap-2 overflow-hidden rounded-full font-display text-base font-extrabold text-white transition active:scale-[0.98] disabled:pointer-events-none"
+          >
+            {enviando && (
+              <span
+                className="absolute inset-y-0 left-0 bg-black/25 transition-all duration-200"
+                style={{ width: `${progressoUpload}%` }}
+                aria-hidden="true"
+              />
+            )}
+            <span className="relative flex items-center gap-2">
               <Send className="h-4 w-4" />
-              {enviando ? "Enviando..." : "Publicar no mural"}
-            </button>
-          </div>
+              {enviando ? `Publicando... ${progressoUpload}%` : "Publicar no mural"}
+            </span>
+          </button>
         </div>
       </div>
     </div>

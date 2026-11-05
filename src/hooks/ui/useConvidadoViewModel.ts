@@ -27,7 +27,18 @@ import {
 import { gerarUuidLocal } from "@/lib/utils";
 import type { MidiaDto, MolduraDto } from "@/types/festa.types";
 
-export type ModoConvidado = "GALERIA" | "CAMERA" | "REVISAO";
+export const MODO_CONVIDADO = {
+  GALERIA: "GALERIA",
+  CAMERA: "CAMERA",
+  REVISAO: "REVISAO",
+} as const;
+export type ModoConvidado = (typeof MODO_CONVIDADO)[keyof typeof MODO_CONVIDADO];
+
+export const TELA_CONVIDADO = {
+  INICIO: "INICIO",
+  MURAL: "MURAL",
+} as const;
+export type TelaConvidado = (typeof TELA_CONVIDADO)[keyof typeof TELA_CONVIDADO];
 export type AbaGaleriaConvidado = "MURAL" | "MINHAS";
 
 function lerOuCriarSessaoId(): string {
@@ -59,7 +70,8 @@ export function useConvidadoViewModel(slug: string) {
   const [nomeConvidado, setNomeConvidado] = useState<string>(
     () => localStorage.getItem(STORAGE_KEYS.CONVIDADO_NOME_AUTOR) ?? ""
   );
-  const [modo, setModo] = useState<ModoConvidado>("GALERIA");
+  const [modo, setModo] = useState<ModoConvidado>(MODO_CONVIDADO.GALERIA);
+  const [tela, setTela] = useState<TelaConvidado>(TELA_CONVIDADO.INICIO);
   const [abaGaleria, setAbaGaleria] = useState<AbaGaleriaConvidado>("MURAL");
   const [molduraSelecionadaId, setMolduraSelecionadaId] = useState<
     string | null
@@ -201,7 +213,7 @@ export function useConvidadoViewModel(slug: string) {
   );
 
   useEffect(() => {
-    if (modo === "CAMERA") {
+    if (modo === MODO_CONVIDADO.CAMERA) {
       iniciarCamera(facingMode);
     } else {
       pararCamera();
@@ -246,7 +258,7 @@ export function useConvidadoViewModel(slug: string) {
       offsetY: 0,
       espelharHorizontal: deveEspelhar,
     });
-    setModo("REVISAO");
+    setModo(MODO_CONVIDADO.REVISAO);
   };
 
   const selecionarArquivoGaleria = async (file: File) => {
@@ -260,7 +272,7 @@ export function useConvidadoViewModel(slug: string) {
         offsetY: 0,
         espelharHorizontal: false,
       });
-      setModo("REVISAO");
+      setModo(MODO_CONVIDADO.REVISAO);
     } catch {
       toast.error("Não foi possível abrir esta foto.");
     }
@@ -340,7 +352,8 @@ export function useConvidadoViewModel(slug: string) {
 
       URL.revokeObjectURL(composicao.previewUrl);
       setProgressoUpload(100);
-      setModo("GALERIA");
+      setModo(MODO_CONVIDADO.GALERIA);
+      setTela(TELA_CONVIDADO.MURAL);
       toast.success("Sua lembrança foi publicada no mural da festa!");
     } catch (error) {
       toast.error(
@@ -420,6 +433,8 @@ export function useConvidadoViewModel(slug: string) {
     setMolduraSelecionadaId,
     modo,
     setModo,
+    tela,
+    setTela,
     abaGaleria,
     setAbaGaleria,
     nomeConvidado,

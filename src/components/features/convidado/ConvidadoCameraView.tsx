@@ -1,6 +1,7 @@
 import { useRef } from "react";
 import { Flashlight, ImagePlus, RefreshCw, Slash, X } from "lucide-react";
 import { Banner } from "@/components/ui/Banner";
+import { useBloquearScrollCorpo } from "@/hooks/ui/useBloquearScrollCorpo";
 import type { MolduraDto } from "@/types/festa.types";
 
 interface ConvidadoCameraViewProps {
@@ -22,7 +23,7 @@ interface ConvidadoCameraViewProps {
 }
 
 const BOTAO_ICONE =
-  "grid h-11 w-11 place-items-center rounded-full bg-white/10 text-white transition hover:bg-white/20 active:scale-95";
+  "grid h-12 w-12 place-items-center rounded-full bg-white/10 text-white transition hover:bg-white/20 active:scale-95";
 
 export function ConvidadoCameraView({
   videoRef,
@@ -42,10 +43,11 @@ export function ConvidadoCameraView({
   onFechar,
 }: ConvidadoCameraViewProps) {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+  useBloquearScrollCorpo();
 
   return (
-    <div className="fixed inset-0 z-50 flex flex-col bg-ameixa text-white">
-      <div className="z-20 flex items-center justify-between px-4 py-3">
+    <div className="fixed inset-0 z-50 flex flex-col overflow-hidden bg-ameixa text-white">
+      <div className="z-20 flex h-14 shrink-0 items-center justify-between px-4">
         <button
           type="button"
           onClick={onFechar}
@@ -55,36 +57,22 @@ export function ConvidadoCameraView({
           <X className="h-5 w-5" />
         </button>
 
-        <span className="font-display text-base font-extrabold tracking-tight">
-          Tire sua foto
-        </span>
-
-        <div className="flex items-center gap-2">
-          {suportaTorch && (
-            <button
-              type="button"
-              onClick={onAlternarTorch}
-              aria-label="Lanterna"
-              aria-pressed={torchAtivo}
-              className={`${BOTAO_ICONE} ${torchAtivo ? "bg-gema text-ameixa hover:bg-gema" : ""}`}
-            >
-              <Flashlight className="h-5 w-5" />
-            </button>
-          )}
-          {podeAlternarCamera && (
-            <button
-              type="button"
-              onClick={onAlternarCamera}
-              aria-label="Trocar entre câmera frontal e traseira"
-              className={BOTAO_ICONE}
-            >
-              <RefreshCw className="h-5 w-5" />
-            </button>
-          )}
-        </div>
+        {suportaTorch ? (
+          <button
+            type="button"
+            onClick={onAlternarTorch}
+            aria-label="Lanterna"
+            aria-pressed={torchAtivo}
+            className={`${BOTAO_ICONE} ${torchAtivo ? "bg-gema text-ameixa hover:bg-gema" : ""}`}
+          >
+            <Flashlight className="h-5 w-5" />
+          </button>
+        ) : (
+          <span className="h-12 w-12" aria-hidden="true" />
+        )}
       </div>
 
-      <div className="relative flex flex-1 items-center justify-center overflow-hidden px-3">
+      <div className="relative flex min-h-0 flex-1 items-center justify-center px-3">
         <div className="relative flex aspect-[9/16] h-full max-h-full w-auto max-w-full items-center justify-center overflow-hidden rounded-[28px] bg-black ring-2 ring-white/20">
           {!cameraErro ? (
             <video
@@ -116,19 +104,19 @@ export function ConvidadoCameraView({
         </div>
       </div>
 
-      <div className="space-y-4 px-4 pb-5 pt-3">
+      <div className="shrink-0 space-y-3 px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-3">
         <div className="no-scrollbar flex items-center gap-2 overflow-x-auto">
           <button
             type="button"
             onClick={() => onSelectMoldura(null)}
             aria-pressed={molduraSelecionadaId === null}
-            className={`flex h-11 shrink-0 items-center gap-1.5 rounded-full px-4 text-sm font-semibold transition ${
+            className={`flex h-10 shrink-0 items-center gap-1.5 rounded-full px-4 text-[13px] font-semibold transition ${
               molduraSelecionadaId === null
                 ? "bg-white text-ameixa"
                 : "bg-white/10 text-white/80"
             }`}
           >
-            <Slash className="h-4 w-4" />
+            <Slash className="h-3.5 w-3.5" />
             Sem moldura
           </button>
 
@@ -140,11 +128,11 @@ export function ConvidadoCameraView({
                 type="button"
                 onClick={() => onSelectMoldura(moldura.id)}
                 aria-pressed={ativa}
-                className={`flex h-11 shrink-0 items-center gap-2 rounded-full py-1 pl-1.5 pr-4 text-sm font-semibold transition ${
+                className={`flex h-10 shrink-0 items-center gap-2 rounded-full py-1 pl-1.5 pr-4 text-[13px] font-semibold transition ${
                   ativa ? "bg-white text-ameixa" : "bg-white/10 text-white/80"
                 }`}
               >
-                <span className="xadrez grid h-8 w-6 place-items-center overflow-hidden rounded-md">
+                <span className="xadrez grid h-7 w-5 place-items-center overflow-hidden rounded">
                   <img
                     src={moldura.arquivo_url}
                     alt=""
@@ -157,7 +145,7 @@ export function ConvidadoCameraView({
           })}
         </div>
 
-        <div className="grid grid-cols-[1fr_auto_1fr] items-center">
+        <div className="grid grid-cols-3 items-center justify-items-center">
           <input
             ref={fileInputRef}
             type="file"
@@ -173,10 +161,10 @@ export function ConvidadoCameraView({
           <button
             type="button"
             onClick={() => fileInputRef.current?.click()}
-            className="flex h-11 w-fit items-center gap-2 rounded-full bg-white/10 px-4 text-sm font-semibold transition hover:bg-white/20"
+            aria-label="Escolher foto da galeria"
+            className={BOTAO_ICONE}
           >
-            <ImagePlus className="h-4 w-4" />
-            Galeria
+            <ImagePlus className="h-5 w-5" />
           </button>
 
           <button
@@ -184,15 +172,23 @@ export function ConvidadoCameraView({
             disabled={Boolean(cameraErro)}
             onClick={onCapturar}
             aria-label="Tirar foto"
-            className="grid h-[76px] w-[76px] place-items-center rounded-full border-4 border-white transition active:scale-95 disabled:opacity-40"
+            className="group grid h-[78px] w-[78px] place-items-center rounded-full border-4 border-white transition disabled:opacity-40"
           >
-            <span
-              className="h-14 w-14 rounded-full"
-              style={{ backgroundColor: "var(--cor1, #e6007e)" }}
-            />
+            <span className="h-[58px] w-[58px] rounded-full bg-white transition group-active:scale-90" />
           </button>
 
-          <span />
+          {podeAlternarCamera ? (
+            <button
+              type="button"
+              onClick={onAlternarCamera}
+              aria-label="Trocar entre câmera frontal e traseira"
+              className={BOTAO_ICONE}
+            >
+              <RefreshCw className="h-5 w-5" />
+            </button>
+          ) : (
+            <span className="h-12 w-12" aria-hidden="true" />
+          )}
         </div>
       </div>
     </div>
