@@ -25,7 +25,7 @@ export function SeletorMolduras({
   corDestaque = "#ffffff",
   grande = false,
 }: SeletorMoldurasProps) {
-  const tamanho = grande ? "h-[128px] w-[72px]" : "h-[84px] w-[48px]";
+  const tamanho = grande ? "h-[108px] w-[61px]" : "h-[84px] w-[48px]";
   const claro = variante === VARIANTE_SELETOR.CLARO;
 
   const estado = (ativa: boolean) => ({

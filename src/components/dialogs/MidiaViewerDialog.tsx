@@ -7,11 +7,18 @@ import { prepararArquivoCompartilhamento } from "@/hooks/business/useComposicaoC
 import { safeCloseDialog } from "@/hooks/ui/useDialogClose";
 import type { MidiaDto } from "@/types/festa.types";
 
+const PREFIXO_ARQUIVO_LEMBRANCA = "lembranca-";
+
+function nomeArquivoLembranca(midiaId: string): string {
+  return `${PREFIXO_ARQUIVO_LEMBRANCA}${midiaId.slice(0, 6)}.jpg`;
+}
+
 export interface MidiaViewerDialogPayload {
   midia: MidiaDto;
   curtida: boolean;
   ehMinha: boolean;
-  onToggleCurtida: (midia: MidiaDto) => void;
+  /** Ausente quando a visão não permite curtir (ex.: painel dos pais). */
+  onToggleCurtida?: (midia: MidiaDto) => void;
   onExcluirPropria?: (midiaId: string) => Promise<void>;
 }
 
@@ -43,7 +50,7 @@ export function MidiaViewerDialog({
     let ativo = true;
     prepararArquivoCompartilhamento(
       midia.url_publica,
-      `lembranca-${midia.id.slice(0, 6)}.jpg`
+      nomeArquivoLembranca(midia.id)
     ).then((file) => {
       if (ativo) setArquivoPronto(file);
     });
@@ -78,7 +85,7 @@ export function MidiaViewerDialog({
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = `lembranca-${midia.id.slice(0, 6)}.jpg`;
+      a.download = nomeArquivoLembranca(midia.id);
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
@@ -90,9 +97,10 @@ export function MidiaViewerDialog({
   };
 
   const handleCurtir = () => {
-    if (curtidaLocal) return;
-    setCurtidaLocal(true);
-    setContadorCurtidas((prev) => prev + 1);
+    if (!payload.onToggleCurtida) return;
+    const passaACurtir = !curtidaLocal;
+    setCurtidaLocal(passaACurtir);
+    setContadorCurtidas((prev) => Math.max(0, prev + (passaACurtir ? 1 : -1)));
     payload.onToggleCurtida(midia);
   };
 
@@ -131,12 +139,15 @@ export function MidiaViewerDialog({
             variant={curtidaLocal ? "default" : "secondary"}
             size="sm"
             onClick={handleCurtir}
-            className="rounded-full"
+            disabled={!payload.onToggleCurtida}
+            aria-pressed={curtidaLocal}
+            aria-label={curtidaLocal ? "Descurtir foto" : "Curtir foto"}
+            className="rounded-full disabled:opacity-100"
           >
             <Heart
               className={`w-4 h-4 ${curtidaLocal ? "fill-current" : ""}`}
             />
-            <span>{contadorCurtidas}</span>
+            <span className="tabular-nums">{contadorCurtidas}</span>
           </Button>
           {payload.ehMinha && payload.onExcluirPropria && (
             <Button
@@ -144,10 +155,11 @@ export function MidiaViewerDialog({
               variant="destructive"
               size="sm"
               onClick={handleExcluir}
+              aria-label="Apagar foto"
               className="rounded-full"
             >
               <Trash2 className="w-4 h-4" />
-              <span>Apagar</span>
+              <span className="hidden sm:inline">Apagar</span>
             </Button>
           )}
         </div>
@@ -160,12 +172,12 @@ export function MidiaViewerDialog({
           {arquivoPronto && typeof navigator.canShare === "function" ? (
             <>
               <Share2 className="w-4 h-4" />
-              <span>Salvar / Compartilhar</span>
+              <span>Compartilhar</span>
             </>
           ) : (
             <>
               <Download className="w-4 h-4" />
-              <span>Baixar Foto</span>
+              <span>Baixar foto</span>
             </>
           )}
         </Button>

@@ -1,5 +1,4 @@
-import { ArrowLeft, Camera, Tv } from "lucide-react";
-import { Link } from "react-router-dom";
+import { ArrowLeft, Camera } from "lucide-react";
 import type { AbaGaleriaConvidado } from "@/hooks/ui/useConvidadoViewModel";
 import type { EventoPublicoDto } from "@/types/festa.types";
 
@@ -45,16 +44,6 @@ export function ConvidadoHeader({
             </h1>
             <p className="mt-1 truncate text-xs text-ameixa-suave">{evento.titulo}</p>
           </div>
-
-          {evento.inclui_telao && (
-            <Link
-              to={`/telao/${evento.slug}`}
-              aria-label="Abrir telão"
-              className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-ameixa/[0.06] text-ameixa transition hover:bg-ameixa/10"
-            >
-              <Tv className="h-5 w-5" />
-            </Link>
-          )}
         </div>
 
         {mostrarAbas && (

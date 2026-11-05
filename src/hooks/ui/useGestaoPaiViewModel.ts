@@ -122,7 +122,6 @@ export function useGestaoPaiViewModel(token: string) {
       midia,
       curtida: false,
       ehMinha: true,
-      onToggleCurtida: () => undefined,
       onExcluirPropria: excluirMidiaDefinitivamente,
     });
   };

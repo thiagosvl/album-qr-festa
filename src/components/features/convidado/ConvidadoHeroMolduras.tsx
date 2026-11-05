@@ -1,5 +1,5 @@
 import { useRef } from "react";
-import { Camera, ChevronRight, ImagePlus, Info } from "lucide-react";
+import { Camera, ChevronRight, ImagePlus, Images, Info } from "lucide-react";
 import {
   SeletorMolduras,
   VARIANTE_SELETOR,
@@ -46,7 +46,7 @@ export function ConvidadoHeroMolduras({
     <div className="mx-auto flex min-h-dvh w-full max-w-md flex-col bg-papel sm:shadow-palco">
       <section className="relative">
         <div
-          className="h-[36dvh] min-h-[220px] max-h-[360px] bg-cover bg-center"
+          className="h-[28dvh] min-h-[160px] max-h-[280px] bg-cover bg-center"
           style={
             evento.capa_url
               ? { backgroundImage: `url(${evento.capa_url})` }
@@ -117,37 +117,38 @@ export function ConvidadoHeroMolduras({
             }}
           />
 
-          <div className="mt-3 space-y-2.5 px-5">
+          <div className="mt-3 grid grid-cols-2 gap-2.5 px-5">
             <button
               type="button"
               onClick={onAbrirCamera}
               style={{ backgroundColor: evento.cor_primaria }}
-              className="flex h-14 w-full items-center justify-center gap-2.5 rounded-full font-display text-lg font-extrabold text-white shadow-suave transition active:scale-[0.98]"
+              className="flex h-14 items-center justify-center gap-2 rounded-full font-display text-base font-extrabold text-white shadow-suave transition active:scale-[0.98]"
             >
-              <Camera className="h-5 w-5" />
+              <Camera className="h-5 w-5 shrink-0" />
               Tirar foto
             </button>
             <button
               type="button"
               onClick={() => inputGaleriaRef.current?.click()}
               style={{ borderColor: evento.cor_secundaria, color: evento.cor_secundaria }}
-              className="flex h-12 w-full items-center justify-center gap-2.5 rounded-full border-2 bg-white font-display text-base font-extrabold transition active:scale-[0.98]"
+              className="flex h-14 items-center justify-center gap-2 rounded-full border-2 bg-white font-display text-base font-extrabold transition active:scale-[0.98]"
             >
-              <ImagePlus className="h-5 w-5" />
-              Escolher do celular
+              <ImagePlus className="h-5 w-5 shrink-0" />
+              Da galeria
             </button>
           </div>
         </section>
       )}
 
-      <div className="mt-2 px-5">
+      <div className="mt-2.5 px-5">
         <button
           type="button"
           onClick={onVerMural}
-          className="flex h-12 w-full items-center justify-center gap-1 rounded-full text-sm font-bold text-ameixa transition hover:bg-ameixa/5"
+          className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-ameixa/[0.07] text-sm font-bold text-ameixa transition hover:bg-ameixa/10 active:scale-[0.98]"
         >
+          <Images className="h-4 w-4 shrink-0" />
           {rotuloMural}
-          <ChevronRight className="h-4 w-4" />
+          <ChevronRight className="h-4 w-4 shrink-0" />
         </button>
       </div>
 
