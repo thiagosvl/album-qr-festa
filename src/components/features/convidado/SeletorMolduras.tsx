@@ -7,13 +7,26 @@ export const VARIANTE_SELETOR = {
 } as const;
 type VarianteSeletor = (typeof VARIANTE_SELETOR)[keyof typeof VARIANTE_SELETOR];
 
+export const TAMANHO_SELETOR = {
+  MINI: "MINI",
+  PADRAO: "PADRAO",
+  GRANDE: "GRANDE",
+} as const;
+type TamanhoSeletor = (typeof TAMANHO_SELETOR)[keyof typeof TAMANHO_SELETOR];
+
+const CLASSES_TAMANHO: Record<TamanhoSeletor, string> = {
+  [TAMANHO_SELETOR.MINI]: "h-[68px] w-[38px]",
+  [TAMANHO_SELETOR.PADRAO]: "h-[84px] w-[48px]",
+  [TAMANHO_SELETOR.GRANDE]: "h-[108px] w-[61px]",
+};
+
 interface SeletorMoldurasProps {
   molduras: MolduraDto[];
   molduraSelecionadaId: string | null;
   onSelectMoldura: (id: string | null) => void;
   variante?: VarianteSeletor;
   corDestaque?: string;
-  grande?: boolean;
+  tamanho?: TamanhoSeletor;
 }
 
 /** Faixa horizontal de molduras: o desenho da moldura é o que identifica a opção. */
@@ -23,9 +36,8 @@ export function SeletorMolduras({
   onSelectMoldura,
   variante = VARIANTE_SELETOR.ESCURO,
   corDestaque = "#ffffff",
-  grande = false,
+  tamanho = TAMANHO_SELETOR.PADRAO,
 }: SeletorMoldurasProps) {
-  const tamanho = grande ? "h-[108px] w-[61px]" : "h-[84px] w-[48px]";
   const claro = variante === VARIANTE_SELETOR.CLARO;
 
   const estado = (ativa: boolean) => ({
@@ -37,7 +49,7 @@ export function SeletorMolduras({
     style: ativa ? { ["--tw-ring-color" as string]: corDestaque } : undefined,
   });
 
-  const base = `xadrez relative shrink-0 snap-start overflow-hidden rounded-lg transition active:scale-95 ${tamanho}`;
+  const base = `xadrez relative shrink-0 snap-start overflow-hidden rounded-lg transition active:scale-95 ${CLASSES_TAMANHO[tamanho]}`;
   const semMoldura = estado(molduraSelecionadaId === null);
 
   return (

@@ -1,20 +1,18 @@
 export type ModoCamera = "user" | "environment";
 
 const RESOLUCAO_IDEAL = { width: 1080, height: 1920 } as const;
-const PROPORCAO_RETRATO = 9 / 16;
 
 /**
- * A câmera frontal de muitos aparelhos recorta o sensor quando forçamos a
- * proporção 9:16, e o preview parece "com zoom". Por isso só a traseira recebe
- * a proporção; a frontal usa o campo de visão natural e o recorte 9:16 é feito
- * na exibição (object-cover) e na composição da foto.
+ * Não forçamos proporção: com aspectRatio 9:16 muitos aparelhos recortam o
+ * sensor e o preview parece "com zoom". Pedimos só a resolução e deixamos o
+ * navegador entregar o campo de visão natural; o recorte 9:16 é feito na
+ * exibição (object-cover) e na composição da foto.
  */
 export function montarRestricoesVideo(modo: ModoCamera): MediaTrackConstraints {
   return {
     facingMode: { ideal: modo },
     width: { ideal: RESOLUCAO_IDEAL.width },
     height: { ideal: RESOLUCAO_IDEAL.height },
-    ...(modo === "environment" ? { aspectRatio: { ideal: PROPORCAO_RETRATO } } : {}),
   };
 }
 

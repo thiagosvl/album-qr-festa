@@ -3,6 +3,7 @@ import { Camera, ChevronRight, ImagePlus, Images, Info } from "lucide-react";
 import { ConvidadoCtaOrcamento } from "@/components/features/convidado/ConvidadoCtaOrcamento";
 import {
   SeletorMolduras,
+  TAMANHO_SELETOR,
   VARIANTE_SELETOR,
 } from "@/components/features/convidado/SeletorMolduras";
 import type { EventoPublicoDto, MolduraDto } from "@/types/festa.types";
@@ -108,7 +109,7 @@ export function ConvidadoHeroMolduras({
               onSelectMoldura={onSelectMoldura}
               variante={VARIANTE_SELETOR.CLARO}
               corDestaque={evento.cor_primaria}
-              grande
+              tamanho={TAMANHO_SELETOR.GRANDE}
             />
           </div>
 
