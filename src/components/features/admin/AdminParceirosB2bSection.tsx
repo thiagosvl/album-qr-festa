@@ -31,7 +31,7 @@ export function AdminParceirosB2bSection({
       <Banner
         variant="info"
         title="Gestão de Parceiros B2B (Buffets, Fotógrafos e Casas de Festas)"
-        description="Cadastre parceiros White-Label, acompanhe o saldo de créditos de eventos e realize recargas avulsas ou mensais."
+        description="Cadastre parceiros, acompanhe o saldo de créditos de eventos e realize recargas avulsas ou mensais."
       />
 
       <Card>

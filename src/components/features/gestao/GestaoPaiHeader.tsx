@@ -94,7 +94,7 @@ export function GestaoPaiHeader({
               className={`${BOTAO} bg-uva-claro text-uva hover:bg-uva hover:text-white`}
             >
               <Download className="h-4 w-4" />
-              Baixar álbum em ZIP
+              Baixar todas as fotos
             </button>
 
             <Link

@@ -53,7 +53,7 @@ export function ParceiroSidebar({
               {parceiro?.nome_empresa ?? "Portal do Parceiro B2B"}
             </h1>
             <p className="text-[11px] text-white/60">
-              Hub White-Label • Buffets & Fotógrafos
+              Portal do parceiro • Buffets & Fotógrafos
             </p>
           </div>
         </div>
@@ -138,7 +138,7 @@ export function ParceiroSidebar({
             }`}
           >
             <Palette className="w-4 h-4 shrink-0" />
-            <span>Marca White-Label</span>
+            <span>Identidade visual</span>
           </button>
         </nav>
       </div>

@@ -47,7 +47,7 @@ export function QrCodeLinksDialog({
     `📸 *Link do QR Code (Convidados):*`,
     urlConvidado,
     "",
-    `👑 *Painel Exclusivo dos Pais (Moderação e Download ZIP):*`,
+    `👑 *Painel Exclusivo dos Pais (Moderação e Download das fotos):*`,
     urlGestaoPai,
     "",
     `📺 *Modo Telão / TV Ao Vivo:*`,

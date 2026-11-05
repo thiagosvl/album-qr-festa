@@ -61,7 +61,7 @@ export function useParceiroPortalViewModel() {
     openDialog(FESTA_DIALOG_NAMES.MIDIAS_EVENTO_ADMIN, { evento });
   };
 
-  const salvarMarcaWhiteLabel = async () => {
+  const salvarIdentidadeVisual = async () => {
     if (!parceiro) return;
     try {
       await atualizarMarcaMutation.mutateAsync({
@@ -75,7 +75,7 @@ export function useParceiroPortalViewModel() {
           logo_url: logoUrl.trim() || null,
         },
       });
-      toast.success("Identidade White-Label atualizada com sucesso!");
+      toast.success("Identidade visual atualizada com sucesso!");
     } catch (err) {
       toast.error(
         err instanceof Error ? err.message : "Erro ao salvar marca do parceiro"
@@ -107,7 +107,7 @@ export function useParceiroPortalViewModel() {
     logoUrl,
     setLogoUrl,
     salvandoMarca: atualizarMarcaMutation.isPending,
-    salvarMarcaWhiteLabel,
+    salvarIdentidadeVisual,
     abrirAtivarEventoDialog,
     abrirQrLinksEvento,
     abrirMoldurasEvento,

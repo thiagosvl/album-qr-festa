@@ -234,7 +234,7 @@ export function ParceiroB2bPlaceholderPage() {
           <Card>
             <CardHeader>
               <CardTitle className="text-lg">
-                Configurações White-Label da Marca Parceira
+                Identidade visual do parceiro
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -289,13 +289,13 @@ export function ParceiroB2bPlaceholderPage() {
                 <Button
                   type="button"
                   disabled={vm.salvandoMarca}
-                  onClick={vm.salvarMarcaWhiteLabel}
+                  onClick={vm.salvarIdentidadeVisual}
                 >
                   <Save className="w-4 h-4" />
                   <span>
                     {vm.salvandoMarca
                       ? "Salvando..."
-                      : "Salvar Marca White-Label"}
+                      : "Salvar identidade visual"}
                   </span>
                 </Button>
               </div>

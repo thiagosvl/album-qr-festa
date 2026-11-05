@@ -187,7 +187,7 @@ export function ParceiroB2bFormDialog({
             ? `Parceiro B2B • ${parceiroEdicao.nome_empresa}`
             : "Novo Parceiro B2B (Buffet / Fotógrafo)"
         }
-        subtitle="Gerencie assinatura, plano de créditos e identidade White-Label"
+        subtitle="Gerencie assinatura, plano de créditos e identidade visual"
         icon={Building2}
         onClose={onClose}
         lockClose={isSubmitting}
