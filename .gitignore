@@ -1,10 +1,7 @@
 node_modules/
 dist/
-build/
 .env
-.env.*
-!.env.example
+.env.local
 .vercel
-.DS_Store
+*.tsbuildinfo
 *.log
-coverage/
