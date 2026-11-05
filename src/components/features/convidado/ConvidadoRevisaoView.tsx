@@ -144,7 +144,7 @@ export function ConvidadoRevisaoView({
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-zinc-950 text-white flex flex-col overflow-y-auto">
+    <div className="fixed inset-0 z-50 bg-ameixa text-white flex flex-col overflow-y-auto">
       <div className="flex-1 flex flex-col lg:flex-row items-center justify-center gap-6 p-4 max-w-4xl mx-auto w-full">
         <div
           ref={palcoRef}
@@ -229,9 +229,9 @@ export function ConvidadoRevisaoView({
           </div>
         </div>
 
-        <div className="w-full max-w-md space-y-3.5 bg-zinc-900/90 p-5 rounded-card border border-white/10">
+        <div className="w-full max-w-md space-y-3.5 bg-ameixa/80/90 p-5 rounded-card border border-white/10">
           <div className="space-y-1.5">
-            <label className="text-xs font-bold text-zinc-300">
+            <label className="text-xs font-bold text-white/75">
               Trocar Moldura da Foto
             </label>
             <div className="flex items-center gap-2 overflow-x-auto pb-1">
@@ -240,8 +240,8 @@ export function ConvidadoRevisaoView({
                 onClick={() => onSelectMoldura(null)}
                 className={`shrink-0 px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 border ${
                   molduraSelecionadaId === null
-                    ? "bg-white text-zinc-950 border-white"
-                    : "bg-zinc-800 text-zinc-300 border-zinc-700"
+                    ? "bg-white text-ameixa border-white"
+                    : "bg-white/10 text-white/75 border-white/15"
                 }`}
               >
                 <Slash className="w-3.5 h-3.5" />
@@ -255,7 +255,7 @@ export function ConvidadoRevisaoView({
                   className={`shrink-0 px-2.5 py-1.5 rounded-xl text-xs font-bold border flex items-center gap-2 ${
                     molduraSelecionadaId === m.id
                       ? "bg-primary text-white border-primary"
-                      : "bg-zinc-800 text-zinc-300 border-zinc-700"
+                      : "bg-white/10 text-white/75 border-white/15"
                   }`}
                 >
                   <img
@@ -270,7 +270,7 @@ export function ConvidadoRevisaoView({
           </div>
 
           <div className="space-y-1">
-            <div className="flex items-center justify-between text-xs font-bold text-zinc-300">
+            <div className="flex items-center justify-between text-xs font-bold text-white/75">
               <span>Zoom e Enquadramento</span>
               <span>{Math.round(transformacao.scale * 100)}%</span>
             </div>
@@ -280,7 +280,7 @@ export function ConvidadoRevisaoView({
                 size="icon"
                 variant="secondary"
                 onClick={() => aplicarNovoScale(transformacao.scale - 0.2)}
-                className="h-8 w-8 rounded-full bg-zinc-800 text-white"
+                className="h-8 w-8 rounded-full bg-white/10 text-white"
               >
                 <ZoomOut className="w-3.5 h-3.5" />
               </Button>
@@ -298,7 +298,7 @@ export function ConvidadoRevisaoView({
                 size="icon"
                 variant="secondary"
                 onClick={() => aplicarNovoScale(transformacao.scale + 0.2)}
-                className="h-8 w-8 rounded-full bg-zinc-800 text-white"
+                className="h-8 w-8 rounded-full bg-white/10 text-white"
               >
                 <ZoomIn className="w-3.5 h-3.5" />
               </Button>
@@ -306,14 +306,14 @@ export function ConvidadoRevisaoView({
           </div>
 
           <div className="space-y-1">
-            <label className="text-xs font-bold text-zinc-300">
+            <label className="text-xs font-bold text-white/75">
               Seu nome (opcional)
             </label>
             <Input
               placeholder="Ex: Tia Ana, Família Silva..."
               value={nomeConvidado}
               onChange={(e) => onChangeNomeConvidado(e.target.value)}
-              className="bg-zinc-950 border-zinc-700 text-white"
+              className="bg-ameixa border-white/15 text-white"
             />
           </div>
 
@@ -323,7 +323,7 @@ export function ConvidadoRevisaoView({
               size="sm"
               variant="secondary"
               onClick={handleSalvarNoCelular}
-              className="bg-zinc-800 text-white hover:bg-zinc-700"
+              className="bg-white/10 text-white hover:bg-white/20"
             >
               <Download className="w-4 h-4" />
               <span>Salvar Foto</span>
@@ -333,7 +333,7 @@ export function ConvidadoRevisaoView({
               size="sm"
               variant="secondary"
               onClick={handleCompartilhar}
-              className="bg-zinc-800 text-white hover:bg-zinc-700"
+              className="bg-white/10 text-white hover:bg-white/20"
             >
               <Share2 className="w-4 h-4" />
               <span>Compartilhar</span>
@@ -342,13 +342,13 @@ export function ConvidadoRevisaoView({
 
           {enviando && (
             <div className="space-y-1">
-              <div className="h-2 w-full rounded-full bg-zinc-800 overflow-hidden">
+              <div className="h-2 w-full rounded-full bg-white/10 overflow-hidden">
                 <div
                   className="h-full bg-primary transition-all duration-200"
                   style={{ width: `${progressoUpload}%` }}
                 />
               </div>
-              <p className="text-xs text-center text-zinc-300">
+              <p className="text-xs text-center text-white/75">
                 Publicando no mural... {progressoUpload}%
               </p>
             </div>
@@ -360,7 +360,7 @@ export function ConvidadoRevisaoView({
               variant="outline"
               disabled={enviando}
               onClick={onRefazer}
-              className="flex-1 bg-transparent border-zinc-700 text-white hover:bg-zinc-800"
+              className="flex-1 bg-transparent border-white/15 text-white hover:bg-white/10"
             >
               <RotateCcw className="w-4 h-4" />
               <span>Outra Foto</span>

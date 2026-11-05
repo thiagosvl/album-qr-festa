@@ -1,15 +1,5 @@
-import {
-  CheckCheck,
-  Eye,
-  EyeOff,
-  FlaskConical,
-  Sparkles,
-  Trash2,
-} from "lucide-react";
+import { CheckCheck, Eye, EyeOff, FlaskConical, Images, Trash2 } from "lucide-react";
 import { FESTA_STATUS_MODERACAO } from "@/constants";
-import { Banner } from "@/components/ui/Banner";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import type { FiltroModeracaoPai } from "@/hooks/ui/useGestaoPaiViewModel";
 import type { FestaStatusModeracaoEnum, MidiaDto } from "@/types/festa.types";
 
@@ -34,6 +24,9 @@ interface GestaoModeracaoSectionProps {
   onExcluirMidia: (midiaId: string) => void;
 }
 
+const BOTAO =
+  "inline-flex h-9 items-center justify-center gap-1.5 rounded-full px-3.5 text-[13px] font-semibold transition active:scale-[0.97]";
+
 export function GestaoModeracaoSection({
   midias,
   resumoMidias,
@@ -49,205 +42,209 @@ export function GestaoModeracaoSection({
   onLimparFotosTeste,
   onExcluirMidia,
 }: GestaoModeracaoSectionProps) {
+  const filtros = [
+    { id: "TODAS" as const, rotulo: "Todas", total: resumoMidias.total },
+    { id: "VISIVEIS" as const, rotulo: "Visíveis", total: resumoMidias.aprovadas },
+    { id: "PENDENTES" as const, rotulo: "Pendentes", total: resumoMidias.pendentes },
+    { id: "OCULTAS" as const, rotulo: "Ocultas", total: resumoMidias.ocultas },
+  ];
+
   return (
-    <div className="space-y-4">
-      <Banner
-        variant="info"
-        title="Controle total do mural em tempo real"
-        description="Você pode aprovar fotos pendentes em lote, clicar na foto para ampliar, ocultar fotos indesejadas ou limpar fotos de teste antes da festa."
-        action={
-          <div className="flex flex-wrap gap-2">
-            {resumoMidias.pendentes > 0 && (
-              <Button
-                type="button"
-                variant="default"
-                size="sm"
-                onClick={onAprovarTodasPendentes}
+    <div className="space-y-5">
+      <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
+        {filtros.map(({ id, rotulo, total }) => {
+          const ativo = filtro === id;
+          return (
+            <button
+              key={id}
+              type="button"
+              aria-pressed={ativo}
+              onClick={() => onChangeFiltro(id)}
+              className={`rounded-3xl p-4 text-left transition ${
+                ativo
+                  ? "bg-ameixa text-white shadow-suave"
+                  : "bg-white text-ameixa shadow-card hover:-translate-y-0.5"
+              }`}
+            >
+              <span className="block font-display text-4xl font-extrabold leading-none tabular-nums">
+                {total}
+              </span>
+              <span
+                className={`mt-2 block text-sm font-semibold ${
+                  ativo ? "text-white/75" : "text-ameixa-suave"
+                }`}
               >
-                <CheckCheck className="w-3.5 h-3.5" />
-                <span>Aprovar Pendentes ({resumoMidias.pendentes})</span>
-              </Button>
-            )}
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={onLimparFotosTeste}
-            >
-              <FlaskConical className="w-3.5 h-3.5" />
-              <span>Limpar Fotos de Teste</span>
-            </Button>
-          </div>
-        }
-      />
-
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div className="flex flex-wrap items-center gap-2">
-          {(
-            [
-              { id: "TODAS", label: `Todas (${resumoMidias.total})` },
-              {
-                id: "VISIVEIS",
-                label: `Visíveis (${resumoMidias.aprovadas})`,
-              },
-              {
-                id: "PENDENTES",
-                label: `Pendentes (${resumoMidias.pendentes})`,
-              },
-              { id: "OCULTAS", label: `Ocultas (${resumoMidias.ocultas})` },
-            ] as const
-          ).map((f) => (
-            <Button
-              key={f.id}
-              type="button"
-              size="sm"
-              variant={filtro === f.id ? "default" : "outline"}
-              onClick={() => onChangeFiltro(f.id)}
-            >
-              {f.label}
-            </Button>
-          ))}
-        </div>
-
-        {selecionadasIds.size > 0 && (
-          <div className="flex flex-wrap items-center gap-2 p-2 rounded-2xl bg-primary/10 border border-primary/20">
-            <span className="text-xs font-bold text-primary px-2">
-              {selecionadasIds.size} selecionada(s)
-            </span>
-            <Button
-              type="button"
-              size="sm"
-              variant="default"
-              onClick={() => onModerarLote(FESTA_STATUS_MODERACAO.APROVADA)}
-            >
-              <Eye className="w-3.5 h-3.5" />
-              <span>Aprovar Lote</span>
-            </Button>
-            <Button
-              type="button"
-              size="sm"
-              variant="outline"
-              onClick={() => onModerarLote(FESTA_STATUS_MODERACAO.OCULTA)}
-            >
-              <EyeOff className="w-3.5 h-3.5" />
-              <span>Ocultar Lote</span>
-            </Button>
-            <Button
-              type="button"
-              size="sm"
-              variant="ghost"
-              onClick={onLimparSelecao}
-            >
-              Cancelar
-            </Button>
-          </div>
-        )}
+                {rotulo}
+              </span>
+            </button>
+          );
+        })}
       </div>
 
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <p className="text-sm text-ameixa-suave">
+          Toque numa foto para ampliar. Antes da festa, limpe as fotos de teste.
+        </p>
+        <div className="flex flex-wrap gap-2">
+          {resumoMidias.pendentes > 0 && (
+            <button
+              type="button"
+              onClick={onAprovarTodasPendentes}
+              className={`${BOTAO} bg-uva text-white`}
+            >
+              <CheckCheck className="h-3.5 w-3.5" />
+              Aprovar pendentes ({resumoMidias.pendentes})
+            </button>
+          )}
+          <button
+            type="button"
+            onClick={onLimparFotosTeste}
+            className={`${BOTAO} bg-white text-ameixa ring-1 ring-ameixa/15 hover:ring-ameixa/30`}
+          >
+            <FlaskConical className="h-3.5 w-3.5" />
+            Limpar fotos de teste
+          </button>
+        </div>
+      </div>
+
+      {selecionadasIds.size > 0 && (
+        <div className="sticky top-[9.5rem] z-20 flex flex-wrap items-center gap-2 rounded-full bg-ameixa p-2 pl-5 text-white shadow-palco">
+          <span className="mr-auto text-sm font-semibold">
+            {selecionadasIds.size === 1
+              ? "1 foto selecionada"
+              : `${selecionadasIds.size} fotos selecionadas`}
+          </span>
+          <button
+            type="button"
+            onClick={() => onModerarLote(FESTA_STATUS_MODERACAO.APROVADA)}
+            className={`${BOTAO} bg-white text-ameixa`}
+          >
+            <Eye className="h-3.5 w-3.5" />
+            Mostrar
+          </button>
+          <button
+            type="button"
+            onClick={() => onModerarLote(FESTA_STATUS_MODERACAO.OCULTA)}
+            className={`${BOTAO} bg-white/15 text-white`}
+          >
+            <EyeOff className="h-3.5 w-3.5" />
+            Ocultar
+          </button>
+          <button
+            type="button"
+            onClick={onLimparSelecao}
+            className={`${BOTAO} text-white/80 hover:text-white`}
+          >
+            Cancelar
+          </button>
+        </div>
+      )}
+
       {midias.length === 0 ? (
-        <div className="rounded-card border border-border/60 bg-card p-10 text-center space-y-2">
-          <Sparkles className="w-8 h-8 text-primary mx-auto" />
-          <p className="font-display font-bold">
-            Nenhuma foto encontrada neste filtro
+        <div className="mx-auto max-w-sm rounded-card bg-white p-8 text-center shadow-card">
+          <div className="mx-auto grid h-14 w-14 -rotate-6 place-items-center rounded-2xl bg-uva-claro text-uva">
+            <Images className="h-7 w-7" />
+          </div>
+          <p className="mt-4 font-display text-xl font-extrabold tracking-tight">
+            Nenhuma foto neste filtro
           </p>
-          <p className="text-xs text-muted-foreground">
-            Assim que os convidados enviarem fotos na festa, você poderá
-            acompanhá-las por aqui.
+          <p className="mt-1.5 text-sm text-ameixa-suave">
+            Quando os convidados enviarem fotos, elas aparecem aqui.
           </p>
         </div>
       ) : (
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
           {midias.map((midia) => {
             const visivel =
               midia.status_moderacao === FESTA_STATUS_MODERACAO.APROVADA;
             const pendente =
               midia.status_moderacao === FESTA_STATUS_MODERACAO.PENDENTE;
             const selecionada = selecionadasIds.has(midia.id);
+            const situacao = visivel ? "Visível" : pendente ? "Pendente" : "Oculta";
+            const corSituacao = visivel
+              ? "bg-white text-ameixa"
+              : pendente
+                ? "bg-gema text-ameixa"
+                : "bg-ameixa text-white";
             return (
-              <div
+              <article
                 key={midia.id}
-                className={`rounded-2xl border bg-card overflow-hidden shadow-card flex flex-col transition-all ${
-                  selecionada
-                    ? "border-primary ring-2 ring-primary/25"
-                    : "border-border/70"
+                className={`flex flex-col overflow-hidden rounded-3xl bg-white shadow-card transition ${
+                  selecionada ? "ring-4 ring-uva" : ""
                 }`}
               >
-                <div
-                  onClick={() => onVisualizarMidia(midia)}
-                  className="aspect-[9/16] relative bg-zinc-900 cursor-pointer group"
-                >
-                  <img
-                    src={midia.url_miniatura || midia.url_publica}
-                    alt={midia.autor ?? "Convidado"}
-                    className={`w-full h-full object-cover transition-transform duration-300 group-hover:scale-[1.03] ${
-                      !visivel ? "opacity-50 grayscale" : ""
-                    }`}
-                  />
-                  <div className="absolute top-2 left-2 flex flex-wrap gap-1">
-                    <Badge
-                      variant={
-                        visivel
-                          ? "success"
-                          : pendente
-                            ? "warning"
-                            : "destructive"
-                      }
-                    >
-                      {visivel ? "Visível" : pendente ? "Pendente" : "Oculta"}
-                    </Badge>
-                  </div>
+                <div className="relative aspect-[9/16] bg-ameixa">
+                  <button
+                    type="button"
+                    onClick={() => onVisualizarMidia(midia)}
+                    className="group block h-full w-full"
+                    aria-label={`Ampliar foto de ${midia.autor || "convidado"}`}
+                  >
+                    <img
+                      src={midia.url_miniatura || midia.url_publica}
+                      alt={midia.autor ?? "Convidado"}
+                      className={`h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.03] ${
+                        !visivel ? "opacity-50 grayscale" : ""
+                      }`}
+                    />
+                  </button>
+                  <span
+                    className={`absolute left-2.5 top-2.5 rounded-full px-2.5 py-1 text-xs font-bold shadow-sm ${corSituacao}`}
+                  >
+                    {situacao}
+                  </span>
                   <input
                     type="checkbox"
                     checked={selecionada}
-                    onClick={(e) => e.stopPropagation()}
                     onChange={() => onToggleSelecao(midia.id)}
-                    className="absolute top-2.5 right-2.5 w-4 h-4 rounded accent-primary cursor-pointer"
+                    aria-label="Selecionar foto"
+                    className="absolute right-2.5 top-2.5 h-5 w-5 cursor-pointer rounded accent-uva"
                   />
                 </div>
 
-                <div className="p-3 space-y-2">
+                <div className="space-y-2.5 p-3">
                   <div className="flex items-center justify-between gap-2">
-                    <p className="text-xs font-bold truncate">
+                    <p className="truncate text-[13px] font-semibold text-ameixa">
                       {midia.autor || "Convidado"}
                     </p>
-                    <span className="text-[11px] text-muted-foreground shrink-0">
+                    <span className="shrink-0 text-xs text-ameixa-suave tabular-nums">
                       ♥ {midia.curtidas}
                     </span>
                   </div>
 
                   <div className="flex items-center gap-1.5">
-                    <Button
+                    <button
                       type="button"
-                      size="sm"
-                      variant={visivel ? "outline" : "tonal"}
-                      className="flex-1 h-8 text-xs px-2"
                       onClick={() => onAlternarVisibilidade(midia)}
+                      className={`${BOTAO} flex-1 ${
+                        visivel
+                          ? "bg-ameixa/[0.06] text-ameixa hover:bg-ameixa/10"
+                          : "bg-uva text-white"
+                      }`}
                     >
                       {visivel ? (
                         <>
-                          <EyeOff className="w-3.5 h-3.5" />
-                          <span>Ocultar</span>
+                          <EyeOff className="h-3.5 w-3.5" />
+                          Ocultar
                         </>
                       ) : (
                         <>
-                          <Eye className="w-3.5 h-3.5" />
-                          <span>Aprovar</span>
+                          <Eye className="h-3.5 w-3.5" />
+                          Mostrar
                         </>
                       )}
-                    </Button>
-
-                    <Button
+                    </button>
+                    <button
                       type="button"
-                      size="icon"
-                      variant="destructive"
-                      className="h-8 w-8 rounded-lg"
                       onClick={() => onExcluirMidia(midia.id)}
+                      aria-label="Excluir foto"
+                      className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-rosa/10 text-rosa transition hover:bg-rosa hover:text-white"
                     >
-                      <Trash2 className="w-3.5 h-3.5" />
-                    </Button>
+                      <Trash2 className="h-3.5 w-3.5" />
+                    </button>
                   </div>
                 </div>
-              </div>
+              </article>
             );
           })}
         </div>

@@ -88,4 +88,13 @@
     background-size: 14px 2px;
     background-repeat: repeat-x;
   }
+
+  .xadrez {
+    background-image: repeating-conic-gradient(#ece4f5 0% 25%, #f8f4fc 0% 50%);
+    background-size: 14px 14px;
+  }
+
+  .legenda-foto {
+    @apply flex items-center justify-between gap-2 bg-white px-3 py-2.5;
+  }
 }

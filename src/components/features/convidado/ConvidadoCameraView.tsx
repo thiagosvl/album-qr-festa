@@ -47,7 +47,7 @@ export function ConvidadoCameraView({
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   return (
-    <div className="fixed inset-0 z-50 bg-zinc-950 text-white flex flex-col">
+    <div className="fixed inset-0 z-50 bg-ameixa text-white flex flex-col">
       <div className="px-4 py-3 flex items-center justify-between bg-black/50 backdrop-blur-md z-20">
         <Button
           type="button"
@@ -90,7 +90,7 @@ export function ConvidadoCameraView({
       </div>
 
       <div className="flex-1 relative flex items-center justify-center overflow-hidden bg-black">
-        <div className="relative aspect-[9/16] h-full max-h-full w-auto max-w-full overflow-hidden flex items-center justify-center bg-zinc-900">
+        <div className="relative aspect-[9/16] h-full max-h-full w-auto max-w-full overflow-hidden flex items-center justify-center bg-ameixa/80">
           {!cameraErro ? (
             <video
               ref={videoRef}
@@ -121,15 +121,15 @@ export function ConvidadoCameraView({
         </div>
       </div>
 
-      <div className="bg-zinc-950/95 border-t border-white/10 px-4 py-3 space-y-3">
+      <div className="bg-ameixa/95 border-t border-white/10 px-4 py-3 space-y-3">
         <div className="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar">
           <button
             type="button"
             onClick={() => onSelectMoldura(null)}
             className={`shrink-0 px-3.5 py-2 rounded-full text-xs font-bold flex items-center gap-1.5 border transition-all ${
               molduraSelecionadaId === null
-                ? "bg-white text-zinc-950 border-white"
-                : "bg-zinc-900 text-zinc-300 border-zinc-700"
+                ? "bg-white text-ameixa border-white"
+                : "bg-ameixa/80 text-white/75 border-white/15"
             }`}
           >
             <Slash className="w-3.5 h-3.5" />
@@ -144,7 +144,7 @@ export function ConvidadoCameraView({
               className={`shrink-0 px-3 py-1.5 rounded-full text-xs font-bold border transition-all flex items-center gap-2 ${
                 molduraSelecionadaId === m.id
                   ? "bg-primary text-white border-primary"
-                  : "bg-zinc-900 text-zinc-300 border-zinc-700"
+                  : "bg-ameixa/80 text-white/75 border-white/15"
               }`}
             >
               <img
@@ -174,7 +174,7 @@ export function ConvidadoCameraView({
             variant="secondary"
             size="sm"
             onClick={() => fileInputRef.current?.click()}
-            className="rounded-full bg-zinc-800 text-white hover:bg-zinc-700"
+            className="rounded-full bg-white/10 text-white hover:bg-white/20"
           >
             <ImagePlus className="w-4 h-4" />
             <span>Da Galeria</span>
@@ -191,7 +191,7 @@ export function ConvidadoCameraView({
             </span>
           </button>
 
-          <div className="w-24 text-right text-[11px] text-zinc-400">
+          <div className="w-24 text-right text-[11px] text-white/60">
             1080×1920 HD
           </div>
         </div>

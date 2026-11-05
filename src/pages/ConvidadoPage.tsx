@@ -124,10 +124,10 @@ export function ConvidadoPage() {
             size="lg"
             onClick={() => vm.setModo("CAMERA")}
             style={{ backgroundColor: vm.evento.cor_primaria }}
-            className="pointer-events-auto rounded-full shadow-modal px-8 text-white border-0"
+            className="pointer-events-auto h-14 rounded-full px-8 font-display text-base font-extrabold text-white shadow-modal border-0"
           >
             <Camera className="w-5 h-5" />
-            <span>Tirar Foto com Moldura</span>
+            <span>Tirar foto com moldura</span>
           </Button>
         </div>
       )}

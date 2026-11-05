@@ -1,6 +1,5 @@
 import { useRef } from "react";
-import { Camera, Check, ImagePlus, Slash, Sparkles } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Camera, Check, ImagePlus, Slash } from "lucide-react";
 import { formatarDataBr } from "@/lib/utils";
 import type { EventoPublicoDto, MolduraDto } from "@/types/festa.types";
 
@@ -14,6 +13,8 @@ interface ConvidadoHeroMoldurasProps {
   podeEnviar: boolean;
 }
 
+const INCLINACOES = ["-rotate-2", "rotate-1", "-rotate-1", "rotate-2"] as const;
+
 export function ConvidadoHeroMolduras({
   evento,
   molduras,
@@ -25,16 +26,20 @@ export function ConvidadoHeroMolduras({
 }: ConvidadoHeroMoldurasProps) {
   const inputGaleriaRef = useRef<HTMLInputElement | null>(null);
 
+  const selo =
+    evento.subtitulo ||
+    (evento.idade_aniversariante
+      ? `${evento.nome_aniversariante ?? evento.titulo} faz ${evento.idade_aniversariante}`
+      : "Álbum oficial da festa");
+
   return (
-    <section className="rounded-card overflow-hidden border border-border/70 bg-card shadow-card">
-      <div className="relative min-h-[220px] sm:min-h-[260px] flex items-end overflow-hidden">
+    <section className="relative overflow-hidden rounded-card bg-white shadow-palco">
+      <div className="relative flex min-h-[250px] items-end overflow-hidden sm:min-h-[300px]">
         <div
           className="absolute inset-0 bg-cover bg-center"
           style={
             evento.capa_url
-              ? {
-                  backgroundImage: `url(${evento.capa_url})`,
-                }
+              ? { backgroundImage: `url(${evento.capa_url})` }
               : {
                   background: `linear-gradient(155deg, ${evento.cor_primaria}, ${evento.cor_secundaria})`,
                 }
@@ -43,174 +48,164 @@ export function ConvidadoHeroMolduras({
         <div
           className="absolute inset-0"
           style={{
-            background: evento.capa_url
-              ? "linear-gradient(to top, rgba(19,13,30,0.88) 8%, rgba(19,13,30,0.25) 65%)"
-              : "linear-gradient(to top, rgba(19,13,30,0.60), rgba(19,13,30,0.08) 70%)",
+            background:
+              "linear-gradient(to top, rgba(28,15,46,0.82) 6%, rgba(28,15,46,0.15) 70%)",
           }}
         />
 
-        <div className="relative z-10 w-full p-5 sm:p-7 text-white text-center sm:text-left flex flex-col sm:flex-row sm:items-end justify-between gap-4">
-          <div className="space-y-1.5 max-w-xl">
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/15 backdrop-blur-md text-xs font-bold uppercase tracking-wider">
-              <Sparkles className="w-3.5 h-3.5" />
-              <span>
-                {evento.subtitulo ||
-                  (evento.idade_aniversariante
-                    ? `${evento.nome_aniversariante ?? evento.titulo} • ${evento.idade_aniversariante}`
-                    : "Álbum Oficial da Festa")}
-              </span>
-            </div>
-            <h2 className="font-festive text-2xl sm:text-4xl font-bold leading-tight drop-shadow-sm">
+        <div className="relative z-10 flex w-full flex-col gap-4 p-6 text-white sm:flex-row sm:items-end sm:justify-between sm:p-8">
+          <div className="max-w-xl">
+            <p className="text-sm font-semibold text-white/85">{selo}</p>
+            <h2 className="mt-1 font-display text-[34px] font-extrabold leading-[1.02] tracking-tight sm:text-5xl">
               {evento.titulo}
             </h2>
-            <p className="text-xs sm:text-sm text-white/90 leading-relaxed">
+            <p className="mt-3 max-w-md text-sm leading-snug text-white/90">
               {evento.boas_vindas ||
-                "Escolha sua moldura favorita abaixo, tire uma foto ou envie da sua galeria para aparecer no mural ao vivo!"}
+                "Escolha uma moldura, tire a foto e veja ela aparecer no mural da festa."}
             </p>
           </div>
 
           {evento.data_evento && (
-            <div className="shrink-0 self-center sm:self-end px-3.5 py-1.5 rounded-full bg-black/35 backdrop-blur-md border border-white/15 text-xs font-semibold">
+            <span className="shrink-0 -rotate-3 self-start rounded-xl bg-gema px-3.5 py-2 font-display text-base font-extrabold text-ameixa shadow-suave sm:self-end">
               {formatarDataBr(evento.data_evento)}
-            </div>
+            </span>
           )}
         </div>
       </div>
 
       {podeEnviar && (
-        <div className="p-4 sm:p-5 bg-muted/35 space-y-4">
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <p className="font-festive text-sm font-bold text-foreground">
-                1. Escolha sua moldura da festa ({molduras.length + 1} opções)
-              </p>
-              <span className="text-[11px] text-muted-foreground">
-                Você também pode trocar depois de tirar a foto
-              </span>
+        <>
+          <div className="relative text-ameixa/25" aria-hidden="true">
+            <span className="absolute -left-3.5 -top-3.5 h-7 w-7 rounded-full bg-background" />
+            <span className="absolute -right-3.5 -top-3.5 h-7 w-7 rounded-full bg-background" />
+            <div className="picotado mx-5" />
+          </div>
+
+          <div className="space-y-5 p-5 sm:p-7">
+            <div>
+              <div className="flex flex-wrap items-baseline justify-between gap-x-4">
+                <h3 className="font-display text-xl font-extrabold tracking-tight">
+                  Escolha a moldura
+                </h3>
+                <p className="text-xs text-ameixa-suave">
+                  Dá para trocar depois de tirar a foto.
+                </p>
+              </div>
+
+              <div className="no-scrollbar -mx-5 mt-3 flex items-stretch gap-3 overflow-x-auto px-5 pb-3 pt-3 sm:-mx-7 sm:px-7">
+                <button
+                  type="button"
+                  onClick={() => onSelectMoldura(null)}
+                  aria-pressed={molduraSelecionadaId === null}
+                  style={
+                    molduraSelecionadaId === null
+                      ? { borderColor: evento.cor_primaria }
+                      : undefined
+                  }
+                  className={`relative flex w-24 shrink-0 flex-col items-center gap-2 rounded-2xl border-2 bg-white p-2 transition sm:w-28 ${
+                    molduraSelecionadaId === null
+                      ? "-translate-y-1 shadow-suave"
+                      : "border-ameixa/10 hover:border-ameixa/25"
+                  }`}
+                >
+                  {molduraSelecionadaId === null && (
+                    <Marca cor={evento.cor_primaria} />
+                  )}
+                  <div className="flex aspect-[9/13] w-full flex-col items-center justify-center gap-1 rounded-xl bg-ameixa/[0.05] text-ameixa-suave">
+                    <Slash className="h-6 w-6" />
+                    <span className="text-[11px] font-semibold">Foto limpa</span>
+                  </div>
+                  <span className="w-full truncate text-center text-xs font-bold">
+                    Sem moldura
+                  </span>
+                </button>
+
+                {molduras.map((moldura, indice) => {
+                  const selecionada = molduraSelecionadaId === moldura.id;
+                  return (
+                    <button
+                      key={moldura.id}
+                      type="button"
+                      onClick={() => onSelectMoldura(moldura.id)}
+                      aria-pressed={selecionada}
+                      style={
+                        selecionada
+                          ? { borderColor: evento.cor_primaria }
+                          : undefined
+                      }
+                      className={`relative flex w-24 shrink-0 flex-col items-center gap-2 rounded-2xl border-2 bg-white p-2 transition sm:w-28 ${
+                        selecionada
+                          ? `-translate-y-1 shadow-suave ${INCLINACOES[indice % INCLINACOES.length]}`
+                          : "border-ameixa/10 hover:border-ameixa/25"
+                      }`}
+                    >
+                      {selecionada && <Marca cor={evento.cor_primaria} />}
+                      <div className="xadrez flex aspect-[9/13] w-full items-center justify-center overflow-hidden rounded-xl">
+                        <img
+                          src={moldura.arquivo_url}
+                          alt={moldura.nome}
+                          className="h-full w-full object-contain"
+                        />
+                      </div>
+                      <span className="w-full truncate text-center text-xs font-bold">
+                        {moldura.nome}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
             </div>
 
-            <div className="flex items-stretch gap-3 overflow-x-auto pb-2 pt-1">
+            <input
+              ref={inputGaleriaRef}
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                e.target.value = "";
+                if (file) onSelecionarArquivo(file);
+              }}
+            />
+
+            <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
               <button
                 type="button"
-                onClick={() => onSelectMoldura(null)}
-                style={
-                  molduraSelecionadaId === null
-                    ? { borderColor: evento.cor_primaria }
-                    : undefined
-                }
-                className={`relative shrink-0 w-24 sm:w-28 rounded-2xl p-2 border-2 bg-background flex flex-col items-center gap-1.5 transition-all ${
-                  molduraSelecionadaId === null
-                    ? "shadow-md ring-2 ring-primary/20"
-                    : "border-border/80 hover:border-primary/40"
-                }`}
+                onClick={onAbrirCamera}
+                style={{ backgroundColor: evento.cor_primaria }}
+                className="flex h-14 items-center justify-center gap-2.5 rounded-full font-display text-lg font-extrabold text-white shadow-suave transition active:scale-[0.98]"
               >
-                {molduraSelecionadaId === null && (
-                  <span
-                    className="absolute -top-2 -right-2 w-6 h-6 rounded-full text-white flex items-center justify-center shadow-sm"
-                    style={{ backgroundColor: evento.cor_primaria }}
-                  >
-                    <Check className="w-3.5 h-3.5" />
-                  </span>
-                )}
-                <div className="w-full aspect-[9/13] rounded-xl bg-muted flex flex-col items-center justify-center gap-1 text-muted-foreground">
-                  <Slash className="w-6 h-6" />
-                  <span className="text-[10px] font-semibold">Foto Pura</span>
-                </div>
-                <span className="text-[11px] font-bold truncate w-full text-center">
-                  Sem moldura
-                </span>
+                <Camera className="h-5 w-5" />
+                Tirar foto agora
               </button>
 
-              {molduras.map((m) => {
-                const selecionada = molduraSelecionadaId === m.id;
-                return (
-                  <button
-                    key={m.id}
-                    type="button"
-                    onClick={() => onSelectMoldura(m.id)}
-                    style={
-                      selecionada
-                        ? { borderColor: evento.cor_primaria }
-                        : undefined
-                    }
-                    className={`relative shrink-0 w-24 sm:w-28 rounded-2xl p-2 border-2 bg-background flex flex-col items-center gap-1.5 transition-all ${
-                      selecionada
-                        ? "shadow-md ring-2 ring-primary/20"
-                        : "border-border/80 hover:border-primary/40"
-                    }`}
-                  >
-                    {selecionada && (
-                      <span
-                        className="absolute -top-2 -right-2 w-6 h-6 rounded-full text-white flex items-center justify-center shadow-sm z-10"
-                        style={{ backgroundColor: evento.cor_primaria }}
-                      >
-                        <Check className="w-3.5 h-3.5" />
-                      </span>
-                    )}
-                    <div
-                      className="w-full aspect-[9/13] rounded-xl overflow-hidden flex items-center justify-center"
-                      style={{
-                        backgroundImage:
-                          "repeating-conic-gradient(#e9e3f0 0% 25%, #f6f2fa 0% 50%)",
-                        backgroundSize: "14px 14px",
-                      }}
-                    >
-                      <img
-                        src={m.arquivo_url}
-                        alt={m.nome}
-                        className="w-full h-full object-contain"
-                      />
-                    </div>
-                    <span className="text-[11px] font-bold truncate w-full text-center">
-                      {m.nome}
-                    </span>
-                  </button>
-                );
-              })}
+              <button
+                type="button"
+                onClick={() => inputGaleriaRef.current?.click()}
+                style={{
+                  borderColor: evento.cor_secundaria,
+                  color: evento.cor_secundaria,
+                }}
+                className="flex h-14 items-center justify-center gap-2.5 rounded-full border-2 bg-white font-display text-lg font-extrabold transition active:scale-[0.98]"
+              >
+                <ImagePlus className="h-5 w-5" />
+                Escolher do celular
+              </button>
             </div>
           </div>
-
-          <input
-            ref={inputGaleriaRef}
-            type="file"
-            accept="image/*"
-            className="hidden"
-            onChange={(e) => {
-              const file = e.target.files?.[0];
-              e.target.value = "";
-              if (file) onSelecionarArquivo(file);
-            }}
-          />
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-            <Button
-              type="button"
-              size="lg"
-              onClick={onAbrirCamera}
-              style={{ backgroundColor: evento.cor_primaria }}
-              className="w-full h-12 text-white border-0 font-festive text-base shadow-card"
-            >
-              <Camera className="w-5 h-5" />
-              <span>Tirar Foto com a Câmera</span>
-            </Button>
-
-            <Button
-              type="button"
-              size="lg"
-              variant="outline"
-              onClick={() => inputGaleriaRef.current?.click()}
-              style={{
-                borderColor: evento.cor_secundaria,
-                color: evento.cor_secundaria,
-              }}
-              className="w-full h-12 bg-background font-festive text-base border-2"
-            >
-              <ImagePlus className="w-5 h-5" />
-              <span>Escolher Foto do Celular</span>
-            </Button>
-          </div>
-        </div>
+        </>
       )}
     </section>
+  );
+}
+
+function Marca({ cor }: { cor: string }) {
+  return (
+    <span
+      className="absolute -right-2 -top-2 z-10 flex h-6 w-6 items-center justify-center rounded-full text-white shadow-sm"
+      style={{ backgroundColor: cor }}
+    >
+      <Check className="h-3.5 w-3.5" />
+    </span>
   );
 }

@@ -20,6 +20,12 @@ export default {
         festive: ["Bricolage Grotesque Variable", "Inter", "sans-serif"],
       },
       colors: {
+        ameixa: { DEFAULT: "#1c0f2e", suave: "#4b3a63" },
+        algodao: "#ffe4f0",
+        uva: { DEFAULT: "#7c3aed", claro: "#ede4ff" },
+        rosa: { DEFAULT: "#e6007e", vivo: "#ff4f9a" },
+        gema: "#ffd23f",
+        papel: "#fdfbff",
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
@@ -80,6 +86,8 @@ export default {
       boxShadow: {
         card: "0 12px 30px -14px rgba(28, 15, 46, 0.22)",
         modal: "0 30px 70px -24px rgba(28, 15, 46, 0.45)",
+        palco: "0 40px 80px -30px rgba(28, 15, 46, 0.45)",
+        suave: "0 12px 30px -12px rgba(28, 15, 46, 0.25)",
       },
     },
   },

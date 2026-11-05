@@ -1,7 +1,6 @@
-import { Camera, Heart, Sparkles } from "lucide-react";
+import { Camera, Heart } from "lucide-react";
 import { FESTA_DIALOG_NAMES } from "@/constants";
 import { useLayout } from "@/contexts/LayoutContext";
-import { Button } from "@/components/ui/button";
 import type { MidiaDto } from "@/types/festa.types";
 
 interface ConvidadoMuralGridProps {
@@ -14,6 +13,8 @@ interface ConvidadoMuralGridProps {
   onAbrirCamera: () => void;
   permiteEnvio: boolean;
 }
+
+const GRADE = "grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 md:grid-cols-4";
 
 export function ConvidadoMuralGrid({
   midias,
@@ -29,11 +30,11 @@ export function ConvidadoMuralGrid({
 
   if (isLoading) {
     return (
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 sm:gap-4">
-        {Array.from({ length: 8 }).map((_, idx) => (
+      <div className={GRADE}>
+        {Array.from({ length: 8 }).map((_, indice) => (
           <div
-            key={idx}
-            className="aspect-[9/16] rounded-photo bg-muted animate-pulse"
+            key={indice}
+            className="aspect-[9/17] animate-pulse rounded-3xl bg-ameixa/[0.06]"
           />
         ))}
       </div>
@@ -42,24 +43,27 @@ export function ConvidadoMuralGrid({
 
   if (midias.length === 0) {
     return (
-      <div className="rounded-card border border-border/60 bg-card p-10 text-center max-w-md mx-auto my-8 space-y-4 shadow-card">
-        <div className="w-14 h-14 rounded-full bg-primary/15 text-primary flex items-center justify-center mx-auto">
-          <Sparkles className="w-7 h-7" />
+      <div className="mx-auto my-6 max-w-sm rounded-card bg-white p-8 text-center shadow-card">
+        <div className="mx-auto grid h-16 w-16 -rotate-6 place-items-center rounded-2xl bg-gema text-ameixa shadow-suave">
+          <Camera className="h-8 w-8" />
         </div>
-        <div className="space-y-1">
-          <h2 className="font-display text-lg font-bold">
-            Inaugure o álbum desta festa!
-          </h2>
-          <p className="text-xs sm:text-sm text-muted-foreground">
-            Escolha sua moldura favorita, registre um momento especial e veja
-            sua foto aparecer aqui ao vivo.
-          </p>
-        </div>
+        <h2 className="mt-5 font-display text-2xl font-extrabold leading-tight tracking-tight">
+          O mural está vazio
+        </h2>
+        <p className="mt-2 text-sm leading-snug text-ameixa-suave">
+          {permiteEnvio
+            ? "Tire a primeira foto da festa. Ela aparece aqui na hora."
+            : "As fotos da festa vão aparecer aqui."}
+        </p>
         {permiteEnvio && (
-          <Button type="button" onClick={onAbrirCamera} className="w-full">
-            <Camera className="w-4 h-4" />
-            <span>Tirar a Primeira Foto</span>
-          </Button>
+          <button
+            type="button"
+            onClick={onAbrirCamera}
+            className="mt-6 inline-flex h-12 w-full items-center justify-center gap-2 rounded-full bg-primary font-semibold text-white transition active:scale-[0.98]"
+          >
+            <Camera className="h-4 w-4" />
+            Tirar a primeira foto
+          </button>
         )}
       </div>
     );
@@ -76,48 +80,48 @@ export function ConvidadoMuralGrid({
   };
 
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 sm:gap-4">
+    <div className={GRADE}>
       {midias.map((midia) => {
         const curtida = curtidasIds.has(midia.id);
         return (
-          <div
+          <article
             key={midia.id}
-            onClick={() => abrirVisualizador(midia)}
-            className="group relative aspect-[9/16] rounded-photo overflow-hidden bg-zinc-900 shadow-card cursor-pointer border border-border/50 transition-transform duration-200 hover:-translate-y-0.5"
+            className="group overflow-hidden rounded-3xl bg-white shadow-card transition duration-200 hover:-translate-y-0.5"
           >
-            <img
-              src={midia.url_miniatura || midia.url_publica}
-              alt={midia.autor ?? "Lembrança da festa"}
-              loading="lazy"
-              className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
-            />
+            <button
+              type="button"
+              onClick={() => abrirVisualizador(midia)}
+              className="block aspect-[9/16] w-full overflow-hidden bg-ameixa"
+              aria-label={`Abrir foto de ${midia.autor || "convidado"}`}
+            >
+              <img
+                src={midia.url_miniatura || midia.url_publica}
+                alt={midia.autor ?? "Lembrança da festa"}
+                loading="lazy"
+                className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
+              />
+            </button>
 
-            <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent p-3 pt-8 flex items-end justify-between gap-2">
-              <div className="min-w-0 text-white">
-                <p className="text-xs font-bold truncate">
-                  {midia.autor || "Convidado"}
-                </p>
-              </div>
-
+            <div className="legenda-foto">
+              <p className="min-w-0 truncate text-[13px] font-semibold text-ameixa">
+                {midia.autor || "Convidado"}
+              </p>
               <button
                 type="button"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onToggleCurtida(midia);
-                }}
-                className={`h-8 px-2.5 rounded-full text-xs font-bold flex items-center gap-1 backdrop-blur-md transition-colors ${
+                onClick={() => onToggleCurtida(midia)}
+                aria-pressed={curtida}
+                aria-label="Curtir foto"
+                className={`flex h-8 shrink-0 items-center gap-1 rounded-full px-2.5 text-xs font-bold transition ${
                   curtida
-                    ? "bg-primary text-white"
-                    : "bg-black/45 text-white hover:bg-black/65"
+                    ? "bg-rosa-vivo text-ameixa"
+                    : "bg-ameixa/[0.06] text-ameixa-suave hover:bg-ameixa/10"
                 }`}
               >
-                <Heart
-                  className={`w-3.5 h-3.5 ${curtida ? "fill-current" : ""}`}
-                />
-                <span>{midia.curtidas}</span>
+                <Heart className={`h-3.5 w-3.5 ${curtida ? "fill-current" : ""}`} />
+                <span className="tabular-nums">{midia.curtidas}</span>
               </button>
             </div>
-          </div>
+          </article>
         );
       })}
     </div>
