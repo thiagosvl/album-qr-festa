@@ -1,12 +1,18 @@
 export type ModoCamera = "user" | "environment";
 
-/** Proporção 3:4 em pé: o celular entrega o campo de visão inteiro do sensor, sem "zoom". */
-const PROPORCAO_RETRATO = 3 / 4;
+/**
+ * Pedimos SEMPRE tamanhos "deitados" (largura > altura), mesmo com o celular em pé.
+ * O navegador entrega o quadro girado conforme a posição do aparelho. Pedir tamanho
+ * em pé (ex.: 1728x2304) ou aspectRatio < 1 faz o Chrome do Android recortar o
+ * sensor para simular o formato, e o preview fica com "zoom" (campo de visão menor
+ * que o do app nativo). Referência: guia de web do Snap Camera Kit.
+ */
+const PROPORCAO_SENSOR = 4 / 3;
 
-const RESOLUCOES_RETRATO = [
-  { width: 1728, height: 2304 },
-  { width: 2304, height: 3072 },
-  { width: 1080, height: 1440 },
+const RESOLUCOES_SENSOR = [
+  { width: 2304, height: 1728 },
+  { width: 1920, height: 1440 },
+  { width: 1280, height: 960 },
 ] as const;
 
 /** Tempo para o Android liberar a câmera anterior antes de abrir outra. */
@@ -15,30 +21,15 @@ export const ESPERA_ENTRE_RODADAS_MS = 500;
 export const RODADAS_TENTATIVA_CAMERA = 2;
 
 /**
- * Lista de pedidos do mais exigente ao mais permissivo (mesma estratégia do
- * piloto): primeiro 3:4 exato; se o aparelho recusar, relaxa até aceitar
- * qualquer vídeo da câmera pedida.
+ * Pedidos do mais exigente ao mais permissivo: 4:3 do sensor em alta, depois
+ * resoluções menores, e por fim qualquer vídeo da câmera pedida.
  */
 export function montarTentativasVideo(modo: ModoCamera): MediaTrackConstraints[] {
   const facingMode = { ideal: modo };
-  const [padrao, ...alternativas] = RESOLUCOES_RETRATO;
   return [
-    // Resolução exata em pé: alguns aparelhos (ex.: Galaxy S25) recusam aspectRatio
-    // exato mas entregam o modo 1728x2304 quando pedido por largura e altura.
-    {
+    ...RESOLUCOES_SENSOR.map((resolucao) => ({
       facingMode,
-      width: { exact: padrao.width },
-      height: { exact: padrao.height },
-    },
-    {
-      facingMode,
-      aspectRatio: { exact: PROPORCAO_RETRATO },
-      width: { ideal: padrao.width },
-      height: { ideal: padrao.height },
-    },
-    ...alternativas.map((resolucao) => ({
-      facingMode,
-      aspectRatio: { ideal: PROPORCAO_RETRATO },
+      aspectRatio: { ideal: PROPORCAO_SENSOR },
       width: { ideal: resolucao.width },
       height: { ideal: resolucao.height },
     })),
