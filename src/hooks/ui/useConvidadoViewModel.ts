@@ -70,6 +70,9 @@ export function useConvidadoViewModel(slug: string) {
   const [torchAtivo, setTorchAtivo] = useState(false);
   const [suportaTorch, setSuportaTorch] = useState(false);
   const [cameraErro, setCameraErro] = useState<string | null>(null);
+  const [espelharPreview, setEspelharPreview] = useState(false);
+  const [podeAlternarCamera, setPodeAlternarCamera] = useState(false);
+  const requisicaoCameraRef = useRef(0);
   const videoRef = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
 
@@ -132,6 +135,7 @@ export function useConvidadoViewModel(slug: string) {
   }, [evento?.id, queryClient, sessaoId, slug]);
 
   const pararCamera = useCallback(() => {
+    requisicaoCameraRef.current += 1;
     if (streamRef.current) {
       streamRef.current.getTracks().forEach((track) => track.stop());
       streamRef.current = null;
@@ -144,16 +148,36 @@ export function useConvidadoViewModel(slug: string) {
     async (modoCamera: "user" | "environment" = facingMode) => {
       pararCamera();
       setCameraErro(null);
+      const idRequisicao = ++requisicaoCameraRef.current;
       try {
         const stream = await navigator.mediaDevices.getUserMedia({
           audio: false,
           video: {
             facingMode: { ideal: modoCamera },
-            width: { ideal: 1920 },
-            height: { ideal: 1080 },
+            width: { ideal: 1080 },
+            height: { ideal: 1920 },
+            aspectRatio: { ideal: 9 / 16 },
           },
         });
+        if (idRequisicao !== requisicaoCameraRef.current) {
+          stream.getTracks().forEach((track) => track.stop());
+          return;
+        }
         streamRef.current = stream;
+        const configuracao = stream.getVideoTracks()[0]?.getSettings();
+        setEspelharPreview(
+          configuracao?.facingMode
+            ? configuracao.facingMode === "user"
+            : modoCamera === "user" || !/Android|iPhone|iPad/i.test(navigator.userAgent)
+        );
+        navigator.mediaDevices
+          .enumerateDevices()
+          .then((dispositivos) =>
+            setPodeAlternarCamera(
+              dispositivos.filter((d) => d.kind === "videoinput").length > 1
+            )
+          )
+          .catch(() => setPodeAlternarCamera(false));
         if (videoRef.current) {
           videoRef.current.srcObject = stream;
           await videoRef.current.play().catch(() => undefined);
@@ -211,7 +235,7 @@ export function useConvidadoViewModel(slug: string) {
     if (!ctx) return;
     ctx.drawImage(video, 0, 0);
     const bitmap = await createImageBitmap(canvasTemp);
-    const deveEspelhar = facingMode === "user";
+    const deveEspelhar = espelharPreview;
     setFonteCapturada(bitmap);
     setEspelharCaptura(deveEspelhar);
     setTransformacao({
@@ -365,6 +389,8 @@ export function useConvidadoViewModel(slug: string) {
     setNomeConvidado,
     videoRef,
     facingMode,
+    espelharPreview,
+    podeAlternarCamera,
     alternarCamera,
     torchAtivo,
     suportaTorch,

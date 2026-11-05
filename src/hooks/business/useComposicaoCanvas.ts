@@ -69,6 +69,72 @@ export function limitarDeslocamentoCanvas(
   };
 }
 
+type FonteFoto = ImageBitmap | HTMLImageElement | HTMLVideoElement;
+
+function desenharFoto(
+  ctx: CanvasRenderingContext2D,
+  fonteFoto: FonteFoto,
+  sourceWidth: number,
+  sourceHeight: number,
+  transformacao: TransformacaoFoto
+): void {
+  const targetW = FESTA_CANVAS_CONFIG.FULL_WIDTH;
+  const targetH = FESTA_CANVAS_CONFIG.FULL_HEIGHT;
+  const clampedScale = Math.max(1, Math.min(3, transformacao.scale));
+  const baseScale = Math.max(targetW / sourceWidth, targetH / sourceHeight);
+  const drawnW = sourceWidth * baseScale * clampedScale;
+  const drawnH = sourceHeight * baseScale * clampedScale;
+
+  const { offsetX, offsetY } = limitarDeslocamentoCanvas(
+    sourceWidth,
+    sourceHeight,
+    clampedScale,
+    transformacao.offsetX,
+    transformacao.offsetY
+  );
+
+  ctx.save();
+  ctx.translate(targetW / 2 + offsetX, targetH / 2 + offsetY);
+  if (transformacao.espelharHorizontal) {
+    ctx.scale(-1, 1);
+  }
+  ctx.drawImage(fonteFoto, -drawnW / 2, -drawnH / 2, drawnW, drawnH);
+  ctx.restore();
+}
+
+export async function renderizarPreviewComMoldura(
+  fonteFoto: ImageBitmap | HTMLImageElement,
+  molduraUrl: string | null,
+  transformacao: TransformacaoFoto,
+  escala = 0.4
+): Promise<string> {
+  const canvas = document.createElement("canvas");
+  canvas.width = Math.round(FESTA_CANVAS_CONFIG.FULL_WIDTH * escala);
+  canvas.height = Math.round(FESTA_CANVAS_CONFIG.FULL_HEIGHT * escala);
+  const ctx = canvas.getContext("2d");
+  if (!ctx) {
+    throw new Error("Contexto 2D indisponível neste dispositivo");
+  }
+  ctx.fillStyle = "#111111";
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.save();
+  ctx.scale(escala, escala);
+  desenharFoto(ctx, fonteFoto, fonteFoto.width, fonteFoto.height, transformacao);
+  if (molduraUrl) {
+    const molduraImg = await carregarImagemCors(molduraUrl);
+    ctx.drawImage(
+      molduraImg,
+      0,
+      0,
+      FESTA_CANVAS_CONFIG.FULL_WIDTH,
+      FESTA_CANVAS_CONFIG.FULL_HEIGHT
+    );
+  }
+  ctx.restore();
+  const blob = await converterCanvasParaBlob(canvas, "image/jpeg", 0.8);
+  return URL.createObjectURL(blob);
+}
+
 export async function renderizarFotoComMoldura(
   fonteFoto: ImageBitmap | HTMLImageElement | HTMLVideoElement,
   molduraUrl: string | null,
@@ -94,26 +160,7 @@ export async function renderizarFotoComMoldura(
   ctxFull.fillStyle = "#111111";
   ctxFull.fillRect(0, 0, targetW, targetH);
 
-  const clampedScale = Math.max(1, Math.min(3, transformacao.scale));
-  const baseScale = Math.max(targetW / sourceWidth, targetH / sourceHeight);
-  const drawnW = sourceWidth * baseScale * clampedScale;
-  const drawnH = sourceHeight * baseScale * clampedScale;
-
-  const { offsetX, offsetY } = limitarDeslocamentoCanvas(
-    sourceWidth,
-    sourceHeight,
-    clampedScale,
-    transformacao.offsetX,
-    transformacao.offsetY
-  );
-
-  ctxFull.save();
-  ctxFull.translate(targetW / 2 + offsetX, targetH / 2 + offsetY);
-  if (transformacao.espelharHorizontal) {
-    ctxFull.scale(-1, 1);
-  }
-  ctxFull.drawImage(fonteFoto, -drawnW / 2, -drawnH / 2, drawnW, drawnH);
-  ctxFull.restore();
+  desenharFoto(ctxFull, fonteFoto, sourceWidth, sourceHeight, transformacao);
 
   if (molduraUrl) {
     const molduraImg = await carregarImagemCors(molduraUrl);

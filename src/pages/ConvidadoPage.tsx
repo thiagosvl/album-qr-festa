@@ -135,7 +135,8 @@ export function ConvidadoPage() {
       {vm.modo === "CAMERA" && (
         <ConvidadoCameraView
           videoRef={vm.videoRef}
-          facingMode={vm.facingMode}
+          espelharPreview={vm.espelharPreview}
+          podeAlternarCamera={vm.podeAlternarCamera}
           onAlternarCamera={vm.alternarCamera}
           torchAtivo={vm.torchAtivo}
           suportaTorch={vm.suportaTorch}

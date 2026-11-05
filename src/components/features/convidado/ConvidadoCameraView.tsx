@@ -1,19 +1,12 @@
 import { useRef } from "react";
-import {
-  Camera,
-  Flashlight,
-  ImagePlus,
-  RefreshCw,
-  Slash,
-  X,
-} from "lucide-react";
+import { Flashlight, ImagePlus, RefreshCw, Slash, X } from "lucide-react";
 import { Banner } from "@/components/ui/Banner";
-import { Button } from "@/components/ui/button";
 import type { MolduraDto } from "@/types/festa.types";
 
 interface ConvidadoCameraViewProps {
   videoRef: React.RefObject<HTMLVideoElement>;
-  facingMode: "user" | "environment";
+  espelharPreview: boolean;
+  podeAlternarCamera: boolean;
   onAlternarCamera: () => void;
   torchAtivo: boolean;
   suportaTorch: boolean;
@@ -28,9 +21,13 @@ interface ConvidadoCameraViewProps {
   onFechar: () => void;
 }
 
+const BOTAO_ICONE =
+  "grid h-11 w-11 place-items-center rounded-full bg-white/10 text-white transition hover:bg-white/20 active:scale-95";
+
 export function ConvidadoCameraView({
   videoRef,
-  facingMode,
+  espelharPreview,
+  podeAlternarCamera,
   onAlternarCamera,
   torchAtivo,
   suportaTorch,
@@ -47,65 +44,63 @@ export function ConvidadoCameraView({
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   return (
-    <div className="fixed inset-0 z-50 bg-ameixa text-white flex flex-col">
-      <div className="px-4 py-3 flex items-center justify-between bg-black/50 backdrop-blur-md z-20">
-        <Button
+    <div className="fixed inset-0 z-50 flex flex-col bg-ameixa text-white">
+      <div className="z-20 flex items-center justify-between px-4 py-3">
+        <button
           type="button"
-          variant="ghost"
-          size="icon"
           onClick={onFechar}
-          className="text-white hover:bg-white/15"
+          aria-label="Fechar câmera"
+          className={BOTAO_ICONE}
         >
-          <X className="w-5 h-5" />
-        </Button>
+          <X className="h-5 w-5" />
+        </button>
 
-        <span className="font-display text-sm font-bold">
-          Escolha sua Moldura
+        <span className="font-display text-base font-extrabold tracking-tight">
+          Tire sua foto
         </span>
 
-        <div className="flex items-center gap-1.5">
+        <div className="flex items-center gap-2">
           {suportaTorch && (
-            <Button
+            <button
               type="button"
-              variant="ghost"
-              size="icon"
               onClick={onAlternarTorch}
-              className={`text-white hover:bg-white/15 ${
-                torchAtivo ? "bg-amber-500/30 text-amber-300" : ""
-              }`}
+              aria-label="Lanterna"
+              aria-pressed={torchAtivo}
+              className={`${BOTAO_ICONE} ${torchAtivo ? "bg-gema text-ameixa hover:bg-gema" : ""}`}
             >
-              <Flashlight className="w-5 h-5" />
-            </Button>
+              <Flashlight className="h-5 w-5" />
+            </button>
           )}
-          <Button
-            type="button"
-            variant="ghost"
-            size="icon"
-            onClick={onAlternarCamera}
-            className="text-white hover:bg-white/15"
-          >
-            <RefreshCw className="w-5 h-5" />
-          </Button>
+          {podeAlternarCamera && (
+            <button
+              type="button"
+              onClick={onAlternarCamera}
+              aria-label="Trocar entre câmera frontal e traseira"
+              className={BOTAO_ICONE}
+            >
+              <RefreshCw className="h-5 w-5" />
+            </button>
+          )}
         </div>
       </div>
 
-      <div className="flex-1 relative flex items-center justify-center overflow-hidden bg-black">
-        <div className="relative aspect-[9/16] h-full max-h-full w-auto max-w-full overflow-hidden flex items-center justify-center bg-ameixa/80">
+      <div className="relative flex flex-1 items-center justify-center overflow-hidden px-3">
+        <div className="relative flex aspect-[9/16] h-full max-h-full w-auto max-w-full items-center justify-center overflow-hidden rounded-[28px] bg-black ring-2 ring-white/20">
           {!cameraErro ? (
             <video
               ref={videoRef}
               playsInline
               muted
               autoPlay
-              className={`w-full h-full object-cover ${
-                facingMode === "user" ? "-scale-x-100" : ""
+              className={`h-full w-full object-cover ${
+                espelharPreview ? "-scale-x-100" : ""
               }`}
             />
           ) : (
-            <div className="p-6 max-w-xs">
+            <div className="max-w-xs p-6">
               <Banner
                 variant="warning"
-                title="Câmera ao vivo não liberada"
+                title="A câmera não abriu"
                 description={cameraErro}
               />
             </div>
@@ -115,49 +110,54 @@ export function ConvidadoCameraView({
             <img
               src={molduraSelecionada.arquivo_url}
               alt={molduraSelecionada.nome}
-              className="absolute inset-0 w-full h-full object-contain pointer-events-none select-none"
+              className="pointer-events-none absolute inset-0 h-full w-full select-none object-contain"
             />
           )}
         </div>
       </div>
 
-      <div className="bg-ameixa/95 border-t border-white/10 px-4 py-3 space-y-3">
-        <div className="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar">
+      <div className="space-y-4 px-4 pb-5 pt-3">
+        <div className="no-scrollbar flex items-center gap-2 overflow-x-auto">
           <button
             type="button"
             onClick={() => onSelectMoldura(null)}
-            className={`shrink-0 px-3.5 py-2 rounded-full text-xs font-bold flex items-center gap-1.5 border transition-all ${
+            aria-pressed={molduraSelecionadaId === null}
+            className={`flex h-11 shrink-0 items-center gap-1.5 rounded-full px-4 text-sm font-semibold transition ${
               molduraSelecionadaId === null
-                ? "bg-white text-ameixa border-white"
-                : "bg-ameixa/80 text-white/75 border-white/15"
+                ? "bg-white text-ameixa"
+                : "bg-white/10 text-white/80"
             }`}
           >
-            <Slash className="w-3.5 h-3.5" />
-            <span>Sem moldura</span>
+            <Slash className="h-4 w-4" />
+            Sem moldura
           </button>
 
-          {molduras.map((m) => (
-            <button
-              key={m.id}
-              type="button"
-              onClick={() => onSelectMoldura(m.id)}
-              className={`shrink-0 px-3 py-1.5 rounded-full text-xs font-bold border transition-all flex items-center gap-2 ${
-                molduraSelecionadaId === m.id
-                  ? "bg-primary text-white border-primary"
-                  : "bg-ameixa/80 text-white/75 border-white/15"
-              }`}
-            >
-              <img
-                src={m.arquivo_url}
-                alt={m.nome}
-                className="w-4 h-6 object-contain rounded bg-white/10"
-              />
-              <span>{m.nome}</span>
-            </button>
-          ))}
+          {molduras.map((moldura) => {
+            const ativa = molduraSelecionadaId === moldura.id;
+            return (
+              <button
+                key={moldura.id}
+                type="button"
+                onClick={() => onSelectMoldura(moldura.id)}
+                aria-pressed={ativa}
+                className={`flex h-11 shrink-0 items-center gap-2 rounded-full py-1 pl-1.5 pr-4 text-sm font-semibold transition ${
+                  ativa ? "bg-white text-ameixa" : "bg-white/10 text-white/80"
+                }`}
+              >
+                <span className="xadrez grid h-8 w-6 place-items-center overflow-hidden rounded-md">
+                  <img
+                    src={moldura.arquivo_url}
+                    alt=""
+                    className="h-full w-full object-contain"
+                  />
+                </span>
+                {moldura.nome}
+              </button>
+            );
+          })}
         </div>
 
-        <div className="flex items-center justify-around pb-2">
+        <div className="grid grid-cols-[1fr_auto_1fr] items-center">
           <input
             ref={fileInputRef}
             type="file"
@@ -165,35 +165,34 @@ export function ConvidadoCameraView({
             className="hidden"
             onChange={(e) => {
               const arquivo = e.target.files?.[0];
+              e.target.value = "";
               if (arquivo) onSelecionarArquivo(arquivo);
             }}
           />
 
-          <Button
+          <button
             type="button"
-            variant="secondary"
-            size="sm"
             onClick={() => fileInputRef.current?.click()}
-            className="rounded-full bg-white/10 text-white hover:bg-white/20"
+            className="flex h-11 w-fit items-center gap-2 rounded-full bg-white/10 px-4 text-sm font-semibold transition hover:bg-white/20"
           >
-            <ImagePlus className="w-4 h-4" />
-            <span>Da Galeria</span>
-          </Button>
+            <ImagePlus className="h-4 w-4" />
+            Galeria
+          </button>
 
           <button
             type="button"
             disabled={Boolean(cameraErro)}
             onClick={onCapturar}
-            className="w-18 h-18 p-1.5 rounded-full border-4 border-white flex items-center justify-center active:scale-95 transition-transform disabled:opacity-40"
+            aria-label="Tirar foto"
+            className="grid h-[76px] w-[76px] place-items-center rounded-full border-4 border-white transition active:scale-95 disabled:opacity-40"
           >
-            <span className="w-14 h-14 rounded-full bg-primary flex items-center justify-center">
-              <Camera className="w-6 h-6 text-white" />
-            </span>
+            <span
+              className="h-14 w-14 rounded-full"
+              style={{ backgroundColor: "var(--cor1, #e6007e)" }}
+            />
           </button>
 
-          <div className="w-24 text-right text-[11px] text-white/60">
-            1080×1920 HD
-          </div>
+          <span />
         </div>
       </div>
     </div>
