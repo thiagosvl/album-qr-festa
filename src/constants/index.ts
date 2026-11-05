@@ -23,6 +23,25 @@ export const FESTA_CANVAS_CONFIG = {
   THUMB_QUALITY: 0.72,
 } as const;
 
+/** Como o visor da câmera encaixa o quadro do sensor (3:4) no formato da foto (9:16). */
+export const ENQUADRAMENTO_CAMERA = {
+  /** Quadro inteiro na largura: campo de visão máximo, faixas desfocadas em cima e embaixo. */
+  QUADRO_INTEIRO: "QUADRO_INTEIRO",
+  /** Tela cheia: corta as laterais do quadro (parece mais "aproximado"). */
+  PREENCHER: "PREENCHER",
+} as const;
+export type EnquadramentoCamera =
+  (typeof ENQUADRAMENTO_CAMERA)[keyof typeof ENQUADRAMENTO_CAMERA];
+
+/** Chaves de comportamento da câmera do convidado (trocar aqui, sem mexer nos componentes). */
+export const CAMERA_CONFIG = {
+  ENQUADRAMENTO: ENQUADRAMENTO_CAMERA.QUADRO_INTEIRO as EnquadramentoCamera,
+  /** Botão para alternar entre as lentes traseiras (principal / ultra-wide) quando o aparelho expõe mais de uma. */
+  PERMITIR_TROCA_LENTE: true,
+  /** `?diagcamera=1` na URL mostra resolução, lentes e versão sobre o visor. */
+  PARAMETRO_DIAGNOSTICO: "diagcamera",
+} as const;
+
 export const FESTA_ROUTES = {
   HOME: "/",
   EVENTO_CONVIDADO: "/e/:slug",

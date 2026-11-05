@@ -1,12 +1,11 @@
+import { CAMERA_CONFIG } from "@/constants";
 import { VERSAO_APP } from "@/lib/versaoApp";
-
-const PARAMETRO_DIAGNOSTICO = "diagcamera";
 
 type CapacidadesComZoom = MediaTrackCapabilities & { zoom?: { min: number; max: number } };
 
 /** Com `?diagcamera=1` na URL a câmera mostra o que o aparelho realmente entregou. */
 export function diagnosticoAtivo(): boolean {
-  return new URLSearchParams(window.location.search).has(PARAMETRO_DIAGNOSTICO);
+  return new URLSearchParams(window.location.search).has(CAMERA_CONFIG.PARAMETRO_DIAGNOSTICO);
 }
 
 export function descreverCamera(

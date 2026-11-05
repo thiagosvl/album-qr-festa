@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import {
+  CAMERA_CONFIG,
   FESTA_BUCKET_MIDIAS,
   FESTA_TIPO_MIDIA,
   STORAGE_KEYS,
@@ -37,7 +38,7 @@ import {
 } from "@/lib/cameraDispositivos";
 import { descreverCamera, diagnosticoAtivo } from "@/lib/cameraDiagnostico";
 import { useHistoricoNavegacao } from "@/hooks/ui/useHistoricoNavegacao";
-import { calcularEscalaAjusteLargura } from "@/lib/escalaFoto";
+import { calcularEscalaInicialCaptura } from "@/lib/escalaFoto";
 import { gerarUuidLocal } from "@/lib/utils";
 import type { MidiaDto, MolduraDto } from "@/types/festa.types";
 
@@ -243,7 +244,10 @@ export function useConvidadoViewModel(slug: string) {
     return () => pararCamera();
   }, [modo, facingMode, deviceIdSelecionado, iniciarCamera, pararCamera]);
 
-  const podeTrocarLente = facingMode === "environment" && lentesTraseiras.length > 1;
+  const podeTrocarLente =
+    CAMERA_CONFIG.PERMITIR_TROCA_LENTE &&
+    facingMode === "environment" &&
+    lentesTraseiras.length > 1;
 
   const trocarLente = () => {
     const atual = streamRef.current?.getVideoTracks()[0]?.getSettings().deviceId;
@@ -283,10 +287,9 @@ export function useConvidadoViewModel(slug: string) {
     origemRevisaoRef.current = MODO_CONVIDADO.CAMERA;
     setFonteCapturada(bitmap);
     setEspelharCaptura(deveEspelhar);
-    // O visor mostra o quadro inteiro da câmera na largura (sem cortar as
-    // laterais); a captura começa com esse mesmo enquadramento.
+    // A captura abre na revisão com o mesmo enquadramento do visor.
     setTransformacao({
-      scale: calcularEscalaAjusteLargura(video.videoWidth, video.videoHeight),
+      scale: calcularEscalaInicialCaptura(video.videoWidth, video.videoHeight),
       offsetX: 0,
       offsetY: 0,
       espelharHorizontal: deveEspelhar,

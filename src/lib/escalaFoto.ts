@@ -1,4 +1,8 @@
-import { FESTA_CANVAS_CONFIG } from "@/constants";
+import {
+  CAMERA_CONFIG,
+  ENQUADRAMENTO_CAMERA,
+  FESTA_CANVAS_CONFIG,
+} from "@/constants";
 
 export const ESCALA_MAXIMA_FOTO = 3;
 
@@ -38,4 +42,14 @@ export function limitarEscala(
     calcularEscalaMinima(larguraFonte, alturaFonte),
     Math.min(ESCALA_MAXIMA_FOTO, escala)
   );
+}
+
+/** Escala com que a foto tirada pela câmera abre na revisão: a mesma do visor. */
+export function calcularEscalaInicialCaptura(
+  larguraFonte: number,
+  alturaFonte: number
+): number {
+  return CAMERA_CONFIG.ENQUADRAMENTO === ENQUADRAMENTO_CAMERA.QUADRO_INTEIRO
+    ? calcularEscalaAjusteLargura(larguraFonte, alturaFonte)
+    : 1;
 }

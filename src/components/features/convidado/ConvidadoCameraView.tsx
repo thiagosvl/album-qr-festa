@@ -6,6 +6,11 @@ import {
   SeletorMolduras,
   TAMANHO_SELETOR,
 } from "@/components/features/convidado/SeletorMolduras";
+import {
+  CAMERA_CONFIG,
+  ENQUADRAMENTO_CAMERA,
+  type EnquadramentoCamera,
+} from "@/constants";
 import type { MolduraDto } from "@/types/festa.types";
 
 interface ConvidadoCameraViewProps {
@@ -28,6 +33,11 @@ interface ConvidadoCameraViewProps {
   onSelecionarArquivo: (file: File) => void;
   onFechar: () => void;
 }
+
+const CLASSES_VIDEO: Record<EnquadramentoCamera, string> = {
+  [ENQUADRAMENTO_CAMERA.QUADRO_INTEIRO]: "h-auto",
+  [ENQUADRAMENTO_CAMERA.PREENCHER]: "h-full object-cover",
+};
 
 const BOTAO_ICONE =
   "grid h-12 w-12 place-items-center rounded-full bg-black/35 text-white backdrop-blur-sm transition hover:bg-black/50 active:scale-95";
@@ -55,6 +65,7 @@ export function ConvidadoCameraView({
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   useBloquearScrollCorpo();
   const videoFundoRef = useRef<HTMLVideoElement | null>(null);
+  const quadroInteiro = CAMERA_CONFIG.ENQUADRAMENTO === ENQUADRAMENTO_CAMERA.QUADRO_INTEIRO;
   const classeEspelho = espelharPreview ? "-scale-x-100" : "";
 
   /** O fundo desfocado reaproveita o mesmo stream do visor (sem abrir outra câmera). */
@@ -70,24 +81,25 @@ export function ConvidadoCameraView({
       <div className="relative aspect-[9/16] w-[min(100vw,calc(100dvh*9/16))] overflow-hidden bg-ameixa">
         {!cameraErro ? (
           <div className="absolute inset-0 flex items-center justify-center overflow-hidden bg-black">
-            {/* Quadro inteiro da câmera na largura (sem cortar laterais, igual à câmera
-                nativa); as faixas de cima e de baixo mostram a própria imagem desfocada,
-                como na foto final. */}
-            <video
-              ref={videoFundoRef}
-              playsInline
-              muted
-              autoPlay
-              aria-hidden="true"
-              className={`absolute inset-0 h-full w-full scale-110 object-cover opacity-70 blur-2xl ${classeEspelho}`}
-            />
+            {/* Quadro inteiro: as faixas de cima e de baixo mostram a própria imagem
+                desfocada, como na foto final. */}
+            {quadroInteiro && (
+              <video
+                ref={videoFundoRef}
+                playsInline
+                muted
+                autoPlay
+                aria-hidden="true"
+                className={`absolute inset-0 h-full w-full scale-110 object-cover opacity-70 blur-2xl ${classeEspelho}`}
+              />
+            )}
             <video
               ref={videoRef}
               playsInline
               muted
               autoPlay
               onPlaying={(e) => sincronizarFundo(e.currentTarget)}
-              className={`relative h-auto w-full ${classeEspelho}`}
+              className={`relative w-full ${CLASSES_VIDEO[CAMERA_CONFIG.ENQUADRAMENTO]} ${classeEspelho}`}
             />
           </div>
         ) : (
