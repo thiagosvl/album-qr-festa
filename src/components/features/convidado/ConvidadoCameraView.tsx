@@ -49,15 +49,6 @@ export function ConvidadoCameraView({
   return (
     <div className="fixed inset-0 z-50 flex flex-col overflow-hidden bg-ameixa text-white">
       <div className="z-20 flex h-14 shrink-0 items-center justify-between px-4">
-        <button
-          type="button"
-          onClick={onFechar}
-          aria-label="Fechar câmera"
-          className={BOTAO_ICONE}
-        >
-          <X className="h-5 w-5" />
-        </button>
-
         {suportaTorch ? (
           <button
             type="button"
@@ -71,6 +62,15 @@ export function ConvidadoCameraView({
         ) : (
           <span className="h-12 w-12" aria-hidden="true" />
         )}
+        <button
+          type="button"
+          onClick={onFechar}
+          aria-label="Fechar câmera"
+          className={BOTAO_ICONE}
+        >
+          <X className="h-5 w-5" />
+        </button>
+
       </div>
 
       <div className="relative flex min-h-0 flex-1 items-center justify-center px-3">

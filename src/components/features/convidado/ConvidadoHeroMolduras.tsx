@@ -1,5 +1,9 @@
 import { useRef } from "react";
-import { Camera, Check, ChevronRight, ImagePlus, Info, Slash } from "lucide-react";
+import { Camera, ChevronRight, ImagePlus, Info } from "lucide-react";
+import {
+  SeletorMolduras,
+  VARIANTE_SELETOR,
+} from "@/components/features/convidado/SeletorMolduras";
 import type { EventoPublicoDto, MolduraDto } from "@/types/festa.types";
 
 interface ConvidadoHeroMoldurasProps {
@@ -14,9 +18,6 @@ interface ConvidadoHeroMoldurasProps {
   totalFotos: number;
   avisos: string[];
 }
-
-const CARTAO_MOLDURA =
-  "relative flex w-[92px] shrink-0 snap-start flex-col items-center gap-1.5 rounded-2xl border-2 bg-white p-1.5 transition";
 
 export function ConvidadoHeroMolduras({
   evento,
@@ -93,54 +94,15 @@ export function ConvidadoHeroMolduras({
             Escolha sua moldura
           </h2>
 
-          <div className="no-scrollbar mt-2 flex snap-x gap-2.5 overflow-x-auto px-5 pb-2 pt-3">
-            <button
-              type="button"
-              onClick={() => onSelectMoldura(null)}
-              aria-pressed={molduraSelecionadaId === null}
-              style={
-                molduraSelecionadaId === null
-                  ? { borderColor: evento.cor_primaria }
-                  : undefined
-              }
-              className={`${CARTAO_MOLDURA} ${
-                molduraSelecionadaId === null ? "" : "border-ameixa/10"
-              }`}
-            >
-              {molduraSelecionadaId === null && <Marca cor={evento.cor_primaria} />}
-              <div className="flex aspect-[9/13] w-full items-center justify-center rounded-xl bg-ameixa/[0.05] text-ameixa-suave">
-                <Slash className="h-6 w-6" />
-              </div>
-              <span className="w-full truncate text-center text-[11px] font-bold text-ameixa">
-                Sem moldura
-              </span>
-            </button>
-
-            {molduras.map((moldura) => {
-              const selecionada = molduraSelecionadaId === moldura.id;
-              return (
-                <button
-                  key={moldura.id}
-                  type="button"
-                  onClick={() => onSelectMoldura(moldura.id)}
-                  aria-pressed={selecionada}
-                  style={selecionada ? { borderColor: evento.cor_primaria } : undefined}
-                  className={`${CARTAO_MOLDURA} ${selecionada ? "" : "border-ameixa/10"}`}
-                >
-                  {selecionada && <Marca cor={evento.cor_primaria} />}
-                  <div className="xadrez flex aspect-[9/13] w-full items-center justify-center overflow-hidden rounded-xl">
-                    <img
-                      src={moldura.arquivo_url}
-                      alt={moldura.nome}
-                      className="h-full w-full object-contain"
-                    />
-                  </div>
-                  <span className="w-full truncate text-center text-[11px] font-bold text-ameixa">
-                    {moldura.nome}
-                  </span>
-                </button>
-              );
-            })}
+          <div className="mt-1 px-4">
+            <SeletorMolduras
+              molduras={molduras}
+              molduraSelecionadaId={molduraSelecionadaId}
+              onSelectMoldura={onSelectMoldura}
+              variante={VARIANTE_SELETOR.CLARO}
+              corDestaque={evento.cor_primaria}
+              grande
+            />
           </div>
 
           <input
@@ -205,16 +167,5 @@ export function ConvidadoHeroMolduras({
         <div className="pb-6" />
       )}
     </div>
-  );
-}
-
-function Marca({ cor }: { cor: string }) {
-  return (
-    <span
-      className="absolute -right-1.5 -top-1.5 z-10 flex h-5 w-5 items-center justify-center rounded-full text-white shadow-sm"
-      style={{ backgroundColor: cor }}
-    >
-      <Check className="h-3 w-3" />
-    </span>
   );
 }

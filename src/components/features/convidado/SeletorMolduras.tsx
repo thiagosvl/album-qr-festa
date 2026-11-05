@@ -1,19 +1,19 @@
-import { Slash } from "lucide-react";
+import { Ban } from "lucide-react";
 import type { MolduraDto } from "@/types/festa.types";
+
+export const VARIANTE_SELETOR = {
+  ESCURO: "ESCURO",
+  CLARO: "CLARO",
+} as const;
+type VarianteSeletor = (typeof VARIANTE_SELETOR)[keyof typeof VARIANTE_SELETOR];
 
 interface SeletorMoldurasProps {
   molduras: MolduraDto[];
   molduraSelecionadaId: string | null;
   onSelectMoldura: (id: string | null) => void;
-}
-
-const MINIATURA =
-  "relative h-[84px] w-[48px] shrink-0 overflow-hidden rounded-xl transition active:scale-95";
-
-function classeEstado(ativa: boolean): string {
-  return ativa
-    ? "ring-[3px] ring-white"
-    : "opacity-70 ring-1 ring-white/25 hover:opacity-100";
+  variante?: VarianteSeletor;
+  corDestaque?: string;
+  grande?: boolean;
 }
 
 /** Faixa horizontal de molduras: o desenho da moldura é o que identifica a opção. */
@@ -21,10 +21,28 @@ export function SeletorMolduras({
   molduras,
   molduraSelecionadaId,
   onSelectMoldura,
+  variante = VARIANTE_SELETOR.ESCURO,
+  corDestaque = "#ffffff",
+  grande = false,
 }: SeletorMoldurasProps) {
+  const tamanho = grande ? "h-[128px] w-[72px]" : "h-[84px] w-[48px]";
+  const claro = variante === VARIANTE_SELETOR.CLARO;
+
+  const estado = (ativa: boolean) => ({
+    className: ativa
+      ? "ring-[3px]"
+      : claro
+        ? "ring-1 ring-ameixa/15 hover:ring-ameixa/30"
+        : "opacity-70 ring-1 ring-white/25 hover:opacity-100",
+    style: ativa ? { ["--tw-ring-color" as string]: corDestaque } : undefined,
+  });
+
+  const base = `xadrez relative shrink-0 snap-start overflow-hidden rounded-lg transition active:scale-95 ${tamanho}`;
+  const semMoldura = estado(molduraSelecionadaId === null);
+
   return (
     <div
-      className="no-scrollbar flex items-center gap-2.5 overflow-x-auto px-1 py-1"
+      className="no-scrollbar flex snap-x items-center gap-2.5 overflow-x-auto p-1"
       role="group"
       aria-label="Molduras"
     >
@@ -34,15 +52,17 @@ export function SeletorMolduras({
         aria-pressed={molduraSelecionadaId === null}
         aria-label="Sem moldura"
         title="Sem moldura"
-        className={`${MINIATURA} grid place-items-center bg-white/10 text-white ${classeEstado(
-          molduraSelecionadaId === null
-        )}`}
+        style={semMoldura.style}
+        className={`${base} grid place-items-center ${semMoldura.className}`}
       >
-        <Slash className="h-5 w-5" />
+        <span className="grid h-8 w-8 place-items-center rounded-full bg-white/90 text-ameixa shadow-sm">
+          <Ban className="h-4 w-4" />
+        </span>
       </button>
 
       {molduras.map((moldura) => {
         const ativa = molduraSelecionadaId === moldura.id;
+        const { className, style } = estado(ativa);
         return (
           <button
             key={moldura.id}
@@ -51,7 +71,8 @@ export function SeletorMolduras({
             aria-pressed={ativa}
             aria-label={moldura.nome}
             title={moldura.nome}
-            className={`${MINIATURA} xadrez ${classeEstado(ativa)}`}
+            style={style}
+            className={`${base} ${className}`}
           >
             <img
               src={moldura.arquivo_url}
