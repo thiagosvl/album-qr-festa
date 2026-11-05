@@ -23,6 +23,13 @@ export function montarTentativasVideo(modo: ModoCamera): MediaTrackConstraints[]
   const facingMode = { ideal: modo };
   const [padrao, ...alternativas] = RESOLUCOES_RETRATO;
   return [
+    // Resolução exata em pé: alguns aparelhos (ex.: Galaxy S25) recusam aspectRatio
+    // exato mas entregam o modo 1728x2304 quando pedido por largura e altura.
+    {
+      facingMode,
+      width: { exact: padrao.width },
+      height: { exact: padrao.height },
+    },
     {
       facingMode,
       aspectRatio: { exact: PROPORCAO_RETRATO },
@@ -80,8 +87,12 @@ export function diagnosticoAtivo(): boolean {
   return new URLSearchParams(window.location.search).has(PARAMETRO_DIAGNOSTICO);
 }
 
-export function descreverConfiguracaoCamera(config: MediaTrackSettings | undefined): string {
-  if (!config) return "sem configuração";
-  const { width, height, facingMode, aspectRatio } = config;
-  return `${width}×${height} · ${aspectRatio?.toFixed(3) ?? "?"} · ${facingMode ?? "facing?"}`;
+export function descreverConfiguracaoCamera(track: MediaStreamTrack | undefined): string {
+  if (!track) return "sem câmera";
+  const { width, height, facingMode } = track.getSettings();
+  const zoom = (track.getCapabilities?.() as CapacidadesComZoom | undefined)?.zoom;
+  const faixaZoom = zoom ? `zoom ${zoom.min}–${zoom.max}` : "sem zoom";
+  return `${width}×${height} · ${facingMode ?? "?"} · ${faixaZoom}`;
 }
+
+type CapacidadesComZoom = MediaTrackCapabilities & { zoom?: { min: number; max: number } };

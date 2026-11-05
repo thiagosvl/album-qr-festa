@@ -184,7 +184,7 @@ export function useConvidadoViewModel(slug: string) {
         if (!stream) return;
         streamRef.current = stream;
         const configuracao = stream.getVideoTracks()[0]?.getSettings();
-        if (diagnosticoAtivo()) setDiagnosticoCamera(descreverConfiguracaoCamera(configuracao));
+        if (diagnosticoAtivo()) setDiagnosticoCamera(descreverConfiguracaoCamera(stream.getVideoTracks()[0]));
         setEspelharPreview(
           configuracao?.facingMode
             ? configuracao.facingMode === "user"
