@@ -1,4 +1,5 @@
 import { FESTA_CANVAS_CONFIG } from "@/constants";
+import { limitarEscala } from "@/lib/escalaFoto";
 
 export interface TransformacaoFoto {
   scale: number;
@@ -55,7 +56,7 @@ export function limitarDeslocamentoCanvas(
   const targetW = FESTA_CANVAS_CONFIG.FULL_WIDTH;
   const targetH = FESTA_CANVAS_CONFIG.FULL_HEIGHT;
   const baseScale = Math.max(targetW / imgWidth, targetH / imgHeight);
-  const clampedScale = Math.max(1, Math.min(3, scale));
+  const clampedScale = limitarEscala(scale, imgWidth, imgHeight);
 
   const drawnW = imgWidth * baseScale * clampedScale;
   const drawnH = imgHeight * baseScale * clampedScale;
@@ -80,7 +81,11 @@ function desenharFoto(
 ): void {
   const targetW = FESTA_CANVAS_CONFIG.FULL_WIDTH;
   const targetH = FESTA_CANVAS_CONFIG.FULL_HEIGHT;
-  const clampedScale = Math.max(1, Math.min(3, transformacao.scale));
+  const clampedScale = limitarEscala(
+    transformacao.scale,
+    sourceWidth,
+    sourceHeight
+  );
   const baseScale = Math.max(targetW / sourceWidth, targetH / sourceHeight);
   const drawnW = sourceWidth * baseScale * clampedScale;
   const drawnH = sourceHeight * baseScale * clampedScale;

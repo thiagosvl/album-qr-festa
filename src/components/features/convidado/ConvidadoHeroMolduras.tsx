@@ -1,3 +1,4 @@
+import { VersaoApp } from "@/components/ui/VersaoApp";
 import { useRef } from "react";
 import { Camera, ChevronRight, ImagePlus, Images, Info } from "lucide-react";
 import { ConvidadoCtaOrcamento } from "@/components/features/convidado/ConvidadoCtaOrcamento";
@@ -181,6 +182,7 @@ export function ConvidadoHeroMolduras({
       ) : (
         <div className="pb-6" />
       )}
+      <VersaoApp />
     </div>
   );
 }

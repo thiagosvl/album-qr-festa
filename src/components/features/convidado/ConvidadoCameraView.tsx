@@ -27,6 +27,15 @@ interface ConvidadoCameraViewProps {
   onFechar: () => void;
 }
 
+/**
+ * Com moldura o vídeo ocupa a largura toda (campo de visão inteiro, as faixas
+ * de cima e de baixo ficam sob a arte); sem moldura ele preenche o quadro.
+ */
+const CLASSES_ENQUADRAMENTO = {
+  AJUSTAR_LARGURA: "h-auto",
+  PREENCHER: "h-full object-cover",
+} as const;
+
 const BOTAO_ICONE =
   "grid h-12 w-12 place-items-center rounded-full bg-black/35 text-white backdrop-blur-sm transition hover:bg-black/50 active:scale-95";
 
@@ -50,20 +59,25 @@ export function ConvidadoCameraView({
 }: ConvidadoCameraViewProps) {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   useBloquearScrollCorpo();
+  const classeEnquadramento = molduraSelecionada
+    ? CLASSES_ENQUADRAMENTO.AJUSTAR_LARGURA
+    : CLASSES_ENQUADRAMENTO.PREENCHER;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center overflow-hidden bg-black text-white">
       <div className="relative aspect-[9/16] w-[min(100vw,calc(100dvh*9/16))] overflow-hidden bg-ameixa">
         {!cameraErro ? (
-          <video
-            ref={videoRef}
-            playsInline
-            muted
-            autoPlay
-            className={`h-full w-full object-cover ${
-              espelharPreview ? "-scale-x-100" : ""
-            }`}
-          />
+          <div className="absolute inset-0 flex items-center justify-center bg-black">
+            <video
+              ref={videoRef}
+              playsInline
+              muted
+              autoPlay
+              className={`w-full ${classeEnquadramento} ${
+                espelharPreview ? "-scale-x-100" : ""
+              }`}
+            />
+          </div>
         ) : (
           <div className="grid h-full place-items-center p-6">
             <Banner

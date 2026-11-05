@@ -33,6 +33,8 @@ import {
   type ModoCamera,
 } from "@/lib/cameraConstraints";
 import { useHistoricoNavegacao } from "@/hooks/ui/useHistoricoNavegacao";
+import { calcularEscalaAjusteLargura } from "@/lib/escalaFoto";
+import { VERSAO_APP } from "@/lib/versaoApp";
 import { gerarUuidLocal } from "@/lib/utils";
 import type { MidiaDto, MolduraDto } from "@/types/festa.types";
 
@@ -184,7 +186,9 @@ export function useConvidadoViewModel(slug: string) {
         if (!stream) return;
         streamRef.current = stream;
         const configuracao = stream.getVideoTracks()[0]?.getSettings();
-        if (diagnosticoAtivo()) setDiagnosticoCamera(descreverConfiguracaoCamera(stream.getVideoTracks()[0]));
+        if (diagnosticoAtivo()) setDiagnosticoCamera(
+            `${descreverConfiguracaoCamera(stream.getVideoTracks()[0])} · ${VERSAO_APP}`
+          );
         setEspelharPreview(
           configuracao?.facingMode
             ? configuracao.facingMode === "user"
@@ -259,8 +263,12 @@ export function useConvidadoViewModel(slug: string) {
     origemRevisaoRef.current = MODO_CONVIDADO.CAMERA;
     setFonteCapturada(bitmap);
     setEspelharCaptura(deveEspelhar);
+    // Com moldura, o visor mostra o vídeo inteiro na largura (campo de visão
+    // igual ao da câmera nativa); a captura repete esse enquadramento.
     setTransformacao({
-      scale: 1,
+      scale: molduraSelecionada
+        ? calcularEscalaAjusteLargura(video.videoWidth, video.videoHeight)
+        : 1,
       offsetX: 0,
       offsetY: 0,
       espelharHorizontal: deveEspelhar,

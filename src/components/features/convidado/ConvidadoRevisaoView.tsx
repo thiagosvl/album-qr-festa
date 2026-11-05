@@ -15,6 +15,11 @@ import {
   desenharPreviewNoCanvas,
   type TransformacaoFoto,
 } from "@/hooks/business/useComposicaoCanvas";
+import {
+  ESCALA_MAXIMA_FOTO,
+  calcularEscalaMinima,
+  limitarEscala,
+} from "@/lib/escalaFoto";
 import { useBloquearScrollCorpo } from "@/hooks/ui/useBloquearScrollCorpo";
 import { SeletorMolduras } from "@/components/features/convidado/SeletorMolduras";
 import type { MolduraDto } from "@/types/festa.types";
@@ -112,7 +117,11 @@ export function ConvidadoRevisaoView({
   if (!fonteCapturada) return null;
 
   const aplicarNovoScale = (valorScale: number) => {
-    const novoScale = Math.max(1, Math.min(3, valorScale));
+    const novoScale = limitarEscala(
+      valorScale,
+      fonteCapturada.width,
+      fonteCapturada.height
+    );
     const clamped = limitarDeslocamentoCanvas(
       fonteCapturada.width,
       fonteCapturada.height,
@@ -314,8 +323,11 @@ export function ConvidadoRevisaoView({
             <ZoomOut className="h-4 w-4 shrink-0 text-white/70" aria-hidden="true" />
             <input
               type="range"
-              min="1"
-              max="3"
+              min={calcularEscalaMinima(
+                fonteCapturada.width,
+                fonteCapturada.height
+              )}
+              max={ESCALA_MAXIMA_FOTO}
               step="0.02"
               value={transformacao.scale}
               onChange={(e) => aplicarNovoScale(Number(e.target.value))}
