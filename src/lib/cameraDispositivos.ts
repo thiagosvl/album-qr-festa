@@ -15,6 +15,17 @@ export function filtrarCamerasTraseiras(cameras: MediaDeviceInfo[]): MediaDevice
   return cameras.filter((camera) => PADRAO_ROTULO_TRASEIRA.test(camera.label));
 }
 
+/**
+ * Lente principal: no Android a traseira principal é a "camera 0" (rótulo
+ * "camera 0, facing back" ou "camera2 0, facing back"); no iPhone é a
+ * "Back Camera"/"Câmera Traseira" sem sufixo (Ultra Wide, Telephoto...).
+ */
+const PADRAO_LENTE_PRINCIPAL = /camera2? 0\b|^(back camera|câmera traseira)$/i;
+
+export function encontrarLentePrincipal(lentes: MediaDeviceInfo[]): MediaDeviceInfo | null {
+  return lentes.find((lente) => PADRAO_LENTE_PRINCIPAL.test(lente.label)) ?? null;
+}
+
 /** Próxima lente da lista, em ciclo, a partir da que está aberta agora. */
 export function proximaLente(
   lentes: MediaDeviceInfo[],

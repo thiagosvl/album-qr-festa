@@ -35,7 +35,7 @@ export type EnquadramentoCamera =
 
 /** Chaves de comportamento da câmera do convidado (trocar aqui, sem mexer nos componentes). */
 export const CAMERA_CONFIG = {
-  ENQUADRAMENTO: ENQUADRAMENTO_CAMERA.QUADRO_INTEIRO as EnquadramentoCamera,
+  ENQUADRAMENTO: ENQUADRAMENTO_CAMERA.PREENCHER as EnquadramentoCamera,
   /** Botão para alternar entre as lentes traseiras (principal / ultra-wide) quando o aparelho expõe mais de uma. */
   PERMITIR_TROCA_LENTE: true,
   /** `?diagcamera=1` na URL mostra resolução, lentes e versão sobre o visor. */

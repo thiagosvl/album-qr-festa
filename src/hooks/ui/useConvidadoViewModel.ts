@@ -32,6 +32,7 @@ import {
   type ModoCamera,
 } from "@/lib/cameraConstraints";
 import {
+  encontrarLentePrincipal,
   filtrarCamerasTraseiras,
   listarCameras,
   proximaLente,
@@ -177,19 +178,38 @@ export function useConvidadoViewModel(slug: string) {
     setSuportaTorch(false);
   }, []);
 
+  /**
+   * Pelo facingMode o navegador às vezes abre a tele ou a ultra-wide. Na primeira
+   * abertura da traseira, se a lente aberta não é a principal, troca para ela.
+   */
+  const garantirLentePrincipal = useCallback(
+    (traseiras: MediaDeviceInfo[], track: MediaStreamTrack | undefined) => {
+      if (!track || track.getSettings().facingMode === "user") return;
+      setLenteTraseiraId((atual) => {
+        if (atual) return atual;
+        const principal = encontrarLentePrincipal(traseiras);
+        const abertaAgora = track.getSettings().deviceId;
+        return principal && principal.deviceId !== abertaAgora ? principal.deviceId : atual;
+      });
+    },
+    []
+  );
+
   const atualizarCamerasDisponiveis = useCallback(
     async (track: MediaStreamTrack | undefined) => {
       try {
         const cameras = await listarCameras();
         setPodeAlternarCamera(cameras.length > 1);
-        setLentesTraseiras(filtrarCamerasTraseiras(cameras));
+        const traseiras = filtrarCamerasTraseiras(cameras);
+        setLentesTraseiras(traseiras);
+        garantirLentePrincipal(traseiras, track);
         if (diagnosticoAtivo()) setDiagnosticoCamera(descreverCamera(track, cameras));
       } catch {
         setPodeAlternarCamera(false);
         setLentesTraseiras([]);
       }
     },
-    []
+    [garantirLentePrincipal]
   );
 
   const iniciarCamera = useCallback(
