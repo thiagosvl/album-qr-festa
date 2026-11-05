@@ -13,6 +13,7 @@ import { useEventoPublicoQuery } from "@/hooks/api/useEventosApi";
 import {
   MIDIAS_QUERY_KEYS,
   useCurtirMidiaMutation,
+  useDescurtirMidiaMutation,
   useExcluirMidiaPropriaMutation,
   useMidiasPublicasQuery,
   useRegistrarMidiaMutation,
@@ -100,6 +101,7 @@ export function useConvidadoViewModel(slug: string) {
   const midiasQuery = useMidiasPublicasQuery(slug, sessaoId, 30000);
   const registrarMidiaMutation = useRegistrarMidiaMutation(slug, sessaoId);
   const curtirMutation = useCurtirMidiaMutation(slug, sessaoId);
+  const descurtirMutation = useDescurtirMidiaMutation(slug, sessaoId);
   const excluirPropriaMutation = useExcluirMidiaPropriaMutation(slug, sessaoId);
 
   const evento = eventoQuery.data;
@@ -275,11 +277,28 @@ export function useConvidadoViewModel(slug: string) {
           nomeConvidado.trim()
         );
       }
-      const composicao = await renderizarFotoComMoldura(
-        fonteCapturada,
-        molduraSelecionada?.arquivo_url ?? null,
-        { ...transformacao, espelharHorizontal: espelharCaptura }
-      );
+      const transformacaoFinal = {
+        ...transformacao,
+        espelharHorizontal: espelharCaptura,
+      };
+      let molduraUsada: MolduraDto | null = molduraSelecionada;
+      let composicao;
+      try {
+        composicao = await renderizarFotoComMoldura(
+          fonteCapturada,
+          molduraUsada?.arquivo_url ?? null,
+          transformacaoFinal
+        );
+      } catch (erroMoldura) {
+        if (!molduraUsada) throw erroMoldura;
+        toast.warning("A moldura não carregou. Publicando a foto sem moldura.");
+        molduraUsada = null;
+        composicao = await renderizarFotoComMoldura(
+          fonteCapturada,
+          null,
+          transformacaoFinal
+        );
+      }
 
       const arquivoId = gerarUuidLocal();
       const pathFull = `${evento.slug}/midias/${arquivoId}.jpg`;
@@ -305,7 +324,7 @@ export function useConvidadoViewModel(slug: string) {
 
       setProgressoUpload(92);
       const midiaCriada = await registrarMidiaMutation.mutateAsync({
-        moldura_id: molduraSelecionada?.id ?? null,
+        moldura_id: molduraUsada?.id ?? null,
         tipo_midia: FESTA_TIPO_MIDIA.FOTO,
         path: pathFull,
         thumb_path: pathThumb,
@@ -334,12 +353,30 @@ export function useConvidadoViewModel(slug: string) {
   };
 
   const alternarCurtida = (midia: MidiaDto) => {
-    if (curtidasIds.has(midia.id)) return;
+    const jaCurtiu = curtidasIds.has(midia.id);
     const novoSet = new Set(curtidasIds);
-    novoSet.add(midia.id);
+    if (jaCurtiu) {
+      novoSet.delete(midia.id);
+    } else {
+      novoSet.add(midia.id);
+    }
     setCurtidasIds(novoSet);
     salvarSetStorage(STORAGE_KEYS.CONVIDADO_CURTIDAS, novoSet);
-    curtirMutation.mutate({ midiaId: midia.id });
+    const reverter = () => {
+      const revertido = new Set(novoSet);
+      if (jaCurtiu) {
+        revertido.add(midia.id);
+      } else {
+        revertido.delete(midia.id);
+      }
+      setCurtidasIds(revertido);
+      salvarSetStorage(STORAGE_KEYS.CONVIDADO_CURTIDAS, revertido);
+      toast.error("Não foi possível atualizar a curtida.");
+    };
+    (jaCurtiu ? descurtirMutation : curtirMutation).mutate(
+      { midiaId: midia.id },
+      { onError: reverter }
+    );
   };
 
   const excluirMinhaMidia = async (midiaId: string) => {

@@ -65,6 +65,21 @@ export function useRegistrarMidiaMutation(slug: string, sessaoId: string) {
   });
 }
 
+function ajustarCurtidasNoCache(
+  queryClient: ReturnType<typeof useQueryClient>,
+  chave: readonly unknown[],
+  midiaId: string,
+  variacao: 1 | -1
+): void {
+  queryClient.setQueryData<MidiaDto[]>(chave, (atual) =>
+    atual?.map((midia) =>
+      midia.id === midiaId
+        ? { ...midia, curtidas: Math.max(0, midia.curtidas + variacao) }
+        : midia
+    )
+  );
+}
+
 export function useCurtirMidiaMutation(slug: string, sessaoId?: string) {
   const queryClient = useQueryClient();
   return useMutation({
@@ -72,7 +87,36 @@ export function useCurtirMidiaMutation(slug: string, sessaoId?: string) {
       apiRequest<MidiaDto>(`/api/public/midias/${midiaId}/curtir`, {
         method: "POST",
       }),
-    onSuccess: () => {
+    onMutate: ({ midiaId }: { midiaId: string }) =>
+      ajustarCurtidasNoCache(
+        queryClient,
+        MIDIAS_QUERY_KEYS.publicas(slug, sessaoId),
+        midiaId,
+        1
+      ),
+    onSettled: () => {
+      queryClient.invalidateQueries({
+        queryKey: MIDIAS_QUERY_KEYS.publicas(slug, sessaoId),
+      });
+    },
+  });
+}
+
+export function useDescurtirMidiaMutation(slug: string, sessaoId?: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ midiaId }: { midiaId: string }) =>
+      apiRequest<MidiaDto>(`/api/public/midias/${midiaId}/curtir`, {
+        method: "DELETE",
+      }),
+    onMutate: ({ midiaId }: { midiaId: string }) =>
+      ajustarCurtidasNoCache(
+        queryClient,
+        MIDIAS_QUERY_KEYS.publicas(slug, sessaoId),
+        midiaId,
+        -1
+      ),
+    onSettled: () => {
       queryClient.invalidateQueries({
         queryKey: MIDIAS_QUERY_KEYS.publicas(slug, sessaoId),
       });
