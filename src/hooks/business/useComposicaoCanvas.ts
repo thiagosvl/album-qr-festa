@@ -107,6 +107,59 @@ function desenharFoto(
   ctx.restore();
 }
 
+/** Lado menor do quadro reduzido usado para o desfoque barato (funciona em todo navegador, sem ctx.filter). */
+const LARGURA_FUNDO_DESFOCADO = 24;
+const ESCURECER_FUNDO = "rgba(0, 0, 0, 0.35)";
+const cacheFundos = new WeakMap<object, HTMLCanvasElement>();
+
+function obterFundoReduzido(
+  fonteFoto: FonteFoto,
+  sourceWidth: number,
+  sourceHeight: number
+): HTMLCanvasElement {
+  const emCache = fonteFoto instanceof HTMLVideoElement ? undefined : cacheFundos.get(fonteFoto);
+  if (emCache) return emCache;
+  const { FULL_WIDTH, FULL_HEIGHT } = FESTA_CANVAS_CONFIG;
+  const reduzido = document.createElement("canvas");
+  reduzido.width = LARGURA_FUNDO_DESFOCADO;
+  reduzido.height = Math.round((LARGURA_FUNDO_DESFOCADO * FULL_HEIGHT) / FULL_WIDTH);
+  const ctx = reduzido.getContext("2d");
+  if (ctx) {
+    const escala = Math.max(reduzido.width / sourceWidth, reduzido.height / sourceHeight);
+    const w = sourceWidth * escala;
+    const h = sourceHeight * escala;
+    ctx.drawImage(fonteFoto, (reduzido.width - w) / 2, (reduzido.height - h) / 2, w, h);
+  }
+  if (!(fonteFoto instanceof HTMLVideoElement)) cacheFundos.set(fonteFoto, reduzido);
+  return reduzido;
+}
+
+/**
+ * Fundo com a própria foto ampliada e desfocada: quando a foto é afastada (ex.:
+ * quadro 3:4 inteiro da câmera), as faixas de cima e de baixo não ficam pretas.
+ */
+function desenharFundoDesfocado(
+  ctx: CanvasRenderingContext2D,
+  fonteFoto: FonteFoto,
+  sourceWidth: number,
+  sourceHeight: number,
+  espelhar: boolean | undefined
+): void {
+  const { FULL_WIDTH, FULL_HEIGHT } = FESTA_CANVAS_CONFIG;
+  const reduzido = obterFundoReduzido(fonteFoto, sourceWidth, sourceHeight);
+  ctx.save();
+  ctx.imageSmoothingEnabled = true;
+  ctx.imageSmoothingQuality = "high";
+  if (espelhar) {
+    ctx.translate(FULL_WIDTH, 0);
+    ctx.scale(-1, 1);
+  }
+  ctx.drawImage(reduzido, 0, 0, FULL_WIDTH, FULL_HEIGHT);
+  ctx.restore();
+  ctx.fillStyle = ESCURECER_FUNDO;
+  ctx.fillRect(0, 0, FULL_WIDTH, FULL_HEIGHT);
+}
+
 const cacheMolduras = new Map<string, Promise<HTMLImageElement>>();
 
 /** Carrega a moldura uma única vez por URL (evita novo download a cada ajuste). */
@@ -136,6 +189,13 @@ export function desenharPreviewNoCanvas(
   ctx.fillRect(0, 0, canvas.width, canvas.height);
   ctx.save();
   ctx.scale(escala, escala);
+  desenharFundoDesfocado(
+    ctx,
+    fonteFoto,
+    fonteFoto.width,
+    fonteFoto.height,
+    transformacao.espelharHorizontal
+  );
   desenharFoto(ctx, fonteFoto, fonteFoto.width, fonteFoto.height, transformacao);
   if (moldura) {
     ctx.drawImage(
@@ -174,6 +234,13 @@ export async function renderizarFotoComMoldura(
   ctxFull.fillStyle = "#111111";
   ctxFull.fillRect(0, 0, targetW, targetH);
 
+  desenharFundoDesfocado(
+    ctxFull,
+    fonteFoto,
+    sourceWidth,
+    sourceHeight,
+    transformacao.espelharHorizontal
+  );
   desenharFoto(ctxFull, fonteFoto, sourceWidth, sourceHeight, transformacao);
 
   if (molduraUrl) {

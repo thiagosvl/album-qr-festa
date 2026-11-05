@@ -27,14 +27,17 @@ import {
 import {
   ESPERA_LIBERAR_CAMERA_MS,
   abrirStreamComFallback,
-  descreverConfiguracaoCamera,
-  diagnosticoAtivo,
   esperar,
   type ModoCamera,
 } from "@/lib/cameraConstraints";
+import {
+  filtrarCamerasTraseiras,
+  listarCameras,
+  proximaLente,
+} from "@/lib/cameraDispositivos";
+import { descreverCamera, diagnosticoAtivo } from "@/lib/cameraDiagnostico";
 import { useHistoricoNavegacao } from "@/hooks/ui/useHistoricoNavegacao";
 import { calcularEscalaAjusteLargura } from "@/lib/escalaFoto";
-import { VERSAO_APP } from "@/lib/versaoApp";
 import { gerarUuidLocal } from "@/lib/utils";
 import type { MidiaDto, MolduraDto } from "@/types/festa.types";
 
@@ -97,6 +100,8 @@ export function useConvidadoViewModel(slug: string) {
   const [cameraErro, setCameraErro] = useState<string | null>(null);
   const [espelharPreview, setEspelharPreview] = useState(false);
   const [podeAlternarCamera, setPodeAlternarCamera] = useState(false);
+  const [lentesTraseiras, setLentesTraseiras] = useState<MediaDeviceInfo[]>([]);
+  const [lenteTraseiraId, setLenteTraseiraId] = useState<string | null>(null);
   const requisicaoCameraRef = useRef(0);
   const videoRef = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
@@ -171,8 +176,23 @@ export function useConvidadoViewModel(slug: string) {
     setSuportaTorch(false);
   }, []);
 
+  const atualizarCamerasDisponiveis = useCallback(
+    async (track: MediaStreamTrack | undefined) => {
+      try {
+        const cameras = await listarCameras();
+        setPodeAlternarCamera(cameras.length > 1);
+        setLentesTraseiras(filtrarCamerasTraseiras(cameras));
+        if (diagnosticoAtivo()) setDiagnosticoCamera(descreverCamera(track, cameras));
+      } catch {
+        setPodeAlternarCamera(false);
+        setLentesTraseiras([]);
+      }
+    },
+    []
+  );
+
   const iniciarCamera = useCallback(
-    async (modoCamera: ModoCamera = facingMode) => {
+    async (modoCamera: ModoCamera, deviceId: string | null) => {
       pararCamera();
       setCameraErro(null);
       const idRequisicao = ++requisicaoCameraRef.current;
@@ -180,33 +200,23 @@ export function useConvidadoViewModel(slug: string) {
         await esperar(ESPERA_LIBERAR_CAMERA_MS);
         if (idRequisicao !== requisicaoCameraRef.current) return;
         const stream = await abrirStreamComFallback(
-          modoCamera,
+          { modo: modoCamera, deviceId },
           () => idRequisicao !== requisicaoCameraRef.current
         );
         if (!stream) return;
         streamRef.current = stream;
-        const configuracao = stream.getVideoTracks()[0]?.getSettings();
-        if (diagnosticoAtivo()) setDiagnosticoCamera(
-            `${descreverConfiguracaoCamera(stream.getVideoTracks()[0])} · ${VERSAO_APP}`
-          );
+        const track = stream.getVideoTracks()[0];
+        const configuracao = track?.getSettings();
         setEspelharPreview(
           configuracao?.facingMode
             ? configuracao.facingMode === "user"
             : modoCamera === "user" || !/Android|iPhone|iPad/i.test(navigator.userAgent)
         );
-        navigator.mediaDevices
-          .enumerateDevices()
-          .then((dispositivos) =>
-            setPodeAlternarCamera(
-              dispositivos.filter((d) => d.kind === "videoinput").length > 1
-            )
-          )
-          .catch(() => setPodeAlternarCamera(false));
+        void atualizarCamerasDisponiveis(track);
         if (videoRef.current) {
           videoRef.current.srcObject = stream;
           await videoRef.current.play().catch(() => undefined);
         }
-        const track = stream.getVideoTracks()[0];
         if (track && "getCapabilities" in track) {
           const caps = track.getCapabilities() as MediaTrackCapabilities & {
             torch?: boolean;
@@ -219,17 +229,27 @@ export function useConvidadoViewModel(slug: string) {
         );
       }
     },
-    [facingMode, pararCamera]
+    [atualizarCamerasDisponiveis, pararCamera]
   );
+
+  const deviceIdSelecionado = facingMode === "environment" ? lenteTraseiraId : null;
 
   useEffect(() => {
     if (modo === MODO_CONVIDADO.CAMERA) {
-      iniciarCamera(facingMode);
+      iniciarCamera(facingMode, deviceIdSelecionado);
     } else {
       pararCamera();
     }
     return () => pararCamera();
-  }, [modo, facingMode, iniciarCamera, pararCamera]);
+  }, [modo, facingMode, deviceIdSelecionado, iniciarCamera, pararCamera]);
+
+  const podeTrocarLente = facingMode === "environment" && lentesTraseiras.length > 1;
+
+  const trocarLente = () => {
+    const atual = streamRef.current?.getVideoTracks()[0]?.getSettings().deviceId;
+    const proxima = proximaLente(lentesTraseiras, atual);
+    if (proxima) setLenteTraseiraId(proxima.deviceId);
+  };
 
   const alternarCamera = () => {
     setFacingMode((prev) => (prev === "user" ? "environment" : "user"));
@@ -263,12 +283,10 @@ export function useConvidadoViewModel(slug: string) {
     origemRevisaoRef.current = MODO_CONVIDADO.CAMERA;
     setFonteCapturada(bitmap);
     setEspelharCaptura(deveEspelhar);
-    // Com moldura, o visor mostra o vídeo inteiro na largura (campo de visão
-    // igual ao da câmera nativa); a captura repete esse enquadramento.
+    // O visor mostra o quadro inteiro da câmera na largura (sem cortar as
+    // laterais); a captura começa com esse mesmo enquadramento.
     setTransformacao({
-      scale: molduraSelecionada
-        ? calcularEscalaAjusteLargura(video.videoWidth, video.videoHeight)
-        : 1,
+      scale: calcularEscalaAjusteLargura(video.videoWidth, video.videoHeight),
       offsetX: 0,
       offsetY: 0,
       espelharHorizontal: deveEspelhar,
@@ -481,6 +499,8 @@ export function useConvidadoViewModel(slug: string) {
     alternarCamera,
     torchAtivo,
     suportaTorch,
+    podeTrocarLente,
+    trocarLente,
     diagnosticoCamera,
     alternarTorch,
     cameraErro,

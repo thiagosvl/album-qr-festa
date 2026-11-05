@@ -141,6 +141,8 @@ export function ConvidadoPage() {
           onAlternarCamera={vm.alternarCamera}
           torchAtivo={vm.torchAtivo}
           suportaTorch={vm.suportaTorch}
+          podeTrocarLente={vm.podeTrocarLente}
+          onTrocarLente={vm.trocarLente}
           diagnostico={vm.diagnosticoCamera}
           onAlternarTorch={vm.alternarTorch}
           cameraErro={vm.cameraErro}
