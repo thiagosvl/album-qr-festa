@@ -24,6 +24,11 @@ import {
   type TransformacaoFoto,
   uploadBlobComProgresso,
 } from "@/hooks/business/useComposicaoCanvas";
+import {
+  aplicarZoomMinimo,
+  montarRestricoesVideo,
+  type ModoCamera,
+} from "@/lib/cameraConstraints";
 import { gerarUuidLocal } from "@/lib/utils";
 import type { MidiaDto, MolduraDto } from "@/types/festa.types";
 
@@ -159,19 +164,14 @@ export function useConvidadoViewModel(slug: string) {
   }, []);
 
   const iniciarCamera = useCallback(
-    async (modoCamera: "user" | "environment" = facingMode) => {
+    async (modoCamera: ModoCamera = facingMode) => {
       pararCamera();
       setCameraErro(null);
       const idRequisicao = ++requisicaoCameraRef.current;
       try {
         const stream = await navigator.mediaDevices.getUserMedia({
           audio: false,
-          video: {
-            facingMode: { ideal: modoCamera },
-            width: { ideal: 1080 },
-            height: { ideal: 1920 },
-            aspectRatio: { ideal: 9 / 16 },
-          },
+          video: montarRestricoesVideo(modoCamera),
         });
         if (idRequisicao !== requisicaoCameraRef.current) {
           stream.getTracks().forEach((track) => track.stop());
@@ -197,6 +197,7 @@ export function useConvidadoViewModel(slug: string) {
           await videoRef.current.play().catch(() => undefined);
         }
         const track = stream.getVideoTracks()[0];
+        if (track) await aplicarZoomMinimo(track);
         if (track && "getCapabilities" in track) {
           const caps = track.getCapabilities() as MediaTrackCapabilities & {
             torch?: boolean;

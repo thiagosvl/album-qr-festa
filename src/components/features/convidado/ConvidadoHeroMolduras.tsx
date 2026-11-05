@@ -6,6 +6,9 @@ import {
 } from "@/components/features/convidado/SeletorMolduras";
 import type { EventoPublicoDto, MolduraDto } from "@/types/festa.types";
 
+/** Capas costumam ter rostos na parte de cima: ancora o recorte perto do topo. */
+const CAPA_POSICAO_FOCO = "center 12%";
+
 interface ConvidadoHeroMoldurasProps {
   evento: EventoPublicoDto;
   molduras: MolduraDto[];
@@ -49,7 +52,10 @@ export function ConvidadoHeroMolduras({
           className="h-[28dvh] min-h-[160px] max-h-[280px] bg-cover bg-center"
           style={
             evento.capa_url
-              ? { backgroundImage: `url(${evento.capa_url})` }
+              ? {
+                  backgroundImage: `url(${evento.capa_url})`,
+                  backgroundPosition: CAPA_POSICAO_FOCO,
+                }
               : {
                   background: `linear-gradient(155deg, ${evento.cor_primaria}, ${evento.cor_secundaria})`,
                 }
@@ -120,21 +126,21 @@ export function ConvidadoHeroMolduras({
           <div className="mt-3 grid grid-cols-2 gap-2.5 px-5">
             <button
               type="button"
-              onClick={onAbrirCamera}
-              style={{ backgroundColor: evento.cor_primaria }}
-              className="flex h-14 items-center justify-center gap-2 rounded-full font-display text-base font-extrabold text-white shadow-suave transition active:scale-[0.98]"
-            >
-              <Camera className="h-5 w-5 shrink-0" />
-              Tirar foto
-            </button>
-            <button
-              type="button"
               onClick={() => inputGaleriaRef.current?.click()}
               style={{ borderColor: evento.cor_secundaria, color: evento.cor_secundaria }}
               className="flex h-14 items-center justify-center gap-2 rounded-full border-2 bg-white font-display text-base font-extrabold transition active:scale-[0.98]"
             >
               <ImagePlus className="h-5 w-5 shrink-0" />
               Da galeria
+            </button>
+            <button
+              type="button"
+              onClick={onAbrirCamera}
+              style={{ backgroundColor: evento.cor_primaria }}
+              className="flex h-14 items-center justify-center gap-2 rounded-full font-display text-base font-extrabold text-white shadow-suave transition active:scale-[0.98]"
+            >
+              <Camera className="h-5 w-5 shrink-0" />
+              Tirar foto
             </button>
           </div>
         </section>
