@@ -17,6 +17,7 @@ interface ConvidadoCameraViewProps {
   suportaTorch: boolean;
   onAlternarTorch: () => void;
   cameraErro: string | null;
+  diagnostico: string | null;
   molduras: MolduraDto[];
   molduraSelecionada: MolduraDto | null;
   molduraSelecionadaId: string | null;
@@ -38,6 +39,7 @@ export function ConvidadoCameraView({
   suportaTorch,
   onAlternarTorch,
   cameraErro,
+  diagnostico,
   molduras,
   molduraSelecionada,
   molduraSelecionadaId,
@@ -78,6 +80,12 @@ export function ConvidadoCameraView({
             alt={molduraSelecionada.nome}
             className="pointer-events-none absolute inset-0 h-full w-full select-none object-contain"
           />
+        )}
+
+        {diagnostico && (
+          <p className="absolute inset-x-0 top-20 z-30 bg-black/70 px-2 py-1 text-center text-[11px] text-white">
+            {diagnostico}
+          </p>
         )}
 
         <div className="absolute inset-x-0 top-0 z-20 flex items-center justify-between bg-gradient-to-b from-black/40 to-transparent px-4 pb-6 pt-[max(0.75rem,env(safe-area-inset-top))]">

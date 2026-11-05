@@ -27,6 +27,8 @@ import {
 import {
   ESPERA_LIBERAR_CAMERA_MS,
   abrirStreamComFallback,
+  descreverConfiguracaoCamera,
+  diagnosticoAtivo,
   esperar,
   type ModoCamera,
 } from "@/lib/cameraConstraints";
@@ -89,6 +91,7 @@ export function useConvidadoViewModel(slug: string) {
   );
   const [torchAtivo, setTorchAtivo] = useState(false);
   const [suportaTorch, setSuportaTorch] = useState(false);
+  const [diagnosticoCamera, setDiagnosticoCamera] = useState<string | null>(null);
   const [cameraErro, setCameraErro] = useState<string | null>(null);
   const [espelharPreview, setEspelharPreview] = useState(false);
   const [podeAlternarCamera, setPodeAlternarCamera] = useState(false);
@@ -181,6 +184,7 @@ export function useConvidadoViewModel(slug: string) {
         if (!stream) return;
         streamRef.current = stream;
         const configuracao = stream.getVideoTracks()[0]?.getSettings();
+        if (diagnosticoAtivo()) setDiagnosticoCamera(descreverConfiguracaoCamera(configuracao));
         setEspelharPreview(
           configuracao?.facingMode
             ? configuracao.facingMode === "user"
@@ -469,6 +473,7 @@ export function useConvidadoViewModel(slug: string) {
     alternarCamera,
     torchAtivo,
     suportaTorch,
+    diagnosticoCamera,
     alternarTorch,
     cameraErro,
     capturarDoVideo,

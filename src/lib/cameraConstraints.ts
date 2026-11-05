@@ -72,3 +72,16 @@ export async function abrirStreamComFallback(
   }
   throw ultimoErro;
 }
+
+const PARAMETRO_DIAGNOSTICO = "diagcamera";
+
+/** Com `?diagcamera=1` na URL a câmera mostra o que o aparelho realmente entregou. */
+export function diagnosticoAtivo(): boolean {
+  return new URLSearchParams(window.location.search).has(PARAMETRO_DIAGNOSTICO);
+}
+
+export function descreverConfiguracaoCamera(config: MediaTrackSettings | undefined): string {
+  if (!config) return "sem configuração";
+  const { width, height, facingMode, aspectRatio } = config;
+  return `${width}×${height} · ${aspectRatio?.toFixed(3) ?? "?"} · ${facingMode ?? "facing?"}`;
+}
