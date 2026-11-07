@@ -174,7 +174,7 @@ export function useGestaoPaiViewModel(token: string) {
     }
   };
 
-  const excluirMidiaDefinitivamente = async (midiaId: string) => {
+  const executarExclusaoMidia = async (midiaId: string) => {
     setAcaoMidia({ id: midiaId, tipo: "EXCLUIR" });
     try {
       await excluirMidiaMutation.mutateAsync(midiaId);
@@ -188,6 +188,20 @@ export function useGestaoPaiViewModel(token: string) {
     }
   };
 
+  const excluirMidiaDefinitivamente = (midiaId: string) => {
+    const midiaAlvo = midias.find((m) => m.id === midiaId);
+    const nomeAutor = midiaAlvo?.autor || "Convidado";
+    openDialog(FESTA_DIALOG_NAMES.CONFIRM_ACTION, {
+      title: "Excluir esta foto?",
+      description: `Tem certeza que deseja excluir permanentemente a foto enviada por "${nomeAutor}"? Esta ação não pode ser desfeita.`,
+      confirmLabel: "Sim, Excluir Foto",
+      variant: "destructive",
+      onConfirm: async () => {
+        await executarExclusaoMidia(midiaId);
+      },
+    });
+  };
+
   const abrirVisualizadorMidia = (midia: MidiaDto) => {
     openDialog(FESTA_DIALOG_NAMES.MIDIA_VIEWER, {
       midia,
@@ -195,7 +209,7 @@ export function useGestaoPaiViewModel(token: string) {
       curtida: false,
       ehMinha: true,
       corPrimaria: evento?.cor_primaria,
-      onExcluirPropria: excluirMidiaDefinitivamente,
+      onExcluirPropria: executarExclusaoMidia,
     });
   };
 

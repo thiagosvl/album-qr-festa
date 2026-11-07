@@ -5,10 +5,12 @@ import { z } from "zod";
 import { toast } from "sonner";
 import {
   FESTA_BUCKET_MIDIAS,
+  FESTA_DIALOG_NAMES,
   SUPABASE_ANON_KEY,
   SUPABASE_URL,
 } from "@/constants";
 import { notificarErrosFormulario } from "@/components/ui/form";
+import { useLayout } from "@/contexts/LayoutContext";
 import {
   useAtualizarMolduraMutation,
   useCriarMolduraMutation,
@@ -34,6 +36,7 @@ export type NovaMolduraFormValues = z.infer<typeof novaMolduraSchema>;
 export type TipoAcaoMoldura = "ATIVA" | "EXCLUIR";
 
 export function useMoldurasEventoViewModel(evento: EventoAdminDto | null) {
+  const { openDialog } = useLayout();
   const [enviando, setEnviando] = useState(false);
   const [acaoMoldura, setAcaoMoldura] = useState<{
     id: string;
@@ -136,16 +139,26 @@ export function useMoldurasEventoViewModel(evento: EventoAdminDto | null) {
     }
   };
 
-  const excluirMoldura = async (molduraId: string) => {
-    setAcaoMoldura({ id: molduraId, tipo: "EXCLUIR" });
-    try {
-      await excluirMutation.mutateAsync(molduraId);
-      toast.success("Moldura excluída");
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Erro ao excluir");
-    } finally {
-      setAcaoMoldura(null);
-    }
+  const excluirMoldura = (molduraId: string) => {
+    const molduraAlvo = molduras.find((m) => m.id === molduraId);
+    const nomeMoldura = molduraAlvo?.nome || "selecionada";
+    openDialog(FESTA_DIALOG_NAMES.CONFIRM_ACTION, {
+      title: "Excluir moldura?",
+      description: `Tem certeza que deseja excluir permanentemente a moldura "${nomeMoldura}"? Esta ação não pode ser desfeita.`,
+      confirmLabel: "Sim, Excluir Moldura",
+      variant: "destructive",
+      onConfirm: async () => {
+        setAcaoMoldura({ id: molduraId, tipo: "EXCLUIR" });
+        try {
+          await excluirMutation.mutateAsync(molduraId);
+          toast.success("Moldura excluída");
+        } catch (err) {
+          toast.error(err instanceof Error ? err.message : "Erro ao excluir");
+        } finally {
+          setAcaoMoldura(null);
+        }
+      },
+    });
   };
 
   return {

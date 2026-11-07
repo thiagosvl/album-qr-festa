@@ -289,7 +289,7 @@ export function MidiasEventoAdminDialog({
                         }
                         disabled={processandoEsta}
                         className="h-7 w-7"
-                        onClick={() => vm.handleExcluirMidia(m.id)}
+                        onClick={() => vm.handleExcluirMidia(m)}
                       >
                         <Trash2 className="w-3 h-3" />
                       </Button>
