@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
-import { FESTA_TIPO_MIDIA } from "@/constants";
+import { FESTA_DIALOG_NAMES, FESTA_TIPO_MIDIA } from "@/constants";
+import { useLayout } from "@/contexts/LayoutContext";
 import { prepararArquivoCompartilhamento } from "@/hooks/business/useComposicaoCanvas";
 import { safeCloseDialog } from "@/hooks/ui/useDialogClose";
 import type { MidiaDto } from "@/types/festa.types";
@@ -43,6 +44,7 @@ export function useMidiaViewerViewModel(
   payload: MidiaViewerDialogPayload | null,
   onClose: () => void
 ) {
+  const { openDialog } = useLayout();
   const [indiceAtual, setIndiceAtual] = useState<number>(0);
   const [arquivoPronto, setArquivoPronto] = useState<File | null>(null);
   const [curtidaLocal, setCurtidaLocal] = useState(false);
@@ -175,15 +177,26 @@ export function useMidiaViewerViewModel(
     payload.onToggleCurtida(midia);
   };
 
-  const handleExcluir = async () => {
+  const handleExcluir = () => {
     if (!midia || !payload?.onExcluirPropria) return;
-    setExcluindo(true);
-    try {
-      await payload.onExcluirPropria(midia.id);
-      safeCloseDialog(onClose);
-    } finally {
-      setExcluindo(false);
-    }
+    const midiaId = midia.id;
+    const onExcluir = payload.onExcluirPropria;
+    openDialog(FESTA_DIALOG_NAMES.CONFIRM_ACTION, {
+      title: "Excluir esta foto?",
+      description:
+        "Tem certeza que deseja excluir esta foto do álbum? Esta ação não pode ser desfeita.",
+      confirmLabel: "Sim, Excluir Foto",
+      variant: "destructive",
+      onConfirm: async () => {
+        setExcluindo(true);
+        try {
+          await onExcluir(midiaId);
+          safeCloseDialog(onClose);
+        } finally {
+          setExcluindo(false);
+        }
+      },
+    });
   };
 
   const podeCompartilharNativo = Boolean(
