@@ -1,5 +1,6 @@
 import React from "react";
 import { useParams } from "react-router-dom";
+import { FESTA_ABA_GALERIA_CONVIDADO } from "@/constants";
 import { ConvidadoCameraView } from "@/components/features/convidado/ConvidadoCameraView";
 import { ConvidadoCtaOrcamento } from "@/components/features/convidado/ConvidadoCtaOrcamento";
 import {
@@ -84,7 +85,11 @@ export function ConvidadoPage() {
         <div className="flex min-h-dvh flex-col pb-24">
           <ConvidadoHeader
             evento={evento}
-            abaGaleria={evento.galeria_publica ? vm.abaGaleria : "MINHAS"}
+            abaGaleria={
+              evento.galeria_publica
+                ? vm.abaGaleria
+                : FESTA_ABA_GALERIA_CONVIDADO.MINHAS
+            }
             onChangeAba={vm.setAbaGaleria}
             todasMidiasCount={vm.todasMidiasCount}
             minhasMidiasCount={vm.minhasMidiasCount}
@@ -106,6 +111,13 @@ export function ConvidadoPage() {
               onExcluirMinhaMidia={vm.excluirMinhaMidia}
               onAbrirCamera={abrirCamera}
               permiteEnvio={podeEnviar}
+              temMaisMidias={
+                evento.galeria_publica &&
+                vm.abaGaleria === FESTA_ABA_GALERIA_CONVIDADO.MURAL &&
+                vm.temMaisMidias
+              }
+              carregandoMaisMidias={vm.carregandoMaisMidias}
+              onCarregarMais={vm.carregarMaisMidias}
             />
           </main>
 
@@ -126,6 +138,8 @@ export function ConvidadoPage() {
           onSelecionarArquivo={vm.selecionarArquivoGaleria}
           onVerMural={() => vm.setTela(TELA_CONVIDADO.MURAL)}
           podeEnviar={podeEnviar}
+          enviandoMidia={vm.enviandoFoto}
+          progressoUpload={vm.progressoUpload}
           totalFotos={
             evento.galeria_publica ? vm.todasMidiasCount : vm.minhasMidiasCount
           }
@@ -146,6 +160,7 @@ export function ConvidadoPage() {
           diagnostico={vm.diagnosticoCamera}
           onAlternarTorch={vm.alternarTorch}
           cameraErro={vm.cameraErro}
+          permiteVideo={evento.permite_video}
           molduras={vm.molduras}
           molduraSelecionada={vm.molduraSelecionada}
           molduraSelecionadaId={vm.molduraSelecionadaId}

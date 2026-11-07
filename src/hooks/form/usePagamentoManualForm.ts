@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -6,6 +7,7 @@ import {
   FESTA_METODO_PAGAMENTO,
   FESTA_TIPO_BAIXA_PAGAMENTO,
 } from "@/constants";
+import { notificarErrosFormulario } from "@/components/ui/form";
 import { useRegistrarPagamentoMutation } from "@/hooks/api/useEventosApi";
 import { safeCloseDialog } from "@/hooks/ui/useDialogClose";
 import type { EventoAdminDto } from "@/types/festa.types";
@@ -33,6 +35,7 @@ const pagamentoSchema = z.object({
 export type PagamentoManualFormValues = z.infer<typeof pagamentoSchema>;
 
 export function usePagamentoManualForm(
+  open: boolean,
   evento: EventoAdminDto | null,
   onSuccessClose: () => void
 ) {
@@ -57,6 +60,25 @@ export function usePagamentoManualForm(
       observacoes_internas: evento?.observacoes_internas ?? "",
     },
   });
+
+  const { reset } = form;
+  const eventoId = evento?.id ?? null;
+
+  useEffect(() => {
+    if (!open || !evento) return;
+    reset({
+      tipo_baixa:
+        evento.valor_pago_centavos === 0
+          ? FESTA_TIPO_BAIXA_PAGAMENTO.SINAL
+          : FESTA_TIPO_BAIXA_PAGAMENTO.QUITACAO_TOTAL,
+      valor_reais:
+        evento.valor_pago_centavos === 0
+          ? evento.valor_sinal_centavos / 100
+          : evento.valor_restante_centavos / 100,
+      metodo_pagamento: FESTA_METODO_PAGAMENTO.PIX_MANUAL,
+      observacoes_internas: evento.observacoes_internas ?? "",
+    });
+  }, [open, eventoId, reset]);
 
   const selecionarTipoPagamento = (
     tipo: PagamentoManualFormValues["tipo_baixa"]
@@ -89,7 +111,7 @@ export function usePagamentoManualForm(
         error instanceof Error ? error.message : "Erro ao registrar pagamento"
       );
     }
-  });
+  }, notificarErrosFormulario);
 
   return {
     form,

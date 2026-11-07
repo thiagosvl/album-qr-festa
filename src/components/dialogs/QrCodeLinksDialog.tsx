@@ -1,4 +1,5 @@
-import { Copy, ExternalLink, QrCode } from "lucide-react";
+import { useState } from "react";
+import { Copy, Download, ExternalLink, QrCode } from "lucide-react";
 import { WhatsAppIcon } from "@/components/icons/WhatsAppIcon";
 import { toast } from "sonner";
 import { Banner } from "@/components/ui/Banner";
@@ -11,6 +12,7 @@ import {
   gerarUrlPublicaEvento,
   gerarUrlTelaoEvento,
 } from "@/hooks/business/useCalculosPedido";
+import { baixarPlaquinhaQrCodePng } from "@/hooks/business/useGeradorDisplayQr";
 import { safeCloseDialog } from "@/hooks/ui/useDialogClose";
 import type { EventoAdminDto } from "@/types/festa.types";
 
@@ -29,6 +31,7 @@ export function QrCodeLinksDialog({
   onClose,
   payload,
 }: QrCodeLinksDialogProps) {
+  const [baixandoPlaquinha, setBaixandoPlaquinha] = useState(false);
   const evento = payload?.evento ?? null;
   if (!evento) return null;
 
@@ -50,10 +53,29 @@ export function QrCodeLinksDialog({
     "",
     `👑 *Painel Exclusivo dos Pais (Moderação e Download das fotos):*`,
     urlGestaoPai,
-    "",
-    `📺 *Modo Telão / TV Ao Vivo:*`,
-    urlTelao,
+    ...(evento.inclui_telao
+      ? ["", `📺 *Modo Telão / TV Ao Vivo:*`, urlTelao]
+      : []),
   ].join("\n");
+
+  const itensLinks = [
+    {
+      titulo: "1. Link dos Convidados (QR Code das Mesas)",
+      url: urlConvidado,
+    },
+    {
+      titulo: "2. Link Secreto de Gestão dos Pais / Anfitrião",
+      url: urlGestaoPai,
+    },
+    ...(evento.inclui_telao
+      ? [
+          {
+            titulo: "3. Link do Telão / TV em Tempo Real",
+            url: urlTelao,
+          },
+        ]
+      : []),
+  ];
 
   const linkWhats = gerarLinkWhatsappCliente(
     evento.anfitriao?.telefone,
@@ -82,6 +104,35 @@ export function QrCodeLinksDialog({
           <p className="text-xs font-bold text-muted-foreground text-center">
             Escaneie para abrir a câmera e galeria dos convidados
           </p>
+          <Button
+            type="button"
+            size="sm"
+            variant="tonal"
+            loading={baixandoPlaquinha}
+            onClick={() => {
+              setBaixandoPlaquinha(true);
+              baixarPlaquinhaQrCodePng({
+                slug: evento.slug,
+                titulo: evento.titulo,
+                subtitulo: evento.subtitulo,
+                cor_primaria: evento.cor_primaria,
+                cor_secundaria: evento.cor_secundaria,
+                urlPublica: urlConvidado,
+              })
+                .then(() =>
+                  toast.success("Plaquinha QR Code pronta para impressão baixada!")
+                )
+                .catch((err: Error) => toast.error(err.message))
+                .finally(() => setBaixandoPlaquinha(false));
+            }}
+          >
+            <Download className="w-3.5 h-3.5" />
+            <span>
+              {baixandoPlaquinha
+                ? "Gerando Plaquinha..."
+                : "Baixar Plaquinha QR Pronta (PNG)"}
+            </span>
+          </Button>
         </div>
 
         <Banner
@@ -91,20 +142,7 @@ export function QrCodeLinksDialog({
         />
 
         <div className="space-y-3">
-          {[
-            {
-              titulo: "1. Link dos Convidados (QR Code das Mesas)",
-              url: urlConvidado,
-            },
-            {
-              titulo: "2. Link Secreto de Gestão dos Pais / Anfitrião",
-              url: urlGestaoPai,
-            },
-            {
-              titulo: "3. Link do Telão / TV em Tempo Real",
-              url: urlTelao,
-            },
-          ].map((item) => (
+          {itensLinks.map((item) => (
             <div
               key={item.titulo}
               className="p-3 rounded-xl border border-border/80 bg-background flex items-center justify-between gap-2"

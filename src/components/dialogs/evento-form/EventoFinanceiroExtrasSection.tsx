@@ -1,7 +1,15 @@
 import { Plus, Trash2 } from "lucide-react";
 import type { UseFieldArrayReturn, UseFormReturn } from "react-hook-form";
 import { Button } from "@/components/ui/button";
+import {
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { MoneyInput } from "@/components/ui/money-input";
 import type { EventoAdminFormValues } from "@/hooks/form/useEventoAdminForm";
 import type { FestaCatalogoExtraB2c } from "@/types/festa.types";
 
@@ -36,41 +44,71 @@ export function EventoFinanceiroExtrasSection({
 
   return (
     <div className="space-y-4 pt-3 border-t border-border/60">
-      <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
-        Negociação Financeira (Pacote + Desconto do Pedido)
+      <p className="text-sm font-semibold text-ameixa-suave">
+        Negociação financeira (pacote e desconto do pedido)
       </p>
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-        <div className="space-y-1">
-          <label className="text-xs font-bold">Valor Pacote (R$)</label>
-          <Input
-            type="number"
-            step="0.01"
-            {...form.register("valor_pacote_reais")}
-          />
-        </div>
-        <div className="space-y-1">
-          <label className="text-xs font-bold">Desconto Concedido (R$)</label>
-          <Input
-            type="number"
-            step="0.01"
-            {...form.register("desconto_reais")}
-          />
-        </div>
-        <div className="space-y-1">
-          <label className="text-xs font-bold">Sinal Combinado (R$)</label>
-          <Input
-            type="number"
-            step="0.01"
-            {...form.register("valor_sinal_reais")}
-          />
-        </div>
+        <FormField
+          control={form.control}
+          name="valor_pacote_reais"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Valor Pacote (R$)</FormLabel>
+              <FormControl>
+                <MoneyInput
+                  value={field.value}
+                  onChange={field.onChange}
+                  onBlur={field.onBlur}
+                  name={field.name}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="desconto_reais"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Desconto Concedido (R$)</FormLabel>
+              <FormControl>
+                <MoneyInput
+                  value={field.value}
+                  onChange={field.onChange}
+                  onBlur={field.onBlur}
+                  name={field.name}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="valor_sinal_reais"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Sinal Combinado (R$)</FormLabel>
+              <FormControl>
+                <MoneyInput
+                  value={field.value}
+                  onChange={field.onChange}
+                  onBlur={field.onBlur}
+                  name={field.name}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
       </div>
 
       <div className="space-y-2.5">
         <div className="flex flex-wrap items-center justify-between gap-2">
-          <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
-            Extras Avulsos & Permissões Técnicas
+          <p className="text-sm font-semibold text-ameixa-suave">
+            Extras avulsos e permissões técnicas
           </p>
           <div className="flex flex-wrap gap-1.5">
             {extrasCatalogo.map((ex) => (
@@ -98,38 +136,69 @@ export function EventoFinanceiroExtrasSection({
           </div>
         </div>
 
-        {extrasArray.fields.map((field, index) => (
+        {extrasArray.fields.map((fieldItem, index) => (
           <div
-            key={field.id}
-            className="grid grid-cols-1 sm:grid-cols-12 gap-2 p-2.5 rounded-xl bg-muted/30 border border-border/60 items-end"
+            key={fieldItem.id}
+            className="grid grid-cols-1 sm:grid-cols-12 gap-2 p-2.5 rounded-xl bg-muted/30 border border-border/60 items-start"
           >
-            <div className="sm:col-span-6 space-y-1">
-              <label className="text-[11px] font-bold">Descrição</label>
-              <Input
-                className="h-9 text-xs"
-                {...form.register(`extras.${index}.nome`)}
+            <div className="sm:col-span-6">
+              <FormField
+                control={form.control}
+                name={`extras.${index}.nome`}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-[11px]">Descrição *</FormLabel>
+                    <FormControl>
+                      <Input className="h-9 text-xs" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
             </div>
-            <div className="sm:col-span-2 space-y-1">
-              <label className="text-[11px] font-bold">Quantidade</label>
-              <Input
-                type="number"
-                className="h-9 text-xs px-2"
-                {...form.register(`extras.${index}.quantidade`)}
+            <div className="sm:col-span-2">
+              <FormField
+                control={form.control}
+                name={`extras.${index}.quantidade`}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-[11px]">Quantidade *</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="number"
+                        className="h-9 text-xs px-2"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
             </div>
-            <div className="sm:col-span-3 space-y-1">
-              <label className="text-[11px] font-bold">
-                Valor Unitário Negociado (R$)
-              </label>
-              <Input
-                type="number"
-                step="0.01"
-                className="h-9 text-xs px-2"
-                {...form.register(`extras.${index}.preco_unitario_reais`)}
+            <div className="sm:col-span-3">
+              <FormField
+                control={form.control}
+                name={`extras.${index}.preco_unitario_reais`}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-[11px]">
+                      Valor Unitário (R$) *
+                    </FormLabel>
+                    <FormControl>
+                      <MoneyInput
+                        className="h-9 text-xs px-2"
+                        value={field.value}
+                        onChange={field.onChange}
+                        onBlur={field.onBlur}
+                        name={field.name}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
             </div>
-            <div className="sm:col-span-1 flex justify-end">
+            <div className="sm:col-span-1 flex justify-end pt-5">
               <Button
                 type="button"
                 variant="destructive"

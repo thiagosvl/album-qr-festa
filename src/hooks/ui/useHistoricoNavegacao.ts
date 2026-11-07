@@ -2,17 +2,6 @@ import { useEffect, useRef, useState } from "react";
 
 const CHAVE_ESTADO_HISTORICO = "festaNavegacao";
 
-/**
- * Faz o botão "voltar" do navegador/celular desfazer um nível de tela do app
- * (revisão, câmera, mural) em vez de sair da página.
- *
- * `profundidade` é o número de telas empilhadas sobre o início (0 = início).
- * O hook mantém o histórico do navegador com o mesmo número de entradas:
- * - a profundidade sobe: empilha entradas;
- * - a profundidade desce por ação do app: desempilha com history.go;
- * - o usuário aperta voltar: chama `aoVoltar`, que deve reduzir a profundidade.
- * Com profundidade 0 o voltar sai da página normalmente.
- */
 export function useHistoricoNavegacao(
   profundidade: number,
   aoVoltar: () => void

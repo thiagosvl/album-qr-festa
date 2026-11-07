@@ -2,6 +2,7 @@ import {
   Download,
   ExternalLink,
   Images,
+  Loader2,
   Lock,
   QrCode,
   Sparkles,
@@ -23,6 +24,8 @@ interface GestaoPaiHeaderProps {
   onAlternarBloqueioUploads: () => void;
   onBaixarZip: () => void;
   totalMidias: number;
+  pausandoEnvios?: boolean;
+  baixandoZip?: boolean;
 }
 
 const BOTAO =
@@ -35,6 +38,8 @@ export function GestaoPaiHeader({
   onAlternarBloqueioUploads,
   onBaixarZip,
   totalMidias,
+  pausandoEnvios = false,
+  baixandoZip = false,
 }: GestaoPaiHeaderProps) {
   const envioPausado = !evento.permite_envio_midias;
 
@@ -67,43 +72,49 @@ export function GestaoPaiHeader({
           <div className="flex flex-wrap items-center gap-2">
             <button
               type="button"
+              disabled={pausandoEnvios}
               onClick={onAlternarBloqueioUploads}
-              className={`${BOTAO} ${
+              className={`${BOTAO} flex-1 sm:flex-initial ${
                 envioPausado
                   ? "bg-rosa text-white"
                   : "bg-white text-ameixa ring-1 ring-ameixa/15 hover:ring-ameixa/30"
               }`}
             >
-              {envioPausado ? (
-                <>
-                  <Lock className="h-4 w-4" />
-                  Envios pausados, reabrir
-                </>
+              {pausandoEnvios ? (
+                <Loader2 className="h-4 w-4 shrink-0 animate-spin" />
+              ) : envioPausado ? (
+                <Lock className="h-4 w-4 shrink-0" />
               ) : (
-                <>
-                  <Unlock className="h-4 w-4" />
-                  Pausar envios
-                </>
+                <Unlock className="h-4 w-4 shrink-0" />
               )}
+              <span className="truncate">
+                {envioPausado ? "Reabrir envios" : "Pausar envios"}
+              </span>
             </button>
 
             <button
               type="button"
-              disabled={totalMidias === 0}
+              disabled={totalMidias === 0 || baixandoZip}
               onClick={onBaixarZip}
-              className={`${BOTAO} bg-uva-claro text-uva hover:bg-uva hover:text-white`}
+              className={`${BOTAO} flex-1 sm:flex-initial bg-uva-claro text-uva hover:bg-uva hover:text-white`}
             >
-              <Download className="h-4 w-4" />
-              Baixar todas as fotos
+              {baixandoZip ? (
+                <Loader2 className="h-4 w-4 shrink-0 animate-spin" />
+              ) : (
+                <Download className="h-4 w-4 shrink-0" />
+              )}
+              <span className="truncate">
+                {baixandoZip ? "Gerando .zip..." : "Baixar fotos"}
+              </span>
             </button>
 
             <Link
               to={`/e/${evento.slug}`}
               target="_blank"
-              className={`${BOTAO} bg-ameixa text-white`}
+              className={`${BOTAO} w-full sm:w-auto bg-ameixa text-white`}
             >
-              <ExternalLink className="h-4 w-4" />
-              Abrir álbum
+              <ExternalLink className="h-4 w-4 shrink-0" />
+              <span>Abrir álbum</span>
             </Link>
           </div>
         </div>

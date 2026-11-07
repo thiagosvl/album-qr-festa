@@ -13,6 +13,7 @@ interface LayoutContextValue {
   openDialog: <T = unknown>(name: FestaDialogName, payload?: T) => void;
   closeDialog: (name?: FestaDialogName) => void;
   isDialogOpen: (name: FestaDialogName) => boolean;
+  getDialogPayload: <T = unknown>(name: FestaDialogName) => T | null;
 }
 
 const LayoutContext = createContext<LayoutContextValue | undefined>(undefined);
@@ -22,33 +23,51 @@ export function LayoutContextProvider({
 }: {
   children: React.ReactNode;
 }) {
-  const [activeDialog, setActiveDialog] = useState<ActiveDialogState>({
-    name: null,
-    payload: null,
-  });
+  const [dialogStack, setDialogStack] = useState<ActiveDialogState[]>([]);
 
   const openDialog = useCallback(
     <T = unknown>(name: FestaDialogName, payload?: T) => {
-      setActiveDialog({ name, payload: payload ?? null });
+      setDialogStack((prev) => {
+        const filtered = prev.filter((d) => d.name !== name);
+        return [...filtered, { name, payload: payload ?? null }];
+      });
     },
     []
   );
 
   const closeDialog = useCallback((name?: FestaDialogName) => {
-    setActiveDialog((prev) => {
-      if (name && prev.name !== name) return prev;
-      return { name: null, payload: null };
+    setDialogStack((prev) => {
+      if (prev.length === 0) return prev;
+      if (!name) return prev.slice(0, -1);
+      return prev.filter((d) => d.name !== name);
     });
   }, []);
 
   const isDialogOpen = useCallback(
-    (name: FestaDialogName) => activeDialog.name === name,
-    [activeDialog.name]
+    (name: FestaDialogName) => dialogStack.some((d) => d.name === name),
+    [dialogStack]
   );
+
+  const getDialogPayload = useCallback(
+    <T = unknown>(name: FestaDialogName): T | null => {
+      const found = dialogStack.find((d) => d.name === name);
+      return (found?.payload as T) ?? null;
+    },
+    [dialogStack]
+  );
+
+  const activeDialog: ActiveDialogState =
+    dialogStack[dialogStack.length - 1] ?? { name: null, payload: null };
 
   return (
     <LayoutContext.Provider
-      value={{ activeDialog, openDialog, closeDialog, isDialogOpen }}
+      value={{
+        activeDialog,
+        openDialog,
+        closeDialog,
+        isDialogOpen,
+        getDialogPayload,
+      }}
     >
       {children}
     </LayoutContext.Provider>

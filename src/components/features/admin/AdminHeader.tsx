@@ -1,6 +1,7 @@
 import { LogOut, Plus, Search, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { NativeSelect } from "@/components/ui/native-select";
 import { STATUS_PEDIDO_LABELS } from "@/hooks/business/useCalculosPedido";
 import type { FestaStatusPedidoEnum } from "@/types/festa.types";
 
@@ -68,14 +69,14 @@ export function AdminHeader({
             />
           </div>
 
-          <select
+          <NativeSelect
+            wrapperClassName="sm:w-60"
             value={filtroStatus}
             onChange={(e) =>
               onChangeFiltroStatus(
                 e.target.value as FestaStatusPedidoEnum | "TODOS"
               )
             }
-            className="h-11 rounded-xl border border-input bg-background px-3.5 text-sm font-medium"
           >
             <option value="TODOS">Todos os Status</option>
             {(Object.keys(STATUS_PEDIDO_LABELS) as FestaStatusPedidoEnum[]).map(
@@ -85,7 +86,7 @@ export function AdminHeader({
                 </option>
               )
             )}
-          </select>
+          </NativeSelect>
         </div>
       </div>
     </header>

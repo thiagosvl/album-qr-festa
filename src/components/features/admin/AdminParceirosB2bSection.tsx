@@ -1,5 +1,13 @@
-import { Building2, Coins, Edit3, ExternalLink, Plus } from "lucide-react";
-import { Link } from "react-router-dom";
+import {
+  Building2,
+  Coins,
+  Copy,
+  Edit3,
+  ExternalLink,
+  KeyRound,
+  Plus,
+} from "lucide-react";
+import { toast } from "sonner";
 import { FESTA_ROUTES } from "@/constants";
 import { Banner } from "@/components/ui/Banner";
 import { Badge } from "@/components/ui/badge";
@@ -15,23 +23,35 @@ interface AdminParceirosB2bSectionProps {
   parceiros: ParceiroB2bAdminDto[];
   planosB2b: FestaCatalogoPlanoB2b[];
   isLoading: boolean;
+  gerandoLinkParceiro: boolean;
   onNovoParceiro: () => void;
   onEditarParceiro: (parceiro: ParceiroB2bAdminDto) => void;
+  onCopiarLinkAcessoParceiro: (parceiroId: string) => void;
+  onEditarPlanoB2b: (plano: FestaCatalogoPlanoB2b) => void;
 }
 
 export function AdminParceirosB2bSection({
   parceiros,
   planosB2b,
   isLoading,
+  gerandoLinkParceiro,
   onNovoParceiro,
   onEditarParceiro,
+  onCopiarLinkAcessoParceiro,
+  onEditarPlanoB2b,
 }: AdminParceirosB2bSectionProps) {
+  const copiarLinkLoginParceiro = () => {
+    const url = `${window.location.origin}${FESTA_ROUTES.PARCEIRO_LOGIN}`;
+    navigator.clipboard.writeText(url);
+    toast.success("Link de login do parceiro copiado!");
+  };
+
   return (
     <div className="space-y-6">
       <Banner
         variant="info"
         title="Gestão de Parceiros B2B (Buffets, Fotógrafos e Casas de Festas)"
-        description="Cadastre parceiros, acompanhe o saldo de créditos de eventos e realize recargas avulsas ou mensais."
+        description="Cadastre parceiros, configure o e-mail e senha de acesso ao portal e gere links de acesso direto para suporte."
       />
 
       <Card>
@@ -44,11 +64,14 @@ export function AdminParceirosB2bSection({
           </div>
 
           <div className="flex items-center gap-2">
-            <Button variant="outline" size="sm" asChild>
-              <Link to={FESTA_ROUTES.PARCEIRO_PORTAL}>
-                <ExternalLink className="w-3.5 h-3.5" />
-                <span>Abrir Portal do Parceiro</span>
-              </Link>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={copiarLinkLoginParceiro}
+            >
+              <Copy className="w-3.5 h-3.5" />
+              <span>Copiar Link de Login</span>
             </Button>
 
             <Button type="button" size="sm" onClick={onNovoParceiro}>
@@ -69,9 +92,11 @@ export function AdminParceirosB2bSection({
               ))}
             </div>
           ) : parceiros.length === 0 ? (
-            <p className="text-sm text-muted-foreground py-6 text-center">
-              Nenhum parceiro B2B cadastrado ainda.
-            </p>
+            <Banner
+              variant="neutral"
+              title="Nenhum parceiro B2B cadastrado"
+              description="Clique em 'Novo Parceiro B2B' para cadastrar um buffet ou fotógrafo e liberar seu login no portal."
+            />
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {parceiros.map((parceiro) => (
@@ -81,15 +106,27 @@ export function AdminParceirosB2bSection({
                 >
                   <div className="space-y-2">
                     <div className="flex items-center justify-between gap-2">
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-2 flex-wrap">
                         <span
                           className="w-3.5 h-3.5 rounded-full"
                           style={{
                             backgroundColor: parceiro.cor_marca ?? "#7c3aed",
                           }}
                         />
-                        <Badge variant={parceiro.ativo ? "success" : "secondary"}>
+                        <Badge
+                          variant={parceiro.ativo ? "success" : "secondary"}
+                        >
                           {parceiro.ativo ? "Parceiro Ativo" : "Inativo"}
+                        </Badge>
+                        <Badge
+                          variant={
+                            parceiro.possui_login ? "tonal" : "secondary"
+                          }
+                        >
+                          <KeyRound className="w-3 h-3 mr-1" />
+                          {parceiro.possui_login
+                            ? "Login Ativo"
+                            : "Definir Senha"}
                         </Badge>
                         {parceiro.plano && (
                           <Badge variant="tonal">{parceiro.plano.nome}</Badge>
@@ -106,8 +143,10 @@ export function AdminParceirosB2bSection({
                         {parceiro.nome_empresa}
                       </h4>
                       <p className="text-xs text-muted-foreground">
-                        {parceiro.email || "Sem e-mail"} •{" "}
-                        {parceiro.telefone || "Sem WhatsApp"} •{" "}
+                        {parceiro.email_acesso ||
+                          parceiro.email ||
+                          "Sem e-mail"}{" "}
+                        • {parceiro.telefone || "Sem WhatsApp"} •{" "}
                         {parceiro.documento || "Sem CNPJ"}
                       </p>
                     </div>
@@ -137,7 +176,18 @@ export function AdminParceirosB2bSection({
                       onClick={() => onEditarParceiro(parceiro)}
                     >
                       <Coins className="w-3.5 h-3.5" />
-                      <span>Recarregar Créditos / Editar</span>
+                      <span>Créditos / Senha</span>
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      loading={gerandoLinkParceiro}
+                      onClick={() => onCopiarLinkAcessoParceiro(parceiro.id)}
+                      title="Gerar e copiar link de acesso (Impersonate) para abrir em aba anônima"
+                    >
+                      <ExternalLink className="w-3.5 h-3.5" />
+                      <span>Acessar como Parceiro</span>
                     </Button>
                     <Button
                       type="button"
@@ -166,18 +216,35 @@ export function AdminParceirosB2bSection({
             {planosB2b.map((pl) => (
               <div
                 key={pl.id}
-                className="rounded-xl border border-border/60 p-3.5 space-y-1.5 bg-muted/20"
+                className="rounded-xl border border-border/60 p-3.5 space-y-2 bg-muted/20 flex flex-col justify-between"
               >
-                <div className="flex items-center justify-between">
-                  <span className="font-display font-bold text-sm">
-                    {pl.nome}
-                  </span>
-                  <Badge variant="tonal">{pl.creditos_mensais} créditos</Badge>
+                <div className="space-y-1.5">
+                  <div className="flex items-center justify-between">
+                    <span className="font-display font-bold text-sm">
+                      {pl.nome}
+                    </span>
+                    <Badge variant="tonal">
+                      {pl.creditos_mensais} créditos
+                    </Badge>
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    {pl.descricao}
+                  </p>
                 </div>
-                <p className="text-xs text-muted-foreground">{pl.descricao}</p>
-                <p className="font-display text-lg font-extrabold text-primary">
-                  {formatarMoedaCentavos(pl.preco_mensal_centavos)}/ciclo
-                </p>
+                <div className="flex items-center justify-between pt-2">
+                  <p className="font-display text-lg font-extrabold text-primary">
+                    {formatarMoedaCentavos(pl.preco_mensal_centavos)}/ciclo
+                  </p>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => onEditarPlanoB2b(pl)}
+                  >
+                    <Edit3 className="w-3.5 h-3.5" />
+                    <span>Editar</span>
+                  </Button>
+                </div>
               </div>
             ))}
           </div>

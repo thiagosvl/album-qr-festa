@@ -6,7 +6,6 @@ import {
 
 const ROTULO_CTA = "Quero para minha festa";
 
-/** Chamada comercial exibida só na demonstração: leva o visitante ao WhatsApp. */
 export function ConvidadoCtaOrcamento() {
   return (
     <a

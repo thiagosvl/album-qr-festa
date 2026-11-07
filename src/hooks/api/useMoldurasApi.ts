@@ -21,36 +21,72 @@ export interface AtualizarMolduraPayload {
   ativa?: boolean;
 }
 
-export function useMoldurasEventoQuery(eventoId: string | undefined) {
+function invalidarCachesMolduras(
+  queryClient: ReturnType<typeof useQueryClient>,
+  eventoId: string
+): void {
+  queryClient.invalidateQueries({
+    queryKey: MOLDURAS_QUERY_KEYS.byEvento(eventoId),
+  });
+  queryClient.invalidateQueries({ queryKey: EVENTOS_QUERY_KEYS.adminList });
+  queryClient.invalidateQueries({
+    queryKey: ["festa", "parceiros-b2b"],
+  });
+  queryClient.invalidateQueries({
+    queryKey: ["festa", "parceiro-portal"],
+  });
+  queryClient.invalidateQueries({
+    queryKey: ["festa", "evento", "publico"],
+  });
+  queryClient.invalidateQueries({ queryKey: ["festa", "gestao"] });
+}
+
+export function useMoldurasEventoQuery(
+  eventoId: string | undefined,
+  tokenGestao?: string
+) {
   return useQuery({
     queryKey: MOLDURAS_QUERY_KEYS.byEvento(eventoId ?? ""),
     queryFn: () =>
-      apiRequest<MolduraDto[]>(`/api/admin/eventos/${eventoId}/molduras`, {
-        requireAuth: true,
-      }),
+      tokenGestao
+        ? apiRequest<MolduraDto[]>(
+            `/api/gestao/${encodeURIComponent(tokenGestao)}/molduras`
+          )
+        : apiRequest<MolduraDto[]>(`/api/admin/eventos/${eventoId}/molduras`, {
+            requireAuth: true,
+          }),
     enabled: Boolean(eventoId),
   });
 }
 
-export function useCriarMolduraMutation(eventoId: string) {
+export function useCriarMolduraMutation(
+  eventoId: string,
+  tokenGestao?: string
+) {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (payload: CriarMolduraPayload) =>
-      apiRequest<MolduraDto>(`/api/admin/eventos/${eventoId}/molduras`, {
-        method: "POST",
-        requireAuth: true,
-        body: payload,
-      }),
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: MOLDURAS_QUERY_KEYS.byEvento(eventoId),
-      });
-      queryClient.invalidateQueries({ queryKey: EVENTOS_QUERY_KEYS.adminList });
-    },
+      tokenGestao
+        ? apiRequest<MolduraDto>(
+            `/api/gestao/${encodeURIComponent(tokenGestao)}/molduras`,
+            {
+              method: "POST",
+              body: payload,
+            }
+          )
+        : apiRequest<MolduraDto>(`/api/admin/eventos/${eventoId}/molduras`, {
+            method: "POST",
+            requireAuth: true,
+            body: payload,
+          }),
+    onSuccess: () => invalidarCachesMolduras(queryClient, eventoId),
   });
 }
 
-export function useAtualizarMolduraMutation(eventoId: string) {
+export function useAtualizarMolduraMutation(
+  eventoId: string,
+  tokenGestao?: string
+) {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: ({
@@ -60,60 +96,91 @@ export function useAtualizarMolduraMutation(eventoId: string) {
       molduraId: string;
       payload: AtualizarMolduraPayload;
     }) =>
-      apiRequest<MolduraDto>(
-        `/api/admin/eventos/${eventoId}/molduras/${molduraId}`,
-        {
-          method: "PATCH",
-          requireAuth: true,
-          body: payload,
-        }
-      ),
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: MOLDURAS_QUERY_KEYS.byEvento(eventoId),
-      });
-      queryClient.invalidateQueries({ queryKey: EVENTOS_QUERY_KEYS.adminList });
+      tokenGestao
+        ? apiRequest<MolduraDto>(
+            `/api/gestao/${encodeURIComponent(tokenGestao)}/molduras/${molduraId}`,
+            {
+              method: "PATCH",
+              body: payload,
+            }
+          )
+        : apiRequest<MolduraDto>(
+            `/api/admin/eventos/${eventoId}/molduras/${molduraId}`,
+            {
+              method: "PATCH",
+              requireAuth: true,
+              body: payload,
+            }
+          ),
+    onSuccess: (updated) => {
+      queryClient.setQueryData<MolduraDto[]>(
+        MOLDURAS_QUERY_KEYS.byEvento(eventoId),
+        (antigas) =>
+          antigas?.map((item) => (item.id === updated.id ? updated : item))
+      );
+      invalidarCachesMolduras(queryClient, eventoId);
     },
   });
 }
 
-export function useExcluirMolduraMutation(eventoId: string) {
+export function useExcluirMolduraMutation(
+  eventoId: string,
+  tokenGestao?: string
+) {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (molduraId: string) =>
-      apiRequest<void>(
-        `/api/admin/eventos/${eventoId}/molduras/${molduraId}`,
-        {
-          method: "DELETE",
-          requireAuth: true,
-        }
-      ),
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: MOLDURAS_QUERY_KEYS.byEvento(eventoId),
-      });
-      queryClient.invalidateQueries({ queryKey: EVENTOS_QUERY_KEYS.adminList });
+      tokenGestao
+        ? apiRequest<void>(
+            `/api/gestao/${encodeURIComponent(tokenGestao)}/molduras/${molduraId}`,
+            { method: "DELETE" }
+          )
+        : apiRequest<void>(
+            `/api/admin/eventos/${eventoId}/molduras/${molduraId}`,
+            {
+              method: "DELETE",
+              requireAuth: true,
+            }
+          ),
+    onSuccess: (_res, molduraId) => {
+      queryClient.setQueryData<MolduraDto[]>(
+        MOLDURAS_QUERY_KEYS.byEvento(eventoId),
+        (antigas) => antigas?.filter((item) => item.id !== molduraId)
+      );
+      invalidarCachesMolduras(queryClient, eventoId);
     },
   });
 }
 
-export function useReordenarMoldurasMutation(eventoId: string) {
+export function useReordenarMoldurasMutation(
+  eventoId: string,
+  tokenGestao?: string
+) {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (ordens: Array<{ id: string; ordem: number }>) =>
-      apiRequest<MolduraDto[]>(
-        `/api/admin/eventos/${eventoId}/molduras/reordenar`,
-        {
-          method: "PUT",
-          requireAuth: true,
-          body: { ordens },
-        }
-      ),
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: MOLDURAS_QUERY_KEYS.byEvento(eventoId),
-      });
-      queryClient.invalidateQueries({ queryKey: EVENTOS_QUERY_KEYS.adminList });
+      tokenGestao
+        ? apiRequest<MolduraDto[]>(
+            `/api/gestao/${encodeURIComponent(tokenGestao)}/molduras/reordenar`,
+            {
+              method: "PUT",
+              body: { ordens },
+            }
+          )
+        : apiRequest<MolduraDto[]>(
+            `/api/admin/eventos/${eventoId}/molduras/reordenar`,
+            {
+              method: "PUT",
+              requireAuth: true,
+              body: { ordens },
+            }
+          ),
+    onSuccess: (novaLista) => {
+      queryClient.setQueryData<MolduraDto[]>(
+        MOLDURAS_QUERY_KEYS.byEvento(eventoId),
+        novaLista
+      );
+      invalidarCachesMolduras(queryClient, eventoId);
     },
   });
 }

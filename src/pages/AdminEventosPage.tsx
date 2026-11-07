@@ -19,6 +19,9 @@ export function AdminEventosPage() {
     );
   }
 
+  const tokenDemoGestao =
+    vm.eventos.find((e) => e.is_demo)?.token_gestao ?? null;
+
   return (
     <div className="min-h-screen flex flex-col lg:flex-row bg-background">
       <AdminSidebar
@@ -26,6 +29,7 @@ export function AdminEventosPage() {
         onChangeAba={vm.setAbaAtiva}
         totalEventos={vm.eventos.length}
         totalParceiros={vm.parceiros.length}
+        tokenDemoGestao={tokenDemoGestao}
         onLogout={vm.fazerLogout}
       />
 
@@ -83,8 +87,11 @@ export function AdminEventosPage() {
               parceiros={vm.parceiros}
               planosB2b={vm.catalogo?.planos_b2b ?? []}
               isLoading={vm.isLoadingParceiros}
+              gerandoLinkParceiro={vm.gerandoLinkParceiro}
               onNovoParceiro={vm.abrirNovoParceiroDialog}
               onEditarParceiro={vm.abrirEditarParceiroDialog}
+              onCopiarLinkAcessoParceiro={vm.copiarLinkAcessoParceiro}
+              onEditarPlanoB2b={vm.abrirEditarPlanoB2bDialog}
             />
           )}
         </main>

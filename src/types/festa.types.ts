@@ -11,6 +11,7 @@ export type FestaEventoMoldura = Tables<"festa_evento_molduras">;
 export type FestaEventoMidia = Tables<"festa_evento_midias">;
 export type FestaParceiroB2b = Tables<"festa_parceiros_b2b">;
 export type FestaTransacaoCreditoB2b = Tables<"festa_transacoes_creditos_b2b">;
+export type FestaRecuperacaoSenha = Tables<"festa_recuperacoes_senha">;
 
 export type FestaPacoteTipoEnum = Enums<"festa_pacote_tipo_enum">;
 export type FestaStatusPedidoEnum = Enums<"festa_status_pedido_enum">;
@@ -23,6 +24,7 @@ export type FestaStatusAssinaturaB2bEnum =
   Enums<"festa_status_assinatura_b2b_enum">;
 export type FestaTipoTransacaoCreditoEnum =
   Enums<"festa_tipo_transacao_credito_enum">;
+export type FestaTipoPerfilEnum = Enums<"festa_tipo_perfil_enum">;
 
 export interface MolduraDto extends FestaEventoMoldura {
   arquivo_url: string;
@@ -98,12 +100,41 @@ export interface ParceiroB2bAdminDto extends FestaParceiroB2b {
   plano: FestaCatalogoPlanoB2b | null;
   total_eventos: number;
   transacoes: FestaTransacaoCreditoB2b[];
+  possui_login: boolean;
+  email_acesso: string | null;
 }
 
 export interface PortalParceiroB2bDto {
-  parceiro: ParceiroB2bAdminDto | null;
-  parceiros_disponiveis: FestaParceiroB2b[];
+  parceiro: ParceiroB2bAdminDto;
+  perfil_usuario: FestaTipoPerfilEnum;
   planos_b2b: FestaCatalogoPlanoB2b[];
   eventos: EventoAdminDto[];
   temas: FestaTemaCatalogo[];
+  operadores: FestaUsuario[];
+}
+
+export interface SolicitarRecuperacaoResponseDto {
+  email_mascarado: string;
+  enviado_por_email: boolean;
+  codigo_dev?: string;
+}
+
+export interface ValidarCodigoRecuperacaoResponseDto {
+  recovery_id: string;
+}
+
+export interface ResetarSenhaRecuperacaoResponseDto {
+  session: {
+    access_token: string;
+    refresh_token: string;
+  };
+  tipo_perfil: FestaTipoPerfilEnum;
+}
+
+export interface SessaoUsuarioAutenticadoDto {
+  id: string;
+  nome: string;
+  email: string | null;
+  tipo_perfil: FestaTipoPerfilEnum;
+  parceiro_id: string | null;
 }

@@ -47,7 +47,7 @@ export function AdminTemasSection({
                 className="rounded-2xl border border-border/70 p-4 flex flex-col justify-between gap-4 bg-card"
               >
                 <div className="flex items-start gap-3.5">
-                  <div className="w-16 h-24 rounded-xl border border-border bg-[repeating-conic-gradient(#e5e7eb_0%_25%,#ffffff_0%_50%)] bg-[length:10px_10px] overflow-hidden shrink-0 flex items-center justify-center">
+                  <div className="xadrez w-16 h-24 rounded-xl border border-border overflow-hidden shrink-0 flex items-center justify-center">
                     {tema.moldura_preview_url ? (
                       <img
                         src={tema.moldura_preview_url}

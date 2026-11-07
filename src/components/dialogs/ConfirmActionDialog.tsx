@@ -70,7 +70,7 @@ export function ConfirmActionDialog({
         <Button
           type="button"
           variant={payload.variant ?? "destructive"}
-          disabled={loading}
+          loading={loading}
           onClick={handleConfirm}
         >
           {loading ? "Processando..." : payload.confirmLabel ?? "Confirmar"}

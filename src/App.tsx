@@ -7,7 +7,9 @@ import { AdminEventosPage } from "@/pages/AdminEventosPage";
 import { AdminLoginPage } from "@/pages/AdminLoginPage";
 import { ConvidadoPage } from "@/pages/ConvidadoPage";
 import { GestaoPaiPage } from "@/pages/GestaoPaiPage";
+import { ImpersonateBridgePage } from "@/pages/ImpersonateBridgePage";
 import { ParceiroB2bPlaceholderPage } from "@/pages/ParceiroB2bPlaceholderPage";
+import { ParceiroLoginPage } from "@/pages/ParceiroLoginPage";
 import { TelaoPage } from "@/pages/TelaoPage";
 import { LayoutProvider } from "@/providers/LayoutProvider";
 
@@ -29,14 +31,14 @@ export function App() {
             <Routes>
               <Route
                 path={FESTA_ROUTES.HOME}
-                element={<Navigate to="/e/demo" replace />}
+                element={<Navigate to={FESTA_ROUTES.DEMO_CONVIDADO} replace />}
               />
               <Route
-                path="/e/admin"
+                path={FESTA_ROUTES.LEGACY_ADMIN}
                 element={<Navigate to={FESTA_ROUTES.ADMIN_DASHBOARD} replace />}
               />
               <Route
-                path="/e/parceiro"
+                path={FESTA_ROUTES.LEGACY_PARCEIRO}
                 element={<Navigate to={FESTA_ROUTES.PARCEIRO_PORTAL} replace />}
               />
               <Route
@@ -49,6 +51,10 @@ export function App() {
                 element={<GestaoPaiPage />}
               />
               <Route
+                path={FESTA_ROUTES.LOGIN}
+                element={<ParceiroLoginPage />}
+              />
+              <Route
                 path={FESTA_ROUTES.ADMIN_LOGIN}
                 element={<AdminLoginPage />}
               />
@@ -57,10 +63,21 @@ export function App() {
                 element={<AdminEventosPage />}
               />
               <Route
+                path={FESTA_ROUTES.PARCEIRO_LOGIN}
+                element={<ParceiroLoginPage />}
+              />
+              <Route
+                path={FESTA_ROUTES.IMPERSONATE_BRIDGE}
+                element={<ImpersonateBridgePage />}
+              />
+              <Route
                 path={FESTA_ROUTES.PARCEIRO_PORTAL}
                 element={<ParceiroB2bPlaceholderPage />}
               />
-              <Route path="*" element={<Navigate to="/e/demo" replace />} />
+              <Route
+                path="*"
+                element={<Navigate to={FESTA_ROUTES.DEMO_CONVIDADO} replace />}
+              />
             </Routes>
             <Toaster position="top-center" richColors closeButton />
           </LayoutProvider>

@@ -5,6 +5,7 @@ import type {
   FestaPacoteTipoEnum,
   FestaStatusAssinaturaB2bEnum,
   FestaTipoTransacaoCreditoEnum,
+  FestaUsuario,
   ParceiroB2bAdminDto,
   PortalParceiroB2bDto,
 } from "@/types/festa.types";
@@ -12,8 +13,7 @@ import { EVENTOS_QUERY_KEYS } from "./useEventosApi";
 
 export const PARCEIRO_B2B_QUERY_KEYS = {
   adminList: ["festa", "parceiros-b2b", "admin"] as const,
-  portal: (parceiroId?: string) =>
-    ["festa", "parceiro-portal", parceiroId ?? "default"] as const,
+  portal: ["festa", "parceiro-portal", "me"] as const,
 };
 
 export interface SalvarParceiroB2bPayload {
@@ -21,6 +21,7 @@ export interface SalvarParceiroB2bPayload {
   documento?: string | null;
   telefone?: string | null;
   email?: string | null;
+  senha_acesso?: string | null;
   logo_url?: string | null;
   cor_marca?: string;
   status_assinatura?: FestaStatusAssinaturaB2bEnum;
@@ -128,70 +129,134 @@ export function useRegistrarCreditoB2bMutation() {
   });
 }
 
-export function usePortalParceiroB2bQuery(parceiroId?: string) {
+export function useImpersonateParceiroB2bMutation() {
+  return useMutation({
+    mutationFn: (parceiroId: string) =>
+      apiRequest<{ tokenHash: string }>(
+        `/api/admin/parceiros-b2b/${parceiroId}/impersonate`,
+        {
+          method: "POST",
+          requireAuth: true,
+        }
+      ),
+  });
+}
+
+export function usePortalParceiroB2bQuery(enabled = true) {
   return useQuery({
-    queryKey: PARCEIRO_B2B_QUERY_KEYS.portal(parceiroId),
-    queryFn: () => {
-      const qs = parceiroId
-        ? `?parceiro_id=${encodeURIComponent(parceiroId)}`
-        : "";
-      return apiRequest<PortalParceiroB2bDto>(
-        `/api/public/parceiro-portal${qs}`
-      );
-    },
+    queryKey: PARCEIRO_B2B_QUERY_KEYS.portal,
+    queryFn: () =>
+      apiRequest<PortalParceiroB2bDto>("/api/parceiro/portal", {
+        requireAuth: true,
+      }),
+    enabled,
+    retry: false,
   });
 }
 
 export function useAtualizarPerfilPortalParceiroMutation() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({
-      id,
-      payload,
-    }: {
-      id: string;
-      payload: Partial<SalvarParceiroB2bPayload>;
-    }) =>
-      apiRequest<ParceiroB2bAdminDto>(`/api/public/parceiro-portal/${id}`, {
+    mutationFn: (payload: Partial<SalvarParceiroB2bPayload>) =>
+      apiRequest<ParceiroB2bAdminDto>("/api/parceiro/portal", {
         method: "PATCH",
+        requireAuth: true,
         body: payload,
       }),
-    onSuccess: (_data, vars) => {
+    onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: PARCEIRO_B2B_QUERY_KEYS.portal(vars.id),
-      });
-      queryClient.invalidateQueries({
-        queryKey: PARCEIRO_B2B_QUERY_KEYS.portal(undefined),
+        queryKey: PARCEIRO_B2B_QUERY_KEYS.portal,
       });
     },
   });
 }
 
+export interface CriarOperadorParceiroPayload {
+  nome: string;
+  email: string;
+  telefone?: string | null;
+  senha_acesso: string;
+  ativo?: boolean;
+}
+
+export interface AtualizarOperadorParceiroPayload {
+  nome?: string;
+  email?: string;
+  telefone?: string | null;
+  senha_acesso?: string | null;
+  ativo?: boolean;
+}
+
 export function useCriarEventoPortalParceiroMutation() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({
-      parceiroId,
-      payload,
-    }: {
-      parceiroId: string;
-      payload: CriarEventoParceiroB2bPayload;
-    }) =>
-      apiRequest<EventoAdminDto>(
-        `/api/public/parceiro-portal/${parceiroId}/eventos`,
-        {
-          method: "POST",
-          body: payload,
-        }
-      ),
-    onSuccess: (_data, vars) => {
+    mutationFn: (payload: CriarEventoParceiroB2bPayload) =>
+      apiRequest<EventoAdminDto>("/api/parceiro/eventos", {
+        method: "POST",
+        requireAuth: true,
+        body: payload,
+      }),
+    onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: PARCEIRO_B2B_QUERY_KEYS.portal(vars.parceiroId),
-      });
-      queryClient.invalidateQueries({
-        queryKey: PARCEIRO_B2B_QUERY_KEYS.portal(undefined),
+        queryKey: PARCEIRO_B2B_QUERY_KEYS.portal,
       });
       queryClient.invalidateQueries({ queryKey: EVENTOS_QUERY_KEYS.adminList });
+    },
+  });
+}
+
+export function useCriarOperadorParceiroMutation() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (payload: CriarOperadorParceiroPayload) =>
+      apiRequest<FestaUsuario>("/api/parceiro/operadores", {
+        method: "POST",
+        requireAuth: true,
+        body: payload,
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: PARCEIRO_B2B_QUERY_KEYS.portal,
+      });
+    },
+  });
+}
+
+export function useAtualizarOperadorParceiroMutation() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({
+      operadorId,
+      payload,
+    }: {
+      operadorId: string;
+      payload: AtualizarOperadorParceiroPayload;
+    }) =>
+      apiRequest<FestaUsuario>(`/api/parceiro/operadores/${operadorId}`, {
+        method: "PATCH",
+        requireAuth: true,
+        body: payload,
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: PARCEIRO_B2B_QUERY_KEYS.portal,
+      });
+    },
+  });
+}
+
+export function useExcluirOperadorParceiroMutation() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (operadorId: string) =>
+      apiRequest<void>(`/api/parceiro/operadores/${operadorId}`, {
+        method: "DELETE",
+        requireAuth: true,
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: PARCEIRO_B2B_QUERY_KEYS.portal,
+      });
     },
   });
 }

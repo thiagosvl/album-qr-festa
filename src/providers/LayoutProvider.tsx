@@ -34,6 +34,10 @@ import {
   type MoldurasEventoDialogPayload,
 } from "@/components/dialogs/MoldurasEventoDialog";
 import {
+  OperadorParceiroFormDialog,
+  type OperadorParceiroFormDialogPayload,
+} from "@/components/dialogs/OperadorParceiroFormDialog";
+import {
   PacoteB2cFormDialog,
   type PacoteB2cFormDialogPayload,
 } from "@/components/dialogs/PacoteB2cFormDialog";
@@ -46,137 +50,113 @@ import {
   type ParceiroB2bFormDialogPayload,
 } from "@/components/dialogs/ParceiroB2bFormDialog";
 import {
+  PlanoB2bFormDialog,
+  type PlanoB2bFormDialogPayload,
+} from "@/components/dialogs/PlanoB2bFormDialog";
+import {
   QrCodeLinksDialog,
   type QrCodeLinksDialogPayload,
 } from "@/components/dialogs/QrCodeLinksDialog";
+import {
+  RecuperarSenhaDialog,
+  type RecuperarSenhaDialogPayload,
+} from "@/components/dialogs/RecuperarSenhaDialog";
 import {
   TemaCatalogoFormDialog,
   type TemaCatalogoFormDialogPayload,
 } from "@/components/dialogs/TemaCatalogoFormDialog";
 
 export function GlobalDialogsRenderer() {
-  const { activeDialog, closeDialog, isDialogOpen } = useLayout();
+  const { closeDialog, isDialogOpen, getDialogPayload } = useLayout();
 
   return (
     <>
-      <ConfirmActionDialog
-        open={isDialogOpen(FESTA_DIALOG_NAMES.CONFIRM_ACTION)}
-        onClose={() => closeDialog(FESTA_DIALOG_NAMES.CONFIRM_ACTION)}
-        payload={
-          isDialogOpen(FESTA_DIALOG_NAMES.CONFIRM_ACTION)
-            ? (activeDialog.payload as ConfirmActionDialogPayload)
-            : null
-        }
-      />
-
-      <MidiaViewerDialog
-        open={isDialogOpen(FESTA_DIALOG_NAMES.MIDIA_VIEWER)}
-        onClose={() => closeDialog(FESTA_DIALOG_NAMES.MIDIA_VIEWER)}
-        payload={
-          isDialogOpen(FESTA_DIALOG_NAMES.MIDIA_VIEWER)
-            ? (activeDialog.payload as MidiaViewerDialogPayload)
-            : null
-        }
-      />
-
       <EventoFormDialog
         open={isDialogOpen(FESTA_DIALOG_NAMES.EVENTO_FORM)}
         onClose={() => closeDialog(FESTA_DIALOG_NAMES.EVENTO_FORM)}
-        payload={
-          isDialogOpen(FESTA_DIALOG_NAMES.EVENTO_FORM)
-            ? (activeDialog.payload as EventoFormDialogPayload)
-            : null
-        }
+        payload={getDialogPayload<EventoFormDialogPayload>(
+          FESTA_DIALOG_NAMES.EVENTO_FORM
+        )}
       />
 
       <PagamentoManualDialog
         open={isDialogOpen(FESTA_DIALOG_NAMES.PAGAMENTO_MANUAL)}
         onClose={() => closeDialog(FESTA_DIALOG_NAMES.PAGAMENTO_MANUAL)}
-        payload={
-          isDialogOpen(FESTA_DIALOG_NAMES.PAGAMENTO_MANUAL)
-            ? (activeDialog.payload as PagamentoManualDialogPayload)
-            : null
-        }
+        payload={getDialogPayload<PagamentoManualDialogPayload>(
+          FESTA_DIALOG_NAMES.PAGAMENTO_MANUAL
+        )}
       />
 
       <MoldurasEventoDialog
         open={isDialogOpen(FESTA_DIALOG_NAMES.MOLDURAS_EVENTO)}
         onClose={() => closeDialog(FESTA_DIALOG_NAMES.MOLDURAS_EVENTO)}
-        payload={
-          isDialogOpen(FESTA_DIALOG_NAMES.MOLDURAS_EVENTO)
-            ? (activeDialog.payload as MoldurasEventoDialogPayload)
-            : null
-        }
+        payload={getDialogPayload<MoldurasEventoDialogPayload>(
+          FESTA_DIALOG_NAMES.MOLDURAS_EVENTO
+        )}
       />
 
       <QrCodeLinksDialog
         open={isDialogOpen(FESTA_DIALOG_NAMES.QRCODE_LINKS)}
         onClose={() => closeDialog(FESTA_DIALOG_NAMES.QRCODE_LINKS)}
-        payload={
-          isDialogOpen(FESTA_DIALOG_NAMES.QRCODE_LINKS)
-            ? (activeDialog.payload as QrCodeLinksDialogPayload)
-            : null
-        }
+        payload={getDialogPayload<QrCodeLinksDialogPayload>(
+          FESTA_DIALOG_NAMES.QRCODE_LINKS
+        )}
       />
 
       <MidiasEventoAdminDialog
         open={isDialogOpen(FESTA_DIALOG_NAMES.MIDIAS_EVENTO_ADMIN)}
         onClose={() => closeDialog(FESTA_DIALOG_NAMES.MIDIAS_EVENTO_ADMIN)}
-        payload={
-          isDialogOpen(FESTA_DIALOG_NAMES.MIDIAS_EVENTO_ADMIN)
-            ? (activeDialog.payload as MidiasEventoAdminDialogPayload)
-            : null
-        }
+        payload={getDialogPayload<MidiasEventoAdminDialogPayload>(
+          FESTA_DIALOG_NAMES.MIDIAS_EVENTO_ADMIN
+        )}
       />
 
       <ExtrasEventoAdminDialog
         open={isDialogOpen(FESTA_DIALOG_NAMES.EXTRAS_EVENTO_ADMIN)}
         onClose={() => closeDialog(FESTA_DIALOG_NAMES.EXTRAS_EVENTO_ADMIN)}
-        payload={
-          isDialogOpen(FESTA_DIALOG_NAMES.EXTRAS_EVENTO_ADMIN)
-            ? (activeDialog.payload as ExtrasEventoAdminDialogPayload)
-            : null
-        }
+        payload={getDialogPayload<ExtrasEventoAdminDialogPayload>(
+          FESTA_DIALOG_NAMES.EXTRAS_EVENTO_ADMIN
+        )}
       />
 
       <PacoteB2cFormDialog
         open={isDialogOpen(FESTA_DIALOG_NAMES.PACOTE_B2C_FORM)}
         onClose={() => closeDialog(FESTA_DIALOG_NAMES.PACOTE_B2C_FORM)}
-        payload={
-          isDialogOpen(FESTA_DIALOG_NAMES.PACOTE_B2C_FORM)
-            ? (activeDialog.payload as PacoteB2cFormDialogPayload)
-            : null
-        }
+        payload={getDialogPayload<PacoteB2cFormDialogPayload>(
+          FESTA_DIALOG_NAMES.PACOTE_B2C_FORM
+        )}
       />
 
       <ExtraB2cFormDialog
         open={isDialogOpen(FESTA_DIALOG_NAMES.EXTRA_B2C_FORM)}
         onClose={() => closeDialog(FESTA_DIALOG_NAMES.EXTRA_B2C_FORM)}
-        payload={
-          isDialogOpen(FESTA_DIALOG_NAMES.EXTRA_B2C_FORM)
-            ? (activeDialog.payload as ExtraB2cFormDialogPayload)
-            : null
-        }
+        payload={getDialogPayload<ExtraB2cFormDialogPayload>(
+          FESTA_DIALOG_NAMES.EXTRA_B2C_FORM
+        )}
       />
 
       <TemaCatalogoFormDialog
         open={isDialogOpen(FESTA_DIALOG_NAMES.TEMA_CATALOGO_FORM)}
         onClose={() => closeDialog(FESTA_DIALOG_NAMES.TEMA_CATALOGO_FORM)}
-        payload={
-          isDialogOpen(FESTA_DIALOG_NAMES.TEMA_CATALOGO_FORM)
-            ? (activeDialog.payload as TemaCatalogoFormDialogPayload)
-            : null
-        }
+        payload={getDialogPayload<TemaCatalogoFormDialogPayload>(
+          FESTA_DIALOG_NAMES.TEMA_CATALOGO_FORM
+        )}
       />
 
       <ParceiroB2bFormDialog
         open={isDialogOpen(FESTA_DIALOG_NAMES.PARCEIRO_B2B_FORM)}
         onClose={() => closeDialog(FESTA_DIALOG_NAMES.PARCEIRO_B2B_FORM)}
-        payload={
-          isDialogOpen(FESTA_DIALOG_NAMES.PARCEIRO_B2B_FORM)
-            ? (activeDialog.payload as ParceiroB2bFormDialogPayload)
-            : null
-        }
+        payload={getDialogPayload<ParceiroB2bFormDialogPayload>(
+          FESTA_DIALOG_NAMES.PARCEIRO_B2B_FORM
+        )}
+      />
+
+      <PlanoB2bFormDialog
+        open={isDialogOpen(FESTA_DIALOG_NAMES.PLANO_B2B_FORM)}
+        onClose={() => closeDialog(FESTA_DIALOG_NAMES.PLANO_B2B_FORM)}
+        payload={getDialogPayload<PlanoB2bFormDialogPayload>(
+          FESTA_DIALOG_NAMES.PLANO_B2B_FORM
+        )}
       />
 
       <EventoParceiroB2bFormDialog
@@ -184,11 +164,41 @@ export function GlobalDialogsRenderer() {
         onClose={() =>
           closeDialog(FESTA_DIALOG_NAMES.EVENTO_PARCEIRO_B2B_FORM)
         }
-        payload={
-          isDialogOpen(FESTA_DIALOG_NAMES.EVENTO_PARCEIRO_B2B_FORM)
-            ? (activeDialog.payload as EventoParceiroB2bFormDialogPayload)
-            : null
-        }
+        payload={getDialogPayload<EventoParceiroB2bFormDialogPayload>(
+          FESTA_DIALOG_NAMES.EVENTO_PARCEIRO_B2B_FORM
+        )}
+      />
+
+      <OperadorParceiroFormDialog
+        open={isDialogOpen(FESTA_DIALOG_NAMES.OPERADOR_PARCEIRO_FORM)}
+        onClose={() => closeDialog(FESTA_DIALOG_NAMES.OPERADOR_PARCEIRO_FORM)}
+        payload={getDialogPayload<OperadorParceiroFormDialogPayload>(
+          FESTA_DIALOG_NAMES.OPERADOR_PARCEIRO_FORM
+        )}
+      />
+
+      <RecuperarSenhaDialog
+        open={isDialogOpen(FESTA_DIALOG_NAMES.RECUPERAR_SENHA)}
+        onClose={() => closeDialog(FESTA_DIALOG_NAMES.RECUPERAR_SENHA)}
+        payload={getDialogPayload<RecuperarSenhaDialogPayload>(
+          FESTA_DIALOG_NAMES.RECUPERAR_SENHA
+        )}
+      />
+
+      <MidiaViewerDialog
+        open={isDialogOpen(FESTA_DIALOG_NAMES.MIDIA_VIEWER)}
+        onClose={() => closeDialog(FESTA_DIALOG_NAMES.MIDIA_VIEWER)}
+        payload={getDialogPayload<MidiaViewerDialogPayload>(
+          FESTA_DIALOG_NAMES.MIDIA_VIEWER
+        )}
+      />
+
+      <ConfirmActionDialog
+        open={isDialogOpen(FESTA_DIALOG_NAMES.CONFIRM_ACTION)}
+        onClose={() => closeDialog(FESTA_DIALOG_NAMES.CONFIRM_ACTION)}
+        payload={getDialogPayload<ConfirmActionDialogPayload>(
+          FESTA_DIALOG_NAMES.CONFIRM_ACTION
+        )}
       />
     </>
   );

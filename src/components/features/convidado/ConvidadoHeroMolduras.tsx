@@ -9,7 +9,6 @@ import {
 } from "@/components/features/convidado/SeletorMolduras";
 import type { EventoPublicoDto, MolduraDto } from "@/types/festa.types";
 
-/** Capas costumam ter rostos na parte de cima: ancora o recorte perto do topo. */
 const CAPA_POSICAO_FOCO = "center 12%";
 
 interface ConvidadoHeroMoldurasProps {
@@ -21,6 +20,8 @@ interface ConvidadoHeroMoldurasProps {
   onSelecionarArquivo: (file: File) => void;
   onVerMural: () => void;
   podeEnviar: boolean;
+  enviandoMidia?: boolean;
+  progressoUpload?: number;
   totalFotos: number;
   avisos: string[];
 }
@@ -34,6 +35,8 @@ export function ConvidadoHeroMolduras({
   onSelecionarArquivo,
   onVerMural,
   podeEnviar,
+  enviandoMidia = false,
+  progressoUpload = 0,
   totalFotos,
   avisos,
 }: ConvidadoHeroMoldurasProps) {
@@ -82,7 +85,7 @@ export function ConvidadoHeroMolduras({
       <div className="relative -mt-10 px-5">
         {selo && (
           <p
-            className="text-xs font-bold uppercase tracking-wider"
+            className="text-sm font-bold"
             style={{ color: evento.cor_primaria }}
           >
             {selo}
@@ -117,7 +120,11 @@ export function ConvidadoHeroMolduras({
           <input
             ref={inputGaleriaRef}
             type="file"
-            accept="image/*"
+            accept={
+              evento.permite_video
+                ? "image/*,video/mp4,video/webm,video/quicktime"
+                : "image/*"
+            }
             className="hidden"
             onChange={(e) => {
               const file = e.target.files?.[0];
@@ -129,18 +136,27 @@ export function ConvidadoHeroMolduras({
           <div className="mt-3 grid grid-cols-2 gap-2.5 px-5">
             <button
               type="button"
+              disabled={enviandoMidia}
               onClick={() => inputGaleriaRef.current?.click()}
-              style={{ borderColor: evento.cor_secundaria, color: evento.cor_secundaria }}
-              className="flex h-14 items-center justify-center gap-2 rounded-full border-2 bg-white font-display text-base font-extrabold transition active:scale-[0.98]"
+              style={{
+                borderColor: evento.cor_secundaria,
+                color: evento.cor_secundaria,
+              }}
+              className="flex h-14 items-center justify-center gap-2 rounded-full border-2 bg-white font-display text-base font-extrabold transition active:scale-[0.98] disabled:opacity-50"
             >
               <ImagePlus className="h-5 w-5 shrink-0" />
-              Da galeria
+              {enviandoMidia
+                ? `Enviando... ${progressoUpload}%`
+                : evento.permite_video
+                  ? "Foto / Vídeo"
+                  : "Da galeria"}
             </button>
             <button
               type="button"
+              disabled={enviandoMidia}
               onClick={onAbrirCamera}
               style={{ backgroundColor: evento.cor_primaria }}
-              className="flex h-14 items-center justify-center gap-2 rounded-full font-display text-base font-extrabold text-white shadow-suave transition active:scale-[0.98]"
+              className="flex h-14 items-center justify-center gap-2 rounded-full font-display text-base font-extrabold text-white shadow-suave transition active:scale-[0.98] disabled:opacity-50"
             >
               <Camera className="h-5 w-5 shrink-0" />
               Tirar foto

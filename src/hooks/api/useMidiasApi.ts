@@ -1,4 +1,9 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  useInfiniteQuery,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
 import { apiRequest } from "@/lib/api";
 import type {
   FestaStatusModeracaoEnum,
@@ -9,8 +14,12 @@ import type {
 import { GESTAO_QUERY_KEYS } from "./useGestaoApi";
 
 export const MIDIAS_QUERY_KEYS = {
+  publicasPorSlug: (slug: string) =>
+    ["festa", "midias", "publicas", slug] as const,
   publicas: (slug: string, sessaoId?: string) =>
     ["festa", "midias", "publicas", slug, sessaoId ?? ""] as const,
+  publicasInfinite: (slug: string, sessaoId?: string) =>
+    ["festa", "midias", "publicas", slug, sessaoId ?? "", "infinite"] as const,
   gestao: (token: string) => ["festa", "midias", "gestao", token] as const,
   admin: (eventoId: string) => ["festa", "midias", "admin", eventoId] as const,
 };
@@ -22,7 +31,21 @@ export interface RegistrarMidiaPayload {
   thumb_path?: string | null;
   autor?: string | null;
   tamanho_bytes?: number | null;
+  duracao_segundos?: number | null;
   sessao_id: string;
+}
+
+async function buscarPaginaMidiasPublicas(
+  slug: string,
+  sessaoId?: string,
+  cursor?: string | null
+): Promise<ListaMidiasPaginadaDto> {
+  const params = new URLSearchParams({ limite: "100" });
+  if (sessaoId) params.set("sessao_id", sessaoId);
+  if (cursor) params.set("cursor", cursor);
+  return apiRequest<ListaMidiasPaginadaDto>(
+    `/api/public/eventos/${encodeURIComponent(slug)}/midias?${params.toString()}`
+  );
 }
 
 export function useMidiasPublicasQuery(
@@ -33,16 +56,30 @@ export function useMidiasPublicasQuery(
   return useQuery({
     queryKey: MIDIAS_QUERY_KEYS.publicas(slug, sessaoId),
     queryFn: async () => {
-      const qs = sessaoId
-        ? `?limite=100&sessao_id=${encodeURIComponent(sessaoId)}`
-        : "?limite=100";
-      const res = await apiRequest<ListaMidiasPaginadaDto>(
-        `/api/public/eventos/${encodeURIComponent(slug)}/midias${qs}`
-      );
+      const res = await buscarPaginaMidiasPublicas(slug, sessaoId);
       return res.itens;
     },
     enabled: Boolean(slug),
     refetchInterval: refetchIntervalMs,
+    refetchOnWindowFocus: true,
+  });
+}
+
+export function useMidiasPublicasInfiniteQuery(
+  slug: string,
+  sessaoId?: string,
+  refetchIntervalMs: number | false = 30000
+) {
+  return useInfiniteQuery({
+    queryKey: MIDIAS_QUERY_KEYS.publicasInfinite(slug, sessaoId),
+    queryFn: ({ pageParam }) =>
+      buscarPaginaMidiasPublicas(slug, sessaoId, pageParam),
+    initialPageParam: null as string | null,
+    getNextPageParam: (lastPage) =>
+      lastPage.tem_mais ? lastPage.proximo_cursor : undefined,
+    enabled: Boolean(slug),
+    refetchInterval: refetchIntervalMs,
+    refetchOnWindowFocus: true,
   });
 }
 
@@ -59,66 +96,37 @@ export function useRegistrarMidiaMutation(slug: string, sessaoId: string) {
       ),
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: MIDIAS_QUERY_KEYS.publicas(slug, sessaoId),
+        queryKey: MIDIAS_QUERY_KEYS.publicasPorSlug(slug),
       });
     },
   });
 }
 
-function ajustarCurtidasNoCache(
-  queryClient: ReturnType<typeof useQueryClient>,
-  chave: readonly unknown[],
-  midiaId: string,
-  variacao: 1 | -1
-): void {
-  queryClient.setQueryData<MidiaDto[]>(chave, (atual) =>
-    atual?.map((midia) =>
-      midia.id === midiaId
-        ? { ...midia, curtidas: Math.max(0, midia.curtidas + variacao) }
-        : midia
-    )
-  );
-}
-
-export function useCurtirMidiaMutation(slug: string, sessaoId?: string) {
+export function useCurtirMidiaMutation(slug: string) {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: ({ midiaId }: { midiaId: string }) =>
       apiRequest<MidiaDto>(`/api/public/midias/${midiaId}/curtir`, {
         method: "POST",
       }),
-    onMutate: ({ midiaId }: { midiaId: string }) =>
-      ajustarCurtidasNoCache(
-        queryClient,
-        MIDIAS_QUERY_KEYS.publicas(slug, sessaoId),
-        midiaId,
-        1
-      ),
     onSettled: () => {
       queryClient.invalidateQueries({
-        queryKey: MIDIAS_QUERY_KEYS.publicas(slug, sessaoId),
+        queryKey: MIDIAS_QUERY_KEYS.publicasPorSlug(slug),
       });
     },
   });
 }
 
-export function useDescurtirMidiaMutation(slug: string, sessaoId?: string) {
+export function useDescurtirMidiaMutation(slug: string) {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: ({ midiaId }: { midiaId: string }) =>
       apiRequest<MidiaDto>(`/api/public/midias/${midiaId}/curtir`, {
         method: "DELETE",
       }),
-    onMutate: ({ midiaId }: { midiaId: string }) =>
-      ajustarCurtidasNoCache(
-        queryClient,
-        MIDIAS_QUERY_KEYS.publicas(slug, sessaoId),
-        midiaId,
-        -1
-      ),
     onSettled: () => {
       queryClient.invalidateQueries({
-        queryKey: MIDIAS_QUERY_KEYS.publicas(slug, sessaoId),
+        queryKey: MIDIAS_QUERY_KEYS.publicasPorSlug(slug),
       });
     },
   });
@@ -134,10 +142,20 @@ export function useExcluirMidiaPropriaMutation(slug: string, sessaoId: string) {
       ),
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: MIDIAS_QUERY_KEYS.publicas(slug, sessaoId),
+        queryKey: MIDIAS_QUERY_KEYS.publicasPorSlug(slug),
       });
     },
   });
+}
+
+function invalidarCachesMidiasGestao(
+  queryClient: ReturnType<typeof useQueryClient>,
+  token: string
+): void {
+  queryClient.invalidateQueries({ queryKey: MIDIAS_QUERY_KEYS.gestao(token) });
+  queryClient.invalidateQueries({ queryKey: GESTAO_QUERY_KEYS.byToken(token) });
+  queryClient.invalidateQueries({ queryKey: ["festa", "midias", "publicas"] });
+  queryClient.invalidateQueries({ queryKey: ["festa", "parceiro-portal"] });
 }
 
 export function useMidiasGestaoQuery(token: string) {
@@ -171,13 +189,13 @@ export function useModerarMidiaMutation(token: string) {
           body: { status_moderacao },
         }
       ),
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: MIDIAS_QUERY_KEYS.gestao(token),
-      });
-      queryClient.invalidateQueries({
-        queryKey: GESTAO_QUERY_KEYS.byToken(token),
-      });
+    onSuccess: (updated) => {
+      queryClient.setQueryData<MidiaDto[]>(
+        MIDIAS_QUERY_KEYS.gestao(token),
+        (antigas) =>
+          antigas?.map((item) => (item.id === updated.id ? updated : item))
+      );
+      invalidarCachesMidiasGestao(queryClient, token);
     },
   });
 }
@@ -190,14 +208,7 @@ export function useLimparMidiasTesteMutation(token: string) {
         `/api/gestao/${encodeURIComponent(token)}/midias-teste`,
         { method: "DELETE" }
       ),
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: MIDIAS_QUERY_KEYS.gestao(token),
-      });
-      queryClient.invalidateQueries({
-        queryKey: GESTAO_QUERY_KEYS.byToken(token),
-      });
-    },
+    onSuccess: () => invalidarCachesMidiasGestao(queryClient, token),
   });
 }
 
@@ -209,13 +220,12 @@ export function useExcluirMidiaGestaoMutation(token: string) {
         `/api/gestao/${encodeURIComponent(token)}/midias/${midiaId}`,
         { method: "DELETE" }
       ),
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: MIDIAS_QUERY_KEYS.gestao(token),
-      });
-      queryClient.invalidateQueries({
-        queryKey: GESTAO_QUERY_KEYS.byToken(token),
-      });
+    onSuccess: (_res, midiaId) => {
+      queryClient.setQueryData<MidiaDto[]>(
+        MIDIAS_QUERY_KEYS.gestao(token),
+        (antigas) => antigas?.filter((item) => item.id !== midiaId)
+      );
+      invalidarCachesMidiasGestao(queryClient, token);
     },
   });
 }
@@ -234,14 +244,7 @@ export function useModerarMidiasLoteGestaoMutation(token: string) {
           body: payload,
         }
       ),
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: MIDIAS_QUERY_KEYS.gestao(token),
-      });
-      queryClient.invalidateQueries({
-        queryKey: GESTAO_QUERY_KEYS.byToken(token),
-      });
-    },
+    onSuccess: () => invalidarCachesMidiasGestao(queryClient, token),
   });
 }
 
@@ -257,6 +260,17 @@ export function useMidiasAdminQuery(eventoId: string | undefined) {
     },
     enabled: Boolean(eventoId),
   });
+}
+
+function invalidarCachesMidiasAdmin(
+  queryClient: ReturnType<typeof useQueryClient>,
+  eventoId: string
+): void {
+  queryClient.invalidateQueries({ queryKey: MIDIAS_QUERY_KEYS.admin(eventoId) });
+  queryClient.invalidateQueries({ queryKey: ["festa", "eventos", "admin"] });
+  queryClient.invalidateQueries({ queryKey: ["festa", "parceiros-b2b"] });
+  queryClient.invalidateQueries({ queryKey: ["festa", "parceiro-portal"] });
+  queryClient.invalidateQueries({ queryKey: ["festa", "midias", "publicas"] });
 }
 
 export function useModerarMidiaAdminMutation(eventoId: string) {
@@ -279,10 +293,47 @@ export function useModerarMidiaAdminMutation(eventoId: string) {
           body: { status_moderacao, fixada_demo },
         }
       ),
-    onSuccess: () => {
-      queryClient.invalidateQueries({
+    onMutate: async (vars) => {
+      await queryClient.cancelQueries({
         queryKey: MIDIAS_QUERY_KEYS.admin(eventoId),
       });
+      const anterior = queryClient.getQueryData<MidiaDto[]>(
+        MIDIAS_QUERY_KEYS.admin(eventoId)
+      );
+      queryClient.setQueryData<MidiaDto[]>(
+        MIDIAS_QUERY_KEYS.admin(eventoId),
+        (antigas) =>
+          antigas?.map((item) =>
+            item.id === vars.midiaId
+              ? {
+                  ...item,
+                  ...(vars.status_moderacao !== undefined
+                    ? { status_moderacao: vars.status_moderacao }
+                    : {}),
+                  ...(vars.fixada_demo !== undefined
+                    ? { fixada_demo: vars.fixada_demo }
+                    : {}),
+                }
+              : item
+          )
+      );
+      return { anterior };
+    },
+    onError: (_err, _vars, ctx) => {
+      if (ctx?.anterior) {
+        queryClient.setQueryData(
+          MIDIAS_QUERY_KEYS.admin(eventoId),
+          ctx.anterior
+        );
+      }
+    },
+    onSuccess: (updated) => {
+      queryClient.setQueryData<MidiaDto[]>(
+        MIDIAS_QUERY_KEYS.admin(eventoId),
+        (antigas) =>
+          antigas?.map((item) => (item.id === updated.id ? updated : item))
+      );
+      invalidarCachesMidiasAdmin(queryClient, eventoId);
     },
   });
 }
@@ -296,17 +347,9 @@ export function useModerarMidiasLoteAdminMutation(eventoId: string) {
     }) =>
       apiRequest<{ atualizadas: number }>(
         `/api/admin/eventos/${eventoId}/midias/moderacao-lote`,
-        {
-          method: "PATCH",
-          requireAuth: true,
-          body: payload,
-        }
+        { method: "PATCH", requireAuth: true, body: payload }
       ),
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: MIDIAS_QUERY_KEYS.admin(eventoId),
-      });
-    },
+    onSuccess: () => invalidarCachesMidiasAdmin(queryClient, eventoId),
   });
 }
 
@@ -318,10 +361,12 @@ export function useExcluirMidiaAdminMutation(eventoId: string) {
         method: "DELETE",
         requireAuth: true,
       }),
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: MIDIAS_QUERY_KEYS.admin(eventoId),
-      });
+    onSuccess: (_res, midiaId) => {
+      queryClient.setQueryData<MidiaDto[]>(
+        MIDIAS_QUERY_KEYS.admin(eventoId),
+        (antigas) => antigas?.filter((item) => item.id !== midiaId)
+      );
+      invalidarCachesMidiasAdmin(queryClient, eventoId);
     },
   });
 }
@@ -332,15 +377,8 @@ export function useLimparMidiasAdminMutation(eventoId: string) {
     mutationFn: () =>
       apiRequest<{ removidas: number }>(
         `/api/admin/eventos/${eventoId}/midias-nao-fixadas`,
-        {
-          method: "DELETE",
-          requireAuth: true,
-        }
+        { method: "DELETE", requireAuth: true }
       ),
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: MIDIAS_QUERY_KEYS.admin(eventoId),
-      });
-    },
+    onSuccess: () => invalidarCachesMidiasAdmin(queryClient, eventoId),
   });
 }

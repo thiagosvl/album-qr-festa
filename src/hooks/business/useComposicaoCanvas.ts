@@ -107,7 +107,6 @@ function desenharFoto(
   ctx.restore();
 }
 
-/** Lado menor do quadro reduzido usado para o desfoque barato (funciona em todo navegador, sem ctx.filter). */
 const LARGURA_FUNDO_DESFOCADO = 24;
 const ESCURECER_FUNDO = "rgba(0, 0, 0, 0.35)";
 const cacheFundos = new WeakMap<object, HTMLCanvasElement>();
@@ -134,10 +133,6 @@ function obterFundoReduzido(
   return reduzido;
 }
 
-/**
- * Fundo com a própria foto ampliada e desfocada: quando a foto é afastada (ex.:
- * quadro 3:4 inteiro da câmera), as faixas de cima e de baixo não ficam pretas.
- */
 function desenharFundoDesfocado(
   ctx: CanvasRenderingContext2D,
   fonteFoto: FonteFoto,
@@ -162,7 +157,6 @@ function desenharFundoDesfocado(
 
 const cacheMolduras = new Map<string, Promise<HTMLImageElement>>();
 
-/** Carrega a moldura uma única vez por URL (evita novo download a cada ajuste). */
 export function carregarMoldura(url: string): Promise<HTMLImageElement> {
   const emCache = cacheMolduras.get(url);
   if (emCache) return emCache;
@@ -174,7 +168,6 @@ export function carregarMoldura(url: string): Promise<HTMLImageElement> {
   return promessa;
 }
 
-/** Desenho síncrono da prévia direto no canvas visível, sem blob nem recarga. */
 export function desenharPreviewNoCanvas(
   canvas: HTMLCanvasElement,
   fonteFoto: ImageBitmap | HTMLImageElement,

@@ -1,26 +1,23 @@
-import { useEffect, useState } from "react";
-import { Download, Heart, Share2, Trash2, User } from "lucide-react";
-import { toast } from "sonner";
+import {
+  ChevronLeft,
+  ChevronRight,
+  Download,
+  Heart,
+  Share2,
+  Trash2,
+  User,
+} from "lucide-react";
+import { FESTA_TIPO_MIDIA } from "@/constants";
 import { BaseDialog } from "@/components/ui/BaseDialog";
 import { Button } from "@/components/ui/button";
-import { prepararArquivoCompartilhamento } from "@/hooks/business/useComposicaoCanvas";
 import { safeCloseDialog } from "@/hooks/ui/useDialogClose";
-import type { MidiaDto } from "@/types/festa.types";
+import {
+  formatarDataHoraEnvioMidia,
+  useMidiaViewerViewModel,
+  type MidiaViewerDialogPayload,
+} from "@/hooks/ui/useMidiaViewerViewModel";
 
-const PREFIXO_ARQUIVO_LEMBRANCA = "lembranca-";
-
-function nomeArquivoLembranca(midiaId: string): string {
-  return `${PREFIXO_ARQUIVO_LEMBRANCA}${midiaId.slice(0, 6)}.jpg`;
-}
-
-export interface MidiaViewerDialogPayload {
-  midia: MidiaDto;
-  curtida: boolean;
-  ehMinha: boolean;
-  /** Ausente quando a visão não permite curtir (ex.: painel dos pais). */
-  onToggleCurtida?: (midia: MidiaDto) => void;
-  onExcluirPropria?: (midiaId: string) => Promise<void>;
-}
+export type { MidiaViewerDialogPayload };
 
 interface MidiaViewerDialogProps {
   open: boolean;
@@ -33,82 +30,16 @@ export function MidiaViewerDialog({
   onClose,
   payload,
 }: MidiaViewerDialogProps) {
-  const [arquivoPronto, setArquivoPronto] = useState<File | null>(null);
-  const [curtidaLocal, setCurtidaLocal] = useState(false);
-  const [contadorCurtidas, setContadorCurtidas] = useState(0);
+  const vm = useMidiaViewerViewModel(open, payload, onClose);
 
-  const midia = payload?.midia ?? null;
+  if (!vm.midia || !payload) return null;
 
-  useEffect(() => {
-    if (!midia || !open) {
-      setArquivoPronto(null);
-      return;
-    }
-    setCurtidaLocal(Boolean(payload?.curtida));
-    setContadorCurtidas(midia.curtidas);
-
-    let ativo = true;
-    prepararArquivoCompartilhamento(
-      midia.url_publica,
-      nomeArquivoLembranca(midia.id)
-    ).then((file) => {
-      if (ativo) setArquivoPronto(file);
-    });
-
-    return () => {
-      ativo = false;
-    };
-  }, [midia, open, payload?.curtida]);
-
-  if (!midia || !payload) return null;
-
-  const handleCompartilharOuBaixar = async () => {
-    if (
-      arquivoPronto &&
-      typeof navigator.canShare === "function" &&
-      navigator.canShare({ files: [arquivoPronto] })
-    ) {
-      try {
-        await navigator.share({
-          files: [arquivoPronto],
-          title: "Lembrança da Festa",
-        });
-        return;
-      } catch (err) {
-        if (err instanceof Error && err.name === "AbortError") return;
-      }
-    }
-
-    try {
-      const response = await fetch(midia.url_publica, { mode: "cors" });
-      const blob = await response.blob();
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = nomeArquivoLembranca(midia.id);
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-      toast.success("Foto salva no seu aparelho!");
-    } catch {
-      window.open(midia.url_publica, "_blank", "noopener,noreferrer");
-    }
-  };
-
-  const handleCurtir = () => {
-    if (!payload.onToggleCurtida) return;
-    const passaACurtir = !curtidaLocal;
-    setCurtidaLocal(passaACurtir);
-    setContadorCurtidas((prev) => Math.max(0, prev + (passaACurtir ? 1 : -1)));
-    payload.onToggleCurtida(midia);
-  };
-
-  const handleExcluir = async () => {
-    if (!payload.onExcluirPropria) return;
-    await payload.onExcluirPropria(midia.id);
-    safeCloseDialog(onClose);
-  };
+  const dataEnvioTexto = formatarDataHoraEnvioMidia(vm.midia.created_at);
+  const subtitulo =
+    vm.totalMidias > 1
+      ? `Foto ${vm.indiceAtual + 1} de ${vm.totalMidias} • ${dataEnvioTexto}`
+      : dataEnvioTexto;
+  const corDestaque = payload.corPrimaria || "#e6007e";
 
   return (
     <BaseDialog
@@ -116,45 +47,105 @@ export function MidiaViewerDialog({
       onOpenChange={(isOpen) => {
         if (!isOpen) safeCloseDialog(onClose);
       }}
-      className="sm:max-w-[440px] bg-zinc-950 text-white border-zinc-800"
+      className="sm:max-w-[500px] bg-ameixa text-white border-white/15 shadow-palco"
     >
       <BaseDialog.Header
-        title={midia.autor || "Convidado da Festa"}
-        subtitle="Lembrança publicada no mural"
+        title={vm.midia.autor || "Convidado da Festa"}
+        subtitle={subtitulo}
         icon={User}
         onClose={onClose}
-        className="bg-zinc-950 border-zinc-800 text-white [&_h2]:text-white [&_p]:text-zinc-400"
+        className="bg-ameixa border-white/10 text-white [&_h2]:text-white [&_p]:text-white/70 [&_button]:bg-white/15 [&_button]:text-white [&_button:hover]:bg-white/25"
       />
-      <BaseDialog.Body className="p-0 bg-black flex items-center justify-center">
-        <img
-          src={midia.url_publica}
-          alt={midia.autor ?? "Foto da festa"}
-          className="max-h-[68vh] w-auto object-contain select-none"
-        />
-      </BaseDialog.Body>
-      <BaseDialog.Footer className="bg-zinc-950 border-zinc-800 justify-between">
-        <div className="flex items-center gap-2">
-          <Button
+
+      <BaseDialog.Body className="relative p-3 sm:p-4 bg-black/55 flex items-center justify-center overflow-hidden">
+        {vm.totalMidias > 1 && (
+          <button
             type="button"
-            variant={curtidaLocal ? "default" : "secondary"}
-            size="sm"
-            onClick={handleCurtir}
-            disabled={!payload.onToggleCurtida}
-            aria-pressed={curtidaLocal}
-            aria-label={curtidaLocal ? "Descurtir foto" : "Curtir foto"}
-            className="rounded-full disabled:opacity-100"
+            onClick={vm.irParaAnterior}
+            aria-label="Foto anterior"
+            title="Foto anterior (←)"
+            className="absolute left-3 z-20 grid h-10 w-10 place-items-center rounded-full bg-white/90 text-ameixa shadow-palco transition hover:scale-105 active:scale-95"
           >
-            <Heart
-              className={`w-4 h-4 ${curtidaLocal ? "fill-current" : ""}`}
+            <ChevronLeft className="h-5 w-5" />
+          </button>
+        )}
+
+        <div className="relative flex items-center justify-center overflow-hidden rounded-2xl ring-2 ring-white/20 shadow-palco bg-ameixa">
+          {vm.midia.tipo_midia === FESTA_TIPO_MIDIA.VIDEO ? (
+            <video
+              key={vm.midia.id}
+              src={vm.midia.url_publica}
+              controls
+              autoPlay
+              playsInline
+              loop
+              className="max-h-[68vh] w-auto object-contain select-none"
             />
-            <span className="tabular-nums">{contadorCurtidas}</span>
-          </Button>
-          {payload.ehMinha && payload.onExcluirPropria && (
+          ) : (
+            <img
+              key={vm.midia.id}
+              src={vm.midia.url_publica}
+              alt={vm.midia.autor ?? "Foto da festa"}
+              className="max-h-[68vh] w-auto object-contain select-none"
+            />
+          )}
+        </div>
+
+        {vm.totalMidias > 1 && (
+          <button
+            type="button"
+            onClick={vm.irParaProxima}
+            aria-label="Próxima foto"
+            title="Próxima foto (→)"
+            className="absolute right-3 z-20 grid h-10 w-10 place-items-center rounded-full bg-white/90 text-ameixa shadow-palco transition hover:scale-105 active:scale-95"
+          >
+            <ChevronRight className="h-5 w-5" />
+          </button>
+        )}
+      </BaseDialog.Body>
+
+      <BaseDialog.Footer className="bg-ameixa border-white/10 justify-between">
+        <div className="flex items-center gap-2">
+          {payload.onToggleCurtida ? (
+            <Button
+              type="button"
+              variant={vm.curtidaLocal ? "default" : "secondary"}
+              size="sm"
+              onClick={vm.handleCurtir}
+              aria-pressed={vm.curtidaLocal}
+              aria-label={vm.curtidaLocal ? "Descurtir foto" : "Curtir foto"}
+              className="rounded-full"
+            >
+              <Heart
+                className={`w-4 h-4 ${vm.curtidaLocal ? "fill-current" : ""}`}
+              />
+              <span className="tabular-nums">
+                {vm.contadorCurtidas === 1
+                  ? "1 curtida"
+                  : `${vm.contadorCurtidas} curtidas`}
+              </span>
+            </Button>
+          ) : (
+            <span className="inline-flex h-9 items-center gap-1.5 rounded-full bg-white/12 px-3.5 text-xs font-bold text-white">
+              <Heart
+                className="w-4 h-4 fill-current"
+                style={{ color: corDestaque }}
+              />
+              <span className="tabular-nums">
+                {vm.contadorCurtidas === 1
+                  ? "1 curtida"
+                  : `${vm.contadorCurtidas} curtidas`}
+              </span>
+            </span>
+          )}
+
+          {vm.ehMinhaAtual && payload.onExcluirPropria && (
             <Button
               type="button"
               variant="destructive"
               size="sm"
-              onClick={handleExcluir}
+              loading={vm.excluindo}
+              onClick={vm.handleExcluir}
               aria-label="Apagar foto"
               className="rounded-full"
             >
@@ -163,13 +154,15 @@ export function MidiaViewerDialog({
             </Button>
           )}
         </div>
+
         <Button
           type="button"
           size="sm"
-          onClick={handleCompartilharOuBaixar}
+          loading={vm.baixando}
+          onClick={vm.handleCompartilharOuBaixar}
           className="rounded-full"
         >
-          {arquivoPronto && typeof navigator.canShare === "function" ? (
+          {vm.podeCompartilharNativo ? (
             <>
               <Share2 className="w-4 h-4" />
               <span>Compartilhar</span>
@@ -177,7 +170,7 @@ export function MidiaViewerDialog({
           ) : (
             <>
               <Download className="w-4 h-4" />
-              <span>Baixar foto</span>
+              <span>Baixar lembrança</span>
             </>
           )}
         </Button>

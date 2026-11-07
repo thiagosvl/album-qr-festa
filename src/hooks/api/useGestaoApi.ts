@@ -43,9 +43,15 @@ export function useAtualizarBriefingMutation(token: string) {
           body: payload,
         }
       ),
-    onSuccess: () => {
+    onSuccess: (updated) => {
       queryClient.invalidateQueries({
         queryKey: GESTAO_QUERY_KEYS.byToken(token),
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["festa", "evento", "publico", updated.evento.slug],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["festa", "midias", "publicas", updated.evento.slug],
       });
     },
   });

@@ -7,6 +7,8 @@ const BODY_LOCK_CLASSNAMES = [
 ];
 
 const RADIX_LAYER_SELECTORS = [
+  '[role="dialog"][data-state="open"]',
+  '[role="alertdialog"][data-state="open"]',
   "[data-radix-dialog-content]",
   "[data-radix-alert-dialog-content]",
   "[data-radix-popover-content]",
@@ -110,7 +112,11 @@ const executeClose = (
 
   const performClose = () => {
     callback();
-    waitForLayerCleanup(cleanupTimeout).finally(stripBodyLockArtifacts);
+    waitForLayerCleanup(cleanupTimeout).finally(() => {
+      if (!hasActiveLayer()) {
+        stripBodyLockArtifacts();
+      }
+    });
   };
 
   if (waitBeforeClose <= 0) {

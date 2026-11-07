@@ -51,25 +51,25 @@ export function AdminKpiCards({ kpis }: AdminKpiCardsProps) {
   ];
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+    <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
       {items.map((item) => {
         const Icon = item.icon;
         return (
           <Card key={item.titulo}>
-            <CardContent className="p-5 flex items-center gap-4">
+            <CardContent className="p-3.5 sm:p-5 flex flex-col sm:flex-row sm:items-center gap-2.5 sm:gap-4">
               <div
-                className={`w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 ${item.color}`}
+                className={`w-10 h-10 sm:w-12 sm:h-12 rounded-2xl flex items-center justify-center shrink-0 ${item.color}`}
               >
-                <Icon className="w-6 h-6" />
+                <Icon className="w-5 h-5 sm:w-6 sm:h-6" />
               </div>
               <div className="min-w-0">
-                <p className="text-xs font-bold text-muted-foreground">
+                <p className="text-xs font-bold text-muted-foreground truncate">
                   {item.titulo}
                 </p>
-                <p className="font-display text-xl font-bold text-foreground mt-0.5">
+                <p className="font-display text-lg sm:text-xl font-bold text-foreground mt-0.5 tabular-nums truncate">
                   {item.valor}
                 </p>
-                <p className="text-[11px] text-muted-foreground mt-0.5">
+                <p className="text-[11px] text-muted-foreground mt-0.5 truncate">
                   {item.sub}
                 </p>
               </div>

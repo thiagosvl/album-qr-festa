@@ -151,7 +151,7 @@ function Footer({
   return (
     <div
       className={cn(
-        "px-5 py-3.5 border-t border-border/60 bg-muted/30 flex items-center justify-end gap-2.5 shrink-0",
+        "px-5 py-3.5 border-t border-border/60 bg-muted/30 flex flex-wrap items-center justify-end gap-2.5 shrink-0",
         className
       )}
     >

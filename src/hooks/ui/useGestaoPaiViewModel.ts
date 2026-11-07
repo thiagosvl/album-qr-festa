@@ -1,17 +1,25 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import {
   API_BASE_URL,
   FESTA_DIALOG_NAMES,
+  FESTA_FILTRO_MODERACAO,
+  FESTA_GESTAO_PAI_TABS,
   FESTA_STATUS_MODERACAO,
+  type FestaFiltroModeracao,
+  type FestaGestaoPaiTab,
 } from "@/constants";
 import { useLayout } from "@/contexts/LayoutContext";
+import { supabase } from "@/integrations/supabase/client";
 import { useCatalogoPublicoQuery } from "@/hooks/api/useCatalogoApi";
 import {
+  GESTAO_QUERY_KEYS,
   useAtualizarBriefingMutation,
   useGestaoEventoQuery,
 } from "@/hooks/api/useGestaoApi";
 import {
+  MIDIAS_QUERY_KEYS,
   useExcluirMidiaGestaoMutation,
   useLimparMidiasTesteMutation,
   useMidiasGestaoQuery,
@@ -20,21 +28,26 @@ import {
 } from "@/hooks/api/useMidiasApi";
 import type { FestaStatusModeracaoEnum, MidiaDto } from "@/types/festa.types";
 
-export type AbaGestaoPai = "MODERACAO" | "BRIEFING" | "ACESSO_QR";
-export type FiltroModeracaoPai =
-  | "TODAS"
-  | "VISIVEIS"
-  | "PENDENTES"
-  | "OCULTAS";
+export type AbaGestaoPai = FestaGestaoPaiTab;
+export type FiltroModeracaoPai = FestaFiltroModeracao;
+export type TipoAcaoMidiaPai = "VISIBILIDADE" | "EXCLUIR";
 
 export function useGestaoPaiViewModel(token: string) {
+  const queryClient = useQueryClient();
   const { openDialog } = useLayout();
-  const [abaAtiva, setAbaAtiva] = useState<AbaGestaoPai>("MODERACAO");
+  const [abaAtiva, setAbaAtiva] = useState<AbaGestaoPai>(
+    FESTA_GESTAO_PAI_TABS.MODERACAO
+  );
   const [filtroVisibilidade, setFiltroVisibilidade] =
-    useState<FiltroModeracaoPai>("TODAS");
+    useState<FiltroModeracaoPai>(FESTA_FILTRO_MODERACAO.TODAS);
   const [selecionadasIds, setSelecionadasIds] = useState<Set<string>>(
     new Set()
   );
+  const [acaoMidia, setAcaoMidia] = useState<{
+    id: string;
+    tipo: TipoAcaoMidiaPai;
+  } | null>(null);
+  const [baixandoZip, setBaixandoZip] = useState(false);
 
   const gestaoQuery = useGestaoEventoQuery(token);
   const midiasQuery = useMidiasGestaoQuery(token);
@@ -51,20 +64,64 @@ export function useGestaoPaiViewModel(token: string) {
   const midias: MidiaDto[] = midiasQuery.data ?? [];
   const temasCatalogo = catalogoQuery.data?.temas ?? [];
 
+  useEffect(() => {
+    if (!evento?.id || !token) return;
+    const channel = supabase
+      .channel(`festa-gestao-pai-${evento.id}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "festa_evento_midias",
+          filter: `evento_id=eq.${evento.id}`,
+        },
+        () => {
+          queryClient.invalidateQueries({
+            queryKey: MIDIAS_QUERY_KEYS.gestao(token),
+          });
+          queryClient.invalidateQueries({
+            queryKey: GESTAO_QUERY_KEYS.byToken(token),
+          });
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [evento?.id, queryClient, token]);
+
   const midiasFiltradas = useMemo(() => {
     return midias.filter((m) => {
-      if (filtroVisibilidade === "VISIVEIS") {
+      if (filtroVisibilidade === FESTA_FILTRO_MODERACAO.VISIVEIS) {
         return m.status_moderacao === FESTA_STATUS_MODERACAO.APROVADA;
       }
-      if (filtroVisibilidade === "PENDENTES") {
+      if (filtroVisibilidade === FESTA_FILTRO_MODERACAO.PENDENTES) {
         return m.status_moderacao === FESTA_STATUS_MODERACAO.PENDENTE;
       }
-      if (filtroVisibilidade === "OCULTAS") {
+      if (filtroVisibilidade === FESTA_FILTRO_MODERACAO.OCULTAS) {
         return m.status_moderacao === FESTA_STATUS_MODERACAO.OCULTA;
       }
       return true;
     });
   }, [midias, filtroVisibilidade]);
+
+  const resumoMidias = useMemo(
+    () => ({
+      total: midias.length,
+      aprovadas: midias.filter(
+        (m) => m.status_moderacao === FESTA_STATUS_MODERACAO.APROVADA
+      ).length,
+      pendentes: midias.filter(
+        (m) => m.status_moderacao === FESTA_STATUS_MODERACAO.PENDENTE
+      ).length,
+      ocultas: midias.filter(
+        (m) => m.status_moderacao === FESTA_STATUS_MODERACAO.OCULTA
+      ).length,
+    }),
+    [midias]
+  );
 
   const alternarSelecaoMidia = (id: string) => {
     setSelecionadasIds((prev) => {
@@ -117,12 +174,44 @@ export function useGestaoPaiViewModel(token: string) {
     }
   };
 
+  const excluirMidiaDefinitivamente = async (midiaId: string) => {
+    setAcaoMidia({ id: midiaId, tipo: "EXCLUIR" });
+    try {
+      await excluirMidiaMutation.mutateAsync(midiaId);
+      toast.success("Foto excluída permanentemente.");
+    } catch (error) {
+      toast.error(
+        error instanceof Error ? error.message : "Erro ao excluir foto"
+      );
+    } finally {
+      setAcaoMidia(null);
+    }
+  };
+
   const abrirVisualizadorMidia = (midia: MidiaDto) => {
     openDialog(FESTA_DIALOG_NAMES.MIDIA_VIEWER, {
       midia,
+      midias: midiasFiltradas,
       curtida: false,
       ehMinha: true,
+      corPrimaria: evento?.cor_primaria,
       onExcluirPropria: excluirMidiaDefinitivamente,
+    });
+  };
+
+  const abrirGerenciadorMolduras = () => {
+    if (!evento || !gestao) return;
+    openDialog(FESTA_DIALOG_NAMES.MOLDURAS_EVENTO, {
+      evento: {
+        ...evento,
+        token_gestao: token,
+        anfitriao: null,
+        tema: null,
+        extras: gestao.extras,
+        molduras: gestao.molduras,
+        valor_restante_centavos: gestao.valor_restante_centavos,
+        total_midias: gestao.resumo_midias.total,
+      },
     });
   };
 
@@ -151,6 +240,7 @@ export function useGestaoPaiViewModel(token: string) {
     const novoStatus = estaVisivel
       ? FESTA_STATUS_MODERACAO.OCULTA
       : FESTA_STATUS_MODERACAO.APROVADA;
+    setAcaoMidia({ id: midia.id, tipo: "VISIBILIDADE" });
     try {
       await moderarMutation.mutateAsync({
         midiaId: midia.id,
@@ -165,6 +255,8 @@ export function useGestaoPaiViewModel(token: string) {
       toast.error(
         error instanceof Error ? error.message : "Erro ao moderar foto"
       );
+    } finally {
+      setAcaoMidia(null);
     }
   };
 
@@ -192,21 +284,32 @@ export function useGestaoPaiViewModel(token: string) {
     });
   };
 
-  const excluirMidiaDefinitivamente = async (midiaId: string) => {
+  const baixarTodasEmZip = async () => {
+    if (!token || baixandoZip) return;
+    setBaixandoZip(true);
     try {
-      await excluirMidiaMutation.mutateAsync(midiaId);
-      toast.success("Foto excluída permanentemente.");
+      const zipUrl = `${API_BASE_URL}/api/gestao/${encodeURIComponent(token)}/midias/zip`;
+      const response = await fetch(zipUrl);
+      if (!response.ok) {
+        throw new Error("Não foi possível gerar o arquivo ZIP");
+      }
+      const blob = await response.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `fotos-${evento?.slug ?? "festa"}.zip`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      toast.success("Download do arquivo .ZIP concluído!");
     } catch (error) {
       toast.error(
-        error instanceof Error ? error.message : "Erro ao excluir foto"
+        error instanceof Error ? error.message : "Erro ao baixar fotos em ZIP"
       );
+    } finally {
+      setBaixandoZip(false);
     }
-  };
-
-  const baixarTodasEmZip = () => {
-    if (!token) return;
-    const zipUrl = `${API_BASE_URL}/api/gestao/${encodeURIComponent(token)}/midias/zip`;
-    window.open(zipUrl, "_blank", "noopener,noreferrer");
   };
 
   return {
@@ -214,6 +317,7 @@ export function useGestaoPaiViewModel(token: string) {
     evento,
     midias,
     midiasFiltradas,
+    resumoMidias,
     temasCatalogo,
     abaAtiva,
     setAbaAtiva,
@@ -225,11 +329,16 @@ export function useGestaoPaiViewModel(token: string) {
     moderarSelecionadasEmLote,
     aprovarTodasPendentes,
     abrirVisualizadorMidia,
+    abrirGerenciadorMolduras,
     alternarBloqueioUploads,
     alternarVisibilidadeMidia,
     limparFotosTeste,
     excluirMidiaDefinitivamente,
     baixarTodasEmZip,
+    baixandoZip,
+    pausandoEnvios: atualizarBriefingMutation.isPending,
+    moderandoLote: moderarLoteMutation.isPending,
+    acaoMidia,
     isLoading: gestaoQuery.isLoading,
     erro: gestaoQuery.error,
   };

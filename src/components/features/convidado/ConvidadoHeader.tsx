@@ -1,4 +1,5 @@
 import { ArrowLeft, Camera } from "lucide-react";
+import { FESTA_ABA_GALERIA_CONVIDADO } from "@/constants";
 import type { AbaGaleriaConvidado } from "@/hooks/ui/useConvidadoViewModel";
 import type { EventoPublicoDto } from "@/types/festa.types";
 
@@ -21,8 +22,16 @@ export function ConvidadoHeader({
 }: ConvidadoHeaderProps) {
   const mostrarAbas = evento.galeria_publica;
   const abas = [
-    { id: "MURAL" as const, rotulo: "Todas", total: todasMidiasCount },
-    { id: "MINHAS" as const, rotulo: "Minhas", total: minhasMidiasCount },
+    {
+      id: FESTA_ABA_GALERIA_CONVIDADO.MURAL,
+      rotulo: "Todas",
+      total: todasMidiasCount,
+    },
+    {
+      id: FESTA_ABA_GALERIA_CONVIDADO.MINHAS,
+      rotulo: "Minhas",
+      total: minhasMidiasCount,
+    },
   ];
 
   return (

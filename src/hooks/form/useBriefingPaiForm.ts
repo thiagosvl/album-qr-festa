@@ -1,9 +1,17 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { toast } from "sonner";
+import {
+  FESTA_BUCKET_MIDIAS,
+  SUPABASE_ANON_KEY,
+  SUPABASE_URL,
+} from "@/constants";
+import { notificarErrosFormulario } from "@/components/ui/form";
 import { useAtualizarBriefingMutation } from "@/hooks/api/useGestaoApi";
+import { uploadBlobComProgresso } from "@/hooks/business/useComposicaoCanvas";
+import { gerarUuidLocal } from "@/lib/utils";
 import type { EventoGestaoDto } from "@/types/festa.types";
 
 const briefingSchema = z.object({
@@ -29,6 +37,7 @@ export function useBriefingPaiForm(
   gestao: EventoGestaoDto | undefined
 ) {
   const atualizarMutation = useAtualizarBriefingMutation(token);
+  const [enviandoCapa, setEnviandoCapa] = useState(false);
 
   const form = useForm<BriefingPaiFormValues>({
     resolver: zodResolver(briefingSchema),
@@ -49,10 +58,13 @@ export function useBriefingPaiForm(
     },
   });
 
+  const { reset } = form;
+  const eventoId = gestao?.evento?.id ?? null;
+
   useEffect(() => {
     if (gestao?.evento) {
       const ev = gestao.evento;
-      form.reset({
+      reset({
         titulo: ev.titulo,
         subtitulo: ev.subtitulo ?? "",
         boas_vindas: ev.boas_vindas ?? "",
@@ -68,7 +80,30 @@ export function useBriefingPaiForm(
         tempo_slideshow_segundos: ev.tempo_slideshow_segundos,
       });
     }
-  }, [gestao, form]);
+  }, [eventoId, reset]);
+
+  const enviarFotoCapa = async (file: File) => {
+    if (!gestao?.evento) return;
+    setEnviandoCapa(true);
+    try {
+      const storagePath = `${gestao.evento.slug}/midias/capa-${gerarUuidLocal()}.jpg`;
+      const publicUrl = await uploadBlobComProgresso(
+        SUPABASE_URL,
+        SUPABASE_ANON_KEY,
+        FESTA_BUCKET_MIDIAS,
+        storagePath,
+        file
+      );
+      form.setValue("capa_url", publicUrl);
+      toast.success("Foto de capa enviada! Clique em Salvar alterações.");
+    } catch (err) {
+      toast.error(
+        err instanceof Error ? err.message : "Erro ao enviar foto de capa"
+      );
+    } finally {
+      setEnviandoCapa(false);
+    }
+  };
 
   const onSubmit = form.handleSubmit(async (values) => {
     try {
@@ -93,10 +128,12 @@ export function useBriefingPaiForm(
         error instanceof Error ? error.message : "Erro ao salvar briefing"
       );
     }
-  });
+  }, notificarErrosFormulario);
 
   return {
     form,
+    enviandoCapa,
+    enviarFotoCapa,
     onSubmit,
     isSaving: atualizarMutation.isPending,
   };

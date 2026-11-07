@@ -29,7 +29,6 @@ interface SeletorMoldurasProps {
   tamanho?: TamanhoSeletor;
 }
 
-/** Faixa horizontal de molduras: o desenho da moldura é o que identifica a opção. */
 export function SeletorMolduras({
   molduras,
   molduraSelecionadaId,

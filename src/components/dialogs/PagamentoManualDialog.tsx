@@ -3,7 +3,16 @@ import { FESTA_TIPO_BAIXA_PAGAMENTO } from "@/constants";
 import { Banner } from "@/components/ui/Banner";
 import { BaseDialog } from "@/components/ui/BaseDialog";
 import { Button } from "@/components/ui/button";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { MoneyInput } from "@/components/ui/money-input";
 import { usePagamentoManualForm } from "@/hooks/form/usePagamentoManualForm";
 import { safeCloseDialog } from "@/hooks/ui/useDialogClose";
 import { formatarMoedaCentavos } from "@/lib/utils";
@@ -31,7 +40,7 @@ export function PagamentoManualDialog({
     saldoRestanteCentavos,
     onSubmit,
     isSubmitting,
-  } = usePagamentoManualForm(evento, onClose);
+  } = usePagamentoManualForm(open, evento, onClose);
 
   if (!evento) return null;
 
@@ -53,104 +62,122 @@ export function PagamentoManualDialog({
         onClose={onClose}
         lockClose={isSubmitting}
       />
-      <form onSubmit={onSubmit} className="flex flex-col flex-1 overflow-hidden">
-        <BaseDialog.Body className="space-y-4">
-          <Banner
-            variant="info"
-            title={`Saldo em aberto: ${formatarMoedaCentavos(saldoRestanteCentavos)}`}
-            description="Ao confirmar o sinal, o pedido avança para Sinal Pago. Ao quitar o total, o pedido fica Quitado & Pronto."
-          />
+      <Form {...form}>
+        <form
+          onSubmit={onSubmit}
+          noValidate
+          className="flex flex-col flex-1 overflow-hidden"
+        >
+          <BaseDialog.Body className="space-y-4">
+            <Banner
+              variant="info"
+              title={`Saldo em aberto: ${formatarMoedaCentavos(saldoRestanteCentavos)}`}
+              description="Ao confirmar o sinal, o pedido avança para Sinal Pago. Ao quitar o total, o pedido fica Quitado & Pronto."
+            />
 
-          <div className="grid grid-cols-3 gap-2">
-            <Button
-              type="button"
-              size="sm"
-              variant={
-                tipoSelecionado === FESTA_TIPO_BAIXA_PAGAMENTO.SINAL
-                  ? "default"
-                  : "outline"
-              }
-              onClick={() =>
-                selecionarTipoPagamento(FESTA_TIPO_BAIXA_PAGAMENTO.SINAL)
-              }
-            >
-              Sinal 50%
-            </Button>
-            <Button
-              type="button"
-              size="sm"
-              variant={
-                tipoSelecionado === FESTA_TIPO_BAIXA_PAGAMENTO.QUITACAO_TOTAL
-                  ? "default"
-                  : "outline"
-              }
-              onClick={() =>
-                selecionarTipoPagamento(
-                  FESTA_TIPO_BAIXA_PAGAMENTO.QUITACAO_TOTAL
-                )
-              }
-            >
-              Quitar Saldo
-            </Button>
-            <Button
-              type="button"
-              size="sm"
-              variant={
-                tipoSelecionado ===
-                FESTA_TIPO_BAIXA_PAGAMENTO.VALOR_PERSONALIZADO
-                  ? "default"
-                  : "outline"
-              }
-              onClick={() =>
-                selecionarTipoPagamento(
+            <div className="grid grid-cols-3 gap-2">
+              <Button
+                type="button"
+                size="sm"
+                variant={
+                  tipoSelecionado === FESTA_TIPO_BAIXA_PAGAMENTO.SINAL
+                    ? "default"
+                    : "outline"
+                }
+                onClick={() =>
+                  selecionarTipoPagamento(FESTA_TIPO_BAIXA_PAGAMENTO.SINAL)
+                }
+              >
+                Sinal 50%
+              </Button>
+              <Button
+                type="button"
+                size="sm"
+                variant={
+                  tipoSelecionado === FESTA_TIPO_BAIXA_PAGAMENTO.QUITACAO_TOTAL
+                    ? "default"
+                    : "outline"
+                }
+                onClick={() =>
+                  selecionarTipoPagamento(
+                    FESTA_TIPO_BAIXA_PAGAMENTO.QUITACAO_TOTAL
+                  )
+                }
+              >
+                Quitar Saldo
+              </Button>
+              <Button
+                type="button"
+                size="sm"
+                variant={
+                  tipoSelecionado ===
                   FESTA_TIPO_BAIXA_PAGAMENTO.VALOR_PERSONALIZADO
-                )
-              }
+                    ? "default"
+                    : "outline"
+                }
+                onClick={() =>
+                  selecionarTipoPagamento(
+                    FESTA_TIPO_BAIXA_PAGAMENTO.VALOR_PERSONALIZADO
+                  )
+                }
+              >
+                Outro Valor
+              </Button>
+            </div>
+
+            <FormField
+              control={form.control}
+              name="valor_reais"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Valor Recebido (R$) *</FormLabel>
+                  <FormControl>
+                    <MoneyInput
+                      value={field.value}
+                      onChange={field.onChange}
+                      onBlur={field.onBlur}
+                      name={field.name}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="observacoes_internas"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>
+                    Observação / Identificador do Comprovante
+                  </FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="Ex: Pix enviado via Nubank às 14:32"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </BaseDialog.Body>
+          <BaseDialog.Footer>
+            <Button
+              type="button"
+              variant="outline"
+              disabled={isSubmitting}
+              onClick={() => safeCloseDialog(onClose)}
             >
-              Outro Valor
+              Cancelar
             </Button>
-          </div>
-
-          <div className="space-y-1.5">
-            <label className="text-xs font-bold text-foreground">
-              Valor Recebido (R$)
-            </label>
-            <Input
-              type="number"
-              step="0.01"
-              {...form.register("valor_reais")}
-            />
-            {form.formState.errors.valor_reais && (
-              <p className="text-xs text-destructive">
-                {form.formState.errors.valor_reais.message}
-              </p>
-            )}
-          </div>
-
-          <div className="space-y-1.5">
-            <label className="text-xs font-bold text-foreground">
-              Observação / Identificador do Comprovante
-            </label>
-            <Input
-              placeholder="Ex: Pix enviado via Nubank às 14:32"
-              {...form.register("observacoes_internas")}
-            />
-          </div>
-        </BaseDialog.Body>
-        <BaseDialog.Footer>
-          <Button
-            type="button"
-            variant="outline"
-            disabled={isSubmitting}
-            onClick={() => safeCloseDialog(onClose)}
-          >
-            Cancelar
-          </Button>
-          <Button type="submit" disabled={isSubmitting}>
-            {isSubmitting ? "Registrando..." : "Confirmar Recebimento"}
-          </Button>
-        </BaseDialog.Footer>
-      </form>
+            <Button type="submit" loading={isSubmitting}>
+              {isSubmitting ? "Registrando..." : "Confirmar Recebimento"}
+            </Button>
+          </BaseDialog.Footer>
+        </form>
+      </Form>
     </BaseDialog>
   );
 }

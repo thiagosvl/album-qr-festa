@@ -25,6 +25,7 @@ interface ConvidadoCameraViewProps {
   onAlternarTorch: () => void;
   cameraErro: string | null;
   diagnostico: string | null;
+  permiteVideo?: boolean;
   molduras: MolduraDto[];
   molduraSelecionada: MolduraDto | null;
   molduraSelecionadaId: string | null;
@@ -54,6 +55,7 @@ export function ConvidadoCameraView({
   onAlternarTorch,
   cameraErro,
   diagnostico,
+  permiteVideo = false,
   molduras,
   molduraSelecionada,
   molduraSelecionadaId,
@@ -68,7 +70,6 @@ export function ConvidadoCameraView({
   const quadroInteiro = CAMERA_CONFIG.ENQUADRAMENTO === ENQUADRAMENTO_CAMERA.QUADRO_INTEIRO;
   const classeEspelho = espelharPreview ? "-scale-x-100" : "";
 
-  /** O fundo desfocado reaproveita o mesmo stream do visor (sem abrir outra câmera). */
   const sincronizarFundo = (video: HTMLVideoElement) => {
     const fundo = videoFundoRef.current;
     if (!fundo || fundo.srcObject === video.srcObject) return;
@@ -81,8 +82,6 @@ export function ConvidadoCameraView({
       <div className="relative aspect-[9/16] w-[min(100vw,calc(100dvh*9/16))] overflow-hidden bg-ameixa">
         {!cameraErro ? (
           <div className="absolute inset-0 flex items-center justify-center overflow-hidden bg-black">
-            {/* Quadro inteiro: as faixas de cima e de baixo mostram a própria imagem
-                desfocada, como na foto final. */}
             {quadroInteiro && (
               <video
                 ref={videoFundoRef}
@@ -174,7 +173,11 @@ export function ConvidadoCameraView({
             <input
               ref={fileInputRef}
               type="file"
-              accept="image/*"
+              accept={
+                permiteVideo
+                  ? "image/*,video/mp4,video/webm,video/quicktime"
+                  : "image/*"
+              }
               className="hidden"
               onChange={(e) => {
                 const arquivo = e.target.files?.[0];

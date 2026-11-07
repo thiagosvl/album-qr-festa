@@ -1,13 +1,11 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import {
-  CAMERA_CONFIG,
-  FESTA_BUCKET_MIDIAS,
+  FESTA_ABA_GALERIA_CONVIDADO,
   FESTA_TIPO_MIDIA,
+  type FestaAbaGaleriaConvidado,
   STORAGE_KEYS,
-  SUPABASE_ANON_KEY,
-  SUPABASE_URL,
 } from "@/constants";
 import { supabase } from "@/integrations/supabase/client";
 import { useEventoPublicoQuery } from "@/hooks/api/useEventosApi";
@@ -16,31 +14,24 @@ import {
   useCurtirMidiaMutation,
   useDescurtirMidiaMutation,
   useExcluirMidiaPropriaMutation,
-  useMidiasPublicasQuery,
+  useMidiasPublicasInfiniteQuery,
   useRegistrarMidiaMutation,
 } from "@/hooks/api/useMidiasApi";
 import {
   carregarArquivoComExifCorrigido,
-  renderizarFotoComMoldura,
   type TransformacaoFoto,
-  uploadBlobComProgresso,
 } from "@/hooks/business/useComposicaoCanvas";
 import {
-  ESPERA_LIBERAR_CAMERA_MS,
-  abrirStreamComFallback,
-  esperar,
-  type ModoCamera,
-} from "@/lib/cameraConstraints";
-import {
-  encontrarLentePrincipal,
-  filtrarCamerasTraseiras,
-  listarCameras,
-  proximaLente,
-} from "@/lib/cameraDispositivos";
-import { descreverCamera, diagnosticoAtivo } from "@/lib/cameraDiagnostico";
+  comporEEnviarFotoConvidado,
+  lerOuCriarSessaoId,
+  lerSetStorage,
+  obterMensagemSucessoEnvioConvidado,
+  salvarSetStorage,
+  validarEEnviarVideoCurto,
+} from "@/hooks/business/useEnvioVideoCurto";
+import { useConvidadoCameraStream } from "@/hooks/ui/useConvidadoCameraStream";
 import { useHistoricoNavegacao } from "@/hooks/ui/useHistoricoNavegacao";
 import { calcularEscalaInicialCaptura } from "@/lib/escalaFoto";
-import { gerarUuidLocal } from "@/lib/utils";
 import type { MidiaDto, MolduraDto } from "@/types/festa.types";
 
 export const MODO_CONVIDADO = {
@@ -48,37 +39,16 @@ export const MODO_CONVIDADO = {
   CAMERA: "CAMERA",
   REVISAO: "REVISAO",
 } as const;
-export type ModoConvidado = (typeof MODO_CONVIDADO)[keyof typeof MODO_CONVIDADO];
+export type ModoConvidado =
+  (typeof MODO_CONVIDADO)[keyof typeof MODO_CONVIDADO];
 
 export const TELA_CONVIDADO = {
   INICIO: "INICIO",
   MURAL: "MURAL",
 } as const;
-export type TelaConvidado = (typeof TELA_CONVIDADO)[keyof typeof TELA_CONVIDADO];
-export type AbaGaleriaConvidado = "MURAL" | "MINHAS";
-
-function lerOuCriarSessaoId(): string {
-  const existente = localStorage.getItem(STORAGE_KEYS.CONVIDADO_SESSAO_ID);
-  if (existente) return existente;
-  const novo = gerarUuidLocal();
-  localStorage.setItem(STORAGE_KEYS.CONVIDADO_SESSAO_ID, novo);
-  return novo;
-}
-
-function lerSetStorage(chave: string): Set<string> {
-  try {
-    const raw = localStorage.getItem(chave);
-    if (!raw) return new Set();
-    const parsed = JSON.parse(raw) as unknown;
-    return Array.isArray(parsed) ? new Set(parsed.map(String)) : new Set();
-  } catch {
-    return new Set();
-  }
-}
-
-function salvarSetStorage(chave: string, conjunto: Set<string>): void {
-  localStorage.setItem(chave, JSON.stringify(Array.from(conjunto)));
-}
+export type TelaConvidado =
+  (typeof TELA_CONVIDADO)[keyof typeof TELA_CONVIDADO];
+export type AbaGaleriaConvidado = FestaAbaGaleriaConvidado;
 
 export function useConvidadoViewModel(slug: string) {
   const queryClient = useQueryClient();
@@ -88,25 +58,14 @@ export function useConvidadoViewModel(slug: string) {
   );
   const [modo, setModo] = useState<ModoConvidado>(MODO_CONVIDADO.GALERIA);
   const [tela, setTela] = useState<TelaConvidado>(TELA_CONVIDADO.INICIO);
-  const [abaGaleria, setAbaGaleria] = useState<AbaGaleriaConvidado>("MURAL");
+  const [abaGaleria, setAbaGaleria] = useState<AbaGaleriaConvidado>(
+    FESTA_ABA_GALERIA_CONVIDADO.MURAL
+  );
   const [molduraSelecionadaId, setMolduraSelecionadaId] = useState<
     string | null
   >(null);
 
-  const [facingMode, setFacingMode] = useState<"user" | "environment">(
-    "environment"
-  );
-  const [torchAtivo, setTorchAtivo] = useState(false);
-  const [suportaTorch, setSuportaTorch] = useState(false);
-  const [diagnosticoCamera, setDiagnosticoCamera] = useState<string | null>(null);
-  const [cameraErro, setCameraErro] = useState<string | null>(null);
-  const [espelharPreview, setEspelharPreview] = useState(false);
-  const [podeAlternarCamera, setPodeAlternarCamera] = useState(false);
-  const [lentesTraseiras, setLentesTraseiras] = useState<MediaDeviceInfo[]>([]);
-  const [lenteTraseiraId, setLenteTraseiraId] = useState<string | null>(null);
-  const requisicaoCameraRef = useRef(0);
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const streamRef = useRef<MediaStream | null>(null);
+  const camera = useConvidadoCameraStream(modo === MODO_CONVIDADO.CAMERA);
 
   const [fonteCapturada, setFonteCapturada] = useState<
     ImageBitmap | HTMLImageElement | null
@@ -130,10 +89,10 @@ export function useConvidadoViewModel(slug: string) {
   );
 
   const eventoQuery = useEventoPublicoQuery(slug);
-  const midiasQuery = useMidiasPublicasQuery(slug, sessaoId, 30000);
+  const midiasQuery = useMidiasPublicasInfiniteQuery(slug, sessaoId, 30000);
   const registrarMidiaMutation = useRegistrarMidiaMutation(slug, sessaoId);
-  const curtirMutation = useCurtirMidiaMutation(slug, sessaoId);
-  const descurtirMutation = useDescurtirMidiaMutation(slug, sessaoId);
+  const curtirMutation = useCurtirMidiaMutation(slug);
+  const descurtirMutation = useDescurtirMidiaMutation(slug);
   const excluirPropriaMutation = useExcluirMidiaPropriaMutation(slug, sessaoId);
 
   const evento = eventoQuery.data;
@@ -157,7 +116,7 @@ export function useConvidadoViewModel(slug: string) {
         },
         () => {
           queryClient.invalidateQueries({
-            queryKey: MIDIAS_QUERY_KEYS.publicas(slug, sessaoId),
+            queryKey: MIDIAS_QUERY_KEYS.publicasPorSlug(slug),
           });
         }
       )
@@ -166,135 +125,17 @@ export function useConvidadoViewModel(slug: string) {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [evento?.id, queryClient, sessaoId, slug]);
+  }, [evento?.id, queryClient, slug]);
 
-  const pararCamera = useCallback(() => {
-    requisicaoCameraRef.current += 1;
-    if (streamRef.current) {
-      streamRef.current.getTracks().forEach((track) => track.stop());
-      streamRef.current = null;
-    }
-    setTorchAtivo(false);
-    setSuportaTorch(false);
-  }, []);
-
-  /**
-   * Pelo facingMode o navegador às vezes abre a tele ou a ultra-wide. Na primeira
-   * abertura da traseira, se a lente aberta não é a principal, troca para ela.
-   */
-  const garantirLentePrincipal = useCallback(
-    (traseiras: MediaDeviceInfo[], track: MediaStreamTrack | undefined) => {
-      if (!track || track.getSettings().facingMode === "user") return;
-      setLenteTraseiraId((atual) => {
-        if (atual) return atual;
-        const principal = encontrarLentePrincipal(traseiras);
-        const abertaAgora = track.getSettings().deviceId;
-        return principal && principal.deviceId !== abertaAgora ? principal.deviceId : atual;
-      });
-    },
-    []
-  );
-
-  const atualizarCamerasDisponiveis = useCallback(
-    async (track: MediaStreamTrack | undefined) => {
-      try {
-        const cameras = await listarCameras();
-        setPodeAlternarCamera(cameras.length > 1);
-        const traseiras = filtrarCamerasTraseiras(cameras);
-        setLentesTraseiras(traseiras);
-        garantirLentePrincipal(traseiras, track);
-        if (diagnosticoAtivo()) setDiagnosticoCamera(descreverCamera(track, cameras));
-      } catch {
-        setPodeAlternarCamera(false);
-        setLentesTraseiras([]);
-      }
-    },
-    [garantirLentePrincipal]
-  );
-
-  const iniciarCamera = useCallback(
-    async (modoCamera: ModoCamera, deviceId: string | null) => {
-      pararCamera();
-      setCameraErro(null);
-      const idRequisicao = ++requisicaoCameraRef.current;
-      try {
-        await esperar(ESPERA_LIBERAR_CAMERA_MS);
-        if (idRequisicao !== requisicaoCameraRef.current) return;
-        const stream = await abrirStreamComFallback(
-          { modo: modoCamera, deviceId },
-          () => idRequisicao !== requisicaoCameraRef.current
-        );
-        if (!stream) return;
-        streamRef.current = stream;
-        const track = stream.getVideoTracks()[0];
-        const configuracao = track?.getSettings();
-        setEspelharPreview(
-          configuracao?.facingMode
-            ? configuracao.facingMode === "user"
-            : modoCamera === "user" || !/Android|iPhone|iPad/i.test(navigator.userAgent)
-        );
-        void atualizarCamerasDisponiveis(track);
-        if (videoRef.current) {
-          videoRef.current.srcObject = stream;
-          await videoRef.current.play().catch(() => undefined);
-        }
-        if (track && "getCapabilities" in track) {
-          const caps = track.getCapabilities() as MediaTrackCapabilities & {
-            torch?: boolean;
-          };
-          setSuportaTorch(Boolean(caps.torch));
-        }
-      } catch {
-        setCameraErro(
-          "Câmera ao vivo indisponível. Escolha uma foto da sua galeria abaixo."
-        );
-      }
-    },
-    [atualizarCamerasDisponiveis, pararCamera]
-  );
-
-  const deviceIdSelecionado = facingMode === "environment" ? lenteTraseiraId : null;
-
-  useEffect(() => {
-    if (modo === MODO_CONVIDADO.CAMERA) {
-      iniciarCamera(facingMode, deviceIdSelecionado);
-    } else {
-      pararCamera();
-    }
-    return () => pararCamera();
-  }, [modo, facingMode, deviceIdSelecionado, iniciarCamera, pararCamera]);
-
-  const podeTrocarLente =
-    CAMERA_CONFIG.PERMITIR_TROCA_LENTE &&
-    facingMode === "environment" &&
-    lentesTraseiras.length > 1;
-
-  const trocarLente = () => {
-    const atual = streamRef.current?.getVideoTracks()[0]?.getSettings().deviceId;
-    const proxima = proximaLente(lentesTraseiras, atual);
-    if (proxima) setLenteTraseiraId(proxima.deviceId);
-  };
-
-  const alternarCamera = () => {
-    setFacingMode((prev) => (prev === "user" ? "environment" : "user"));
-  };
-
-  const alternarTorch = async () => {
-    const track = streamRef.current?.getVideoTracks()[0];
-    if (!track) return;
-    const novoValor = !torchAtivo;
-    try {
-      await track.applyConstraints({
-        advanced: [{ torch: novoValor } as MediaTrackConstraintSet],
-      });
-      setTorchAtivo(novoValor);
-    } catch {
-      toast.error("Não foi possível ativar a lanterna neste aparelho.");
-    }
+  const registrarMidiaLocal = (id: string) => {
+    const atualizado = new Set(minhasMidiasLocalIds);
+    atualizado.add(id);
+    setMinhasMidiasLocalIds(atualizado);
+    salvarSetStorage(STORAGE_KEYS.CONVIDADO_MINHAS_MIDIAS, atualizado);
   };
 
   const capturarDoVideo = async () => {
-    const video = videoRef.current;
+    const video = camera.videoRef.current;
     if (!video || !video.videoWidth) return;
     const canvasTemp = document.createElement("canvas");
     canvasTemp.width = video.videoWidth;
@@ -303,11 +144,10 @@ export function useConvidadoViewModel(slug: string) {
     if (!ctx) return;
     ctx.drawImage(video, 0, 0);
     const bitmap = await createImageBitmap(canvasTemp);
-    const deveEspelhar = espelharPreview;
+    const deveEspelhar = camera.espelharPreview;
     origemRevisaoRef.current = MODO_CONVIDADO.CAMERA;
     setFonteCapturada(bitmap);
     setEspelharCaptura(deveEspelhar);
-    // A captura abre na revisão com o mesmo enquadramento do visor.
     setTransformacao({
       scale: calcularEscalaInicialCaptura(video.videoWidth, video.videoHeight),
       offsetX: 0,
@@ -317,7 +157,50 @@ export function useConvidadoViewModel(slug: string) {
     setModo(MODO_CONVIDADO.REVISAO);
   };
 
+  const enviarVideoCurtoDireto = async (file: File) => {
+    if (!evento) return;
+    if (!evento.permite_video) {
+      toast.error("O envio de vídeos não está habilitado neste álbum.");
+      return;
+    }
+    setEnviandoFoto(true);
+    setProgressoUpload(10);
+    const toastId = toast.loading("Enviando vídeo curto para a festa...");
+    try {
+      const up = await validarEEnviarVideoCurto(
+        evento.slug,
+        file,
+        setProgressoUpload
+      );
+      const midiaCriada = await registrarMidiaMutation.mutateAsync({
+        moldura_id: null,
+        tipo_midia: FESTA_TIPO_MIDIA.VIDEO,
+        path: up.pathFull,
+        thumb_path: up.pathThumb,
+        autor: nomeConvidado.trim() || null,
+        sessao_id: sessaoId,
+        tamanho_bytes: up.tamanhoBytes,
+        duracao_segundos: up.duracaoSegundos,
+      });
+      registrarMidiaLocal(midiaCriada.id);
+      toast.dismiss(toastId);
+      setModo(MODO_CONVIDADO.GALERIA);
+      setTela(TELA_CONVIDADO.MURAL);
+      toast.success(obterMensagemSucessoEnvioConvidado(evento, true));
+    } catch (err) {
+      toast.dismiss(toastId);
+      toast.error(err instanceof Error ? err.message : "Erro ao enviar vídeo");
+    } finally {
+      setEnviandoFoto(false);
+      setProgressoUpload(0);
+    }
+  };
+
   const selecionarArquivoGaleria = async (file: File) => {
+    if (file.type.startsWith("video/")) {
+      await enviarVideoCurtoDireto(file);
+      return;
+    }
     try {
       const imagem = await carregarArquivoComExifCorrigido(file);
       origemRevisaoRef.current = MODO_CONVIDADO.GALERIA;
@@ -346,72 +229,34 @@ export function useConvidadoViewModel(slug: string) {
           nomeConvidado.trim()
         );
       }
-      const transformacaoFinal = {
-        ...transformacao,
-        espelharHorizontal: espelharCaptura,
-      };
-      let molduraUsada: MolduraDto | null = molduraSelecionada;
-      let composicao;
-      try {
-        composicao = await renderizarFotoComMoldura(
-          fonteCapturada,
-          molduraUsada?.arquivo_url ?? null,
-          transformacaoFinal
-        );
-      } catch (erroMoldura) {
-        if (!molduraUsada) throw erroMoldura;
+      const up = await comporEEnviarFotoConvidado({
+        slugEvento: evento.slug,
+        fonteCapturada,
+        molduraSelecionada,
+        transformacao,
+        espelharCaptura,
+        onProgress: setProgressoUpload,
+      });
+      if (up.molduraFalhou) {
         toast.warning("A moldura não carregou. Publicando a foto sem moldura.");
-        molduraUsada = null;
-        composicao = await renderizarFotoComMoldura(
-          fonteCapturada,
-          null,
-          transformacaoFinal
-        );
       }
-
-      const arquivoId = gerarUuidLocal();
-      const pathFull = `${evento.slug}/midias/${arquivoId}.jpg`;
-      const pathThumb = `${evento.slug}/midias/thumbs/${arquivoId}.jpg`;
-
-      await Promise.all([
-        uploadBlobComProgresso(
-          SUPABASE_URL,
-          SUPABASE_ANON_KEY,
-          FESTA_BUCKET_MIDIAS,
-          pathFull,
-          composicao.fullBlob,
-          (pct) => setProgressoUpload(Math.max(10, Math.round(pct * 0.85)))
-        ),
-        uploadBlobComProgresso(
-          SUPABASE_URL,
-          SUPABASE_ANON_KEY,
-          FESTA_BUCKET_MIDIAS,
-          pathThumb,
-          composicao.thumbBlob
-        ),
-      ]);
 
       setProgressoUpload(92);
       const midiaCriada = await registrarMidiaMutation.mutateAsync({
-        moldura_id: molduraUsada?.id ?? null,
+        moldura_id: up.molduraUsadaId,
         tipo_midia: FESTA_TIPO_MIDIA.FOTO,
-        path: pathFull,
-        thumb_path: pathThumb,
+        path: up.pathFull,
+        thumb_path: up.pathThumb,
         autor: nomeConvidado.trim() || null,
         sessao_id: sessaoId,
-        tamanho_bytes: composicao.fullBlob.size,
+        tamanho_bytes: up.tamanhoBytes,
       });
 
-      const atualizado = new Set(minhasMidiasLocalIds);
-      atualizado.add(midiaCriada.id);
-      setMinhasMidiasLocalIds(atualizado);
-      salvarSetStorage(STORAGE_KEYS.CONVIDADO_MINHAS_MIDIAS, atualizado);
-
-      URL.revokeObjectURL(composicao.previewUrl);
+      registrarMidiaLocal(midiaCriada.id);
       setProgressoUpload(100);
       setModo(MODO_CONVIDADO.GALERIA);
       setTela(TELA_CONVIDADO.MURAL);
-      toast.success("Sua lembrança foi publicada no mural da festa!");
+      toast.success(obterMensagemSucessoEnvioConvidado(evento, false));
     } catch (error) {
       toast.error(
         error instanceof Error ? error.message : "Erro ao enviar a foto"
@@ -425,28 +270,13 @@ export function useConvidadoViewModel(slug: string) {
   const alternarCurtida = (midia: MidiaDto) => {
     const jaCurtiu = curtidasIds.has(midia.id);
     const novoSet = new Set(curtidasIds);
-    if (jaCurtiu) {
-      novoSet.delete(midia.id);
-    } else {
-      novoSet.add(midia.id);
-    }
+    if (jaCurtiu) novoSet.delete(midia.id);
+    else novoSet.add(midia.id);
     setCurtidasIds(novoSet);
     salvarSetStorage(STORAGE_KEYS.CONVIDADO_CURTIDAS, novoSet);
-    const reverter = () => {
-      const revertido = new Set(novoSet);
-      if (jaCurtiu) {
-        revertido.add(midia.id);
-      } else {
-        revertido.delete(midia.id);
-      }
-      setCurtidasIds(revertido);
-      salvarSetStorage(STORAGE_KEYS.CONVIDADO_CURTIDAS, revertido);
-      toast.error("Não foi possível atualizar a curtida.");
-    };
-    (jaCurtiu ? descurtirMutation : curtirMutation).mutate(
-      { midiaId: midia.id },
-      { onError: reverter }
-    );
+    (jaCurtiu ? descurtirMutation : curtirMutation).mutate({
+      midiaId: midia.id,
+    });
   };
 
   const excluirMinhaMidia = async (midiaId: string) => {
@@ -456,7 +286,7 @@ export function useConvidadoViewModel(slug: string) {
       novoSet.delete(midiaId);
       setMinhasMidiasLocalIds(novoSet);
       salvarSetStorage(STORAGE_KEYS.CONVIDADO_MINHAS_MIDIAS, novoSet);
-      toast.success("Foto removida da galeria.");
+      toast.success("Lembrança removida da galeria.");
     } catch (error) {
       toast.error(
         error instanceof Error ? error.message : "Não foi possível excluir"
@@ -483,7 +313,21 @@ export function useConvidadoViewModel(slug: string) {
 
   useHistoricoNavegacao(profundidadeNavegacao, voltarUmNivel);
 
-  const todasMidias: MidiaDto[] = midiasQuery.data ?? [];
+  const todasMidias = useMemo<MidiaDto[]>(() => {
+    const paginas = midiasQuery.data?.pages ?? [];
+    const vistos = new Set<string>();
+    const lista: MidiaDto[] = [];
+    for (const pagina of paginas) {
+      for (const item of pagina.itens) {
+        if (!vistos.has(item.id)) {
+          vistos.add(item.id);
+          lista.push(item);
+        }
+      }
+    }
+    return lista;
+  }, [midiasQuery.data]);
+
   const minhasMidias = useMemo(
     () =>
       todasMidias.filter(
@@ -492,7 +336,11 @@ export function useConvidadoViewModel(slug: string) {
     [todasMidias, sessaoId, minhasMidiasLocalIds]
   );
 
-  const midiasExibidas = abaGaleria === "MINHAS" ? minhasMidias : todasMidias;
+  const midiasExibidas =
+    !evento?.galeria_publica ||
+    abaGaleria === FESTA_ABA_GALERIA_CONVIDADO.MINHAS
+      ? minhasMidias
+      : todasMidias;
 
   return {
     sessaoId,
@@ -503,6 +351,9 @@ export function useConvidadoViewModel(slug: string) {
     todasMidiasCount: todasMidias.length,
     minhasMidiasCount: minhasMidias.length,
     isLoadingMidias: midiasQuery.isLoading,
+    temMaisMidias: Boolean(midiasQuery.hasNextPage),
+    carregandoMaisMidias: midiasQuery.isFetchingNextPage,
+    carregarMaisMidias: () => midiasQuery.fetchNextPage(),
     molduras,
     molduraSelecionada,
     molduraSelecionadaId,
@@ -515,18 +366,7 @@ export function useConvidadoViewModel(slug: string) {
     setAbaGaleria,
     nomeConvidado,
     setNomeConvidado,
-    videoRef,
-    facingMode,
-    espelharPreview,
-    podeAlternarCamera,
-    alternarCamera,
-    torchAtivo,
-    suportaTorch,
-    podeTrocarLente,
-    trocarLente,
-    diagnosticoCamera,
-    alternarTorch,
-    cameraErro,
+    ...camera,
     capturarDoVideo,
     selecionarArquivoGaleria,
     fonteCapturada,

@@ -6,23 +6,30 @@ import {
   FESTA_DIALOG_NAMES,
   FESTA_ROUTES,
   FESTA_STATUS_PEDIDO,
+  FESTA_TIPO_PERFIL,
   type FestaAdminTab,
 } from "@/constants";
 import { useLayout } from "@/contexts/LayoutContext";
 import { supabase } from "@/integrations/supabase/client";
+import { apiRequest } from "@/lib/api";
 import { useCatalogoAdminQuery } from "@/hooks/api/useCatalogoApi";
 import {
   useEventosAdminQuery,
   useExcluirEventoMutation,
 } from "@/hooks/api/useEventosApi";
-import { useParceirosB2bAdminQuery } from "@/hooks/api/useParceiroB2bApi";
+import {
+  useImpersonateParceiroB2bMutation,
+  useParceirosB2bAdminQuery,
+} from "@/hooks/api/useParceiroB2bApi";
 import type {
   EventoAdminDto,
   FestaCatalogoExtraB2c,
   FestaCatalogoPacoteB2c,
+  FestaCatalogoPlanoB2b,
   FestaStatusPedidoEnum,
   FestaTemaCatalogo,
   ParceiroB2bAdminDto,
+  SessaoUsuarioAutenticadoDto,
 } from "@/types/festa.types";
 
 export function useAdminEventosViewModel() {
@@ -68,6 +75,36 @@ export function useAdminEventosViewModel() {
   const catalogoQuery = useCatalogoAdminQuery(autenticado);
   const parceirosQuery = useParceirosB2bAdminQuery(autenticado);
   const excluirMutation = useExcluirEventoMutation();
+  const impersonateParceiroMutation = useImpersonateParceiroB2bMutation();
+
+  useEffect(() => {
+    if (!eventosQuery.isError) return;
+    apiRequest<SessaoUsuarioAutenticadoDto>("/api/auth/me", {
+      requireAuth: true,
+    })
+      .then((me) => {
+        if (
+          me.tipo_perfil === FESTA_TIPO_PERFIL.PARCEIRO_ADMIN ||
+          me.tipo_perfil === FESTA_TIPO_PERFIL.PARCEIRO_OPERADOR
+        ) {
+          navigate(FESTA_ROUTES.PARCEIRO_PORTAL, { replace: true });
+          return;
+        }
+        supabase.auth.signOut().finally(() => {
+          navigate(FESTA_ROUTES.ADMIN_LOGIN, { replace: true });
+        });
+      })
+      .catch(() => {
+        toast.error(
+          eventosQuery.error instanceof Error
+            ? eventosQuery.error.message
+            : "Sessão expirada ou acesso restrito a administradores."
+        );
+        supabase.auth.signOut().finally(() => {
+          navigate(FESTA_ROUTES.ADMIN_LOGIN, { replace: true });
+        });
+      });
+  }, [eventosQuery.isError, eventosQuery.error, navigate]);
 
   const eventos = eventosQuery.data ?? [];
   const parceiros = parceirosQuery.data ?? [];
@@ -183,6 +220,23 @@ export function useAdminEventosViewModel() {
     });
   };
 
+  const abrirEditarPlanoB2bDialog = (plano: FestaCatalogoPlanoB2b) => {
+    openDialog(FESTA_DIALOG_NAMES.PLANO_B2B_FORM, { plano });
+  };
+
+  const copiarLinkAcessoParceiro = async (parceiroId: string) => {
+    try {
+      const res = await impersonateParceiroMutation.mutateAsync(parceiroId);
+      const url = `${window.location.origin}${FESTA_ROUTES.IMPERSONATE_BRIDGE}?token_hash=${encodeURIComponent(res.tokenHash)}`;
+      await navigator.clipboard.writeText(url);
+      toast.success("Link de acesso copiado! Abra em uma janela anônima.");
+    } catch (err) {
+      toast.error(
+        err instanceof Error ? err.message : "Erro ao gerar link de acesso."
+      );
+    }
+  };
+
   const confirmarExclusaoEvento = (evento: EventoAdminDto) => {
     openDialog(FESTA_DIALOG_NAMES.CONFIRM_ACTION, {
       title: `Excluir "${evento.titulo}"?`,
@@ -237,6 +291,9 @@ export function useAdminEventosViewModel() {
     abrirEditarTemaDialog,
     abrirNovoParceiroDialog,
     abrirEditarParceiroDialog,
+    abrirEditarPlanoB2bDialog,
+    copiarLinkAcessoParceiro,
+    gerandoLinkParceiro: impersonateParceiroMutation.isPending,
     confirmarExclusaoEvento,
     fazerLogout,
   };

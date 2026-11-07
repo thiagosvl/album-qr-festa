@@ -1,25 +1,32 @@
 import React from "react";
 import {
+  GalleryHorizontal,
   Grid,
   Heart,
   Maximize2,
-  Pause,
-  Play,
+  Minimize2,
   QrCode,
 } from "lucide-react";
 import { useParams } from "react-router-dom";
+import {
+  FESTA_DIALOG_NAMES,
+  FESTA_MODO_TELAO,
+  FESTA_TIPO_MIDIA,
+} from "@/constants";
+import { TelaoSlideshowStage } from "@/components/features/telao/TelaoSlideshowStage";
 import { Banner } from "@/components/ui/Banner";
 import { QrCodeView } from "@/components/ui/QrCodeView";
+import { useLayout } from "@/contexts/LayoutContext";
 import { gerarUrlPublicaEvento } from "@/hooks/business/useCalculosPedido";
 import { useTelaoViewModel } from "@/hooks/ui/useTelaoViewModel";
 
 const BOTAO_BASE =
-  "inline-flex h-10 items-center justify-center gap-2 rounded-full px-4 text-sm font-semibold transition active:scale-[0.97]";
-const BOTAO_CLARO = `${BOTAO_BASE} bg-white/10 text-white hover:bg-white/20`;
-const BOTAO_ATIVO = `${BOTAO_BASE} bg-white text-ameixa`;
+  "inline-flex h-9 items-center justify-center gap-2 rounded-full px-3.5 text-xs sm:text-sm font-semibold transition active:scale-[0.97]";
+const BOTAO_CLARO = `${BOTAO_BASE} bg-white/12 text-white hover:bg-white/20`;
 
 export function TelaoPage() {
   const { slug = "demo" } = useParams<{ slug: string }>();
+  const { openDialog } = useLayout();
   const vm = useTelaoViewModel(slug);
 
   if (vm.isLoading) {
@@ -42,12 +49,25 @@ export function TelaoPage() {
     );
   }
 
+  if (!vm.evento.inclui_telao && !vm.evento.is_demo) {
+    return (
+      <div className="mx-auto flex min-h-screen max-w-md items-center justify-center bg-ameixa p-6">
+        <Banner
+          variant="warning"
+          title="Telão ao Vivo não contratado neste pacote"
+          description="O Mural e Slideshow para TV/Projetor em tempo real faz parte do Pacote Completo ou pode ser adicionado como extra ao pedido."
+        />
+      </div>
+    );
+  }
+
   const urlPublica = gerarUrlPublicaEvento(vm.evento.slug);
   const customVars = {
     "--cor1": vm.evento.cor_primaria,
     "--cor2": vm.evento.cor_secundaria,
   } as React.CSSProperties;
-  const emSlideshow = vm.modoExibicao === "SLIDESHOW" && vm.midiaDestaque;
+  const emSlideshow =
+    vm.modoExibicao === FESTA_MODO_TELAO.SLIDESHOW && vm.midiaDestaque;
 
   return (
     <div
@@ -65,61 +85,83 @@ export function TelaoPage() {
         aria-hidden="true"
       />
 
-      <header className="relative z-10 flex flex-wrap items-center justify-between gap-4 px-6 py-5 sm:px-10">
-        <div className="min-w-0">
-          <h1 className="truncate font-display text-3xl font-extrabold leading-none tracking-tight sm:text-4xl">
+      <header className="relative z-10 flex flex-wrap items-center justify-between gap-3 px-6 py-3 sm:px-10">
+        <div className="flex items-baseline gap-3 min-w-0">
+          <h1 className="truncate font-display text-2xl font-extrabold leading-none tracking-tight sm:text-3xl">
             {vm.evento.titulo}
           </h1>
-          <p className="mt-2 text-sm text-white/70">
+          <span className="shrink-0 rounded-full bg-white/10 px-2.5 py-0.5 text-xs font-semibold text-white/80">
             {vm.midias.length === 1
               ? "1 foto no mural"
               : `${vm.midias.length} fotos no mural`}
-          </p>
+          </span>
         </div>
 
-        <div className="flex items-center gap-2">
-          <button
-            type="button"
-            className={vm.modoExibicao === "MOSAICO" ? BOTAO_ATIVO : BOTAO_CLARO}
-            onClick={() => vm.setModoExibicao("MOSAICO")}
+        <div className="flex flex-wrap items-center gap-2">
+          <div
+            className="inline-flex items-center rounded-full bg-white/10 p-1"
+            role="tablist"
+            aria-label="Modo de visualização do telão"
           >
-            <Grid className="h-4 w-4" />
-            Mural
-          </button>
-          <button
-            type="button"
-            className={vm.modoExibicao === "SLIDESHOW" ? BOTAO_ATIVO : BOTAO_CLARO}
-            onClick={() => vm.iniciarSlideshowEmTelaCheia(0)}
-          >
-            <Play className="h-4 w-4" />
-            Slideshow
-          </button>
-          {vm.modoExibicao === "SLIDESHOW" && (
             <button
               type="button"
-              aria-label={vm.pausado ? "Retomar slideshow" : "Pausar slideshow"}
-              className={`${BOTAO_CLARO} w-10 px-0`}
-              onClick={() => vm.setPausado((pausado) => !pausado)}
+              role="tab"
+              aria-selected={vm.modoExibicao === FESTA_MODO_TELAO.SLIDESHOW}
+              className={`inline-flex h-8 items-center gap-1.5 rounded-full px-3.5 text-xs font-bold transition ${
+                vm.modoExibicao === FESTA_MODO_TELAO.SLIDESHOW
+                  ? "bg-white text-ameixa shadow-sm"
+                  : "text-white/80 hover:text-white"
+              }`}
+              onClick={() => vm.abrirNoSlideshow()}
             >
-              {vm.pausado ? (
-                <Play className="h-4 w-4" />
-              ) : (
-                <Pause className="h-4 w-4" />
-              )}
+              <GalleryHorizontal className="h-3.5 w-3.5 shrink-0" />
+              <span>Carrossel (Palco)</span>
             </button>
-          )}
+            <button
+              type="button"
+              role="tab"
+              aria-selected={vm.modoExibicao === FESTA_MODO_TELAO.MOSAICO}
+              className={`inline-flex h-8 items-center gap-1.5 rounded-full px-3.5 text-xs font-bold transition ${
+                vm.modoExibicao === FESTA_MODO_TELAO.MOSAICO
+                  ? "bg-white text-ameixa shadow-sm"
+                  : "text-white/80 hover:text-white"
+              }`}
+              onClick={() => vm.setModoExibicao(FESTA_MODO_TELAO.MOSAICO)}
+            >
+              <Grid className="h-3.5 w-3.5 shrink-0" />
+              <span>Grade (Mural)</span>
+            </button>
+          </div>
+
           <button
             type="button"
-            aria-label="Tela cheia"
-            className={`${BOTAO_CLARO} w-10 px-0`}
+            aria-label={
+              vm.emTelaCheia ? "Sair da tela cheia" : "Expandir em tela cheia"
+            }
+            title={
+              vm.emTelaCheia
+                ? "Sair da tela cheia (F)"
+                : "Expandir em tela cheia (F)"
+            }
+            className={BOTAO_CLARO}
             onClick={vm.alternarTelaCheia}
           >
-            <Maximize2 className="h-4 w-4" />
+            {vm.emTelaCheia ? (
+              <>
+                <Minimize2 className="h-4 w-4 shrink-0" />
+                <span className="hidden md:inline">Sair da tela cheia</span>
+              </>
+            ) : (
+              <>
+                <Maximize2 className="h-4 w-4 shrink-0" />
+                <span className="hidden md:inline">Tela cheia</span>
+              </>
+            )}
           </button>
         </div>
       </header>
 
-      <main className="relative z-10 mx-auto flex w-full max-w-[1500px] flex-1 flex-col items-center justify-between gap-8 px-6 pb-8 sm:px-10 lg:flex-row">
+      <main className="relative z-10 mx-auto flex w-full max-w-[1580px] flex-1 flex-col items-center justify-between gap-6 px-6 pb-4 sm:px-10 lg:flex-row">
         {vm.midias.length === 0 ? (
           <div className="flex flex-1 flex-col items-center justify-center text-center">
             <div className="grid h-20 w-20 -rotate-6 place-items-center rounded-3xl bg-gema text-ameixa shadow-palco">
@@ -133,62 +175,67 @@ export function TelaoPage() {
             </p>
           </div>
         ) : emSlideshow && vm.midiaDestaque ? (
-          <div className="flex w-full flex-1 items-center justify-center gap-12">
-            <div className="relative">
-              <div
-                className="absolute -inset-6 rounded-[44px] opacity-60 blur-2xl"
-                style={{
-                  background: `linear-gradient(160deg, ${vm.evento.cor_primaria}, ${vm.evento.cor_secundaria})`,
-                }}
-                aria-hidden="true"
-              />
-              <div className="relative aspect-[9/16] h-[74vh] overflow-hidden rounded-[32px] bg-black shadow-palco ring-4 ring-white">
-                <img
-                  key={vm.midiaDestaque.id}
-                  src={vm.midiaDestaque.url_publica}
-                  alt={vm.midiaDestaque.autor ?? "Foto no telão"}
-                  className="h-full w-full object-contain animate-in fade-in duration-500"
-                />
-              </div>
-            </div>
-
-            <div className="hidden max-w-md flex-col gap-4 md:flex">
-              <p className="text-sm font-semibold text-white/65">
-                Foto {vm.indiceAtual + 1} de {vm.midias.length}
-              </p>
-              <h2 className="font-display text-6xl font-extrabold leading-[0.98] tracking-tight">
-                {vm.midiaDestaque.autor || "Convidado especial"}
-              </h2>
-              <p className="flex items-center gap-2 text-lg text-white/80">
-                <Heart
-                  className="h-5 w-5 fill-current"
-                  style={{ color: vm.evento.cor_primaria }}
-                />
-                {vm.midiaDestaque.curtidas === 1
-                  ? "1 curtida"
-                  : `${vm.midiaDestaque.curtidas} curtidas`}
-              </p>
-            </div>
-          </div>
+          <TelaoSlideshowStage
+            midias={vm.midias}
+            midiaDestaque={vm.midiaDestaque}
+            midiaAnterior={vm.midiaAnterior}
+            midiaProxima={vm.midiaProxima}
+            midiaRecemChegadaId={vm.midiaRecemChegadaId}
+            indiceAtual={vm.indiceAtual}
+            pausado={vm.pausado}
+            corPrimaria={vm.evento.cor_primaria}
+            corSecundaria={vm.evento.cor_secundaria}
+            intervaloMs={vm.intervaloMs}
+            onAnterior={vm.irParaAnterior}
+            onProxima={vm.irParaProxima}
+            onAlternarPausa={vm.alternarPausa}
+            onSelecionarMidia={vm.selecionarMidia}
+          />
         ) : (
-          <div className="grid max-h-[76vh] w-full flex-1 grid-cols-2 content-start gap-4 overflow-y-auto pr-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
-            {vm.midias.map((midia, indice) => (
+          <div className="scrollbar-palco grid max-h-[82vh] w-full flex-1 grid-cols-2 content-start gap-4 overflow-y-auto pr-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+            {vm.midias.map((midia) => (
               <button
                 type="button"
                 key={midia.id}
-                onClick={() => vm.iniciarSlideshowEmTelaCheia(indice)}
+                onClick={() =>
+                  openDialog(FESTA_DIALOG_NAMES.MIDIA_VIEWER, {
+                    midia,
+                    midias: vm.midias,
+                    corPrimaria: vm.evento?.cor_primaria,
+                  })
+                }
                 className="group overflow-hidden rounded-3xl bg-white text-left shadow-suave transition duration-200 hover:-translate-y-1"
               >
-                <div className="aspect-[9/16] overflow-hidden bg-ameixa">
-                  <img
-                    src={midia.url_miniatura || midia.url_publica}
-                    alt={midia.autor ?? "Convidado"}
-                    className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
-                  />
+                <div className="relative aspect-[9/16] overflow-hidden bg-ameixa">
+                  {midia.tipo_midia === FESTA_TIPO_MIDIA.VIDEO &&
+                  !midia.url_miniatura ? (
+                    <video
+                      src={midia.url_publica}
+                      muted
+                      playsInline
+                      preload="metadata"
+                      className="h-full w-full object-cover"
+                    />
+                  ) : (
+                    <img
+                      src={midia.url_miniatura || midia.url_publica}
+                      alt={midia.autor ?? "Convidado"}
+                      className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                    />
+                  )}
                 </div>
-                <p className="truncate px-3 py-2.5 text-[13px] font-semibold text-ameixa">
-                  {midia.autor || "Convidado"}
-                </p>
+                <div className="flex items-center justify-between gap-2 px-3 py-2.5">
+                  <p className="min-w-0 truncate text-[13px] font-semibold text-ameixa">
+                    {midia.autor || "Convidado"}
+                  </p>
+                  <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-ameixa/[0.06] px-2 py-0.5 text-[11px] font-bold text-ameixa-suave tabular-nums">
+                    <Heart
+                      className="h-3 w-3 fill-current"
+                      style={{ color: vm.evento?.cor_primaria }}
+                    />
+                    {midia.curtidas}
+                  </span>
+                </div>
               </button>
             ))}
           </div>
@@ -196,12 +243,21 @@ export function TelaoPage() {
 
         <aside className="w-full shrink-0 lg:w-72">
           <div className="relative overflow-hidden rounded-card bg-white p-6 text-center text-ameixa shadow-palco">
-            <span className="absolute -left-3 top-[62%] h-6 w-6 rounded-full bg-ameixa" aria-hidden="true" />
-            <span className="absolute -right-3 top-[62%] h-6 w-6 rounded-full bg-ameixa" aria-hidden="true" />
+            <span
+              className="absolute -left-3 top-[62%] h-6 w-6 rounded-full bg-ameixa"
+              aria-hidden="true"
+            />
+            <span
+              className="absolute -right-3 top-[62%] h-6 w-6 rounded-full bg-ameixa"
+              aria-hidden="true"
+            />
             <div className="mx-auto w-fit">
               <QrCodeView value={urlPublica} size={190} />
             </div>
-            <div className="picotado mx-auto mt-5 text-ameixa/25" aria-hidden="true" />
+            <div
+              className="picotado mx-auto mt-5 text-ameixa/25"
+              aria-hidden="true"
+            />
             <p className="mt-5 font-display text-2xl font-extrabold leading-tight tracking-tight">
               Aponte a câmera e entre no álbum
             </p>

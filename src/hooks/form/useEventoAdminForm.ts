@@ -4,15 +4,14 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { toast } from "sonner";
 import { FESTA_PACOTE_TIPO, FESTA_STATUS_PEDIDO } from "@/constants";
+import { notificarErrosFormulario } from "@/components/ui/form";
+import { useCatalogoPublicoQuery } from "@/hooks/api/useCatalogoApi";
 import {
   useAtualizarEventoMutation,
   useCriarEventoMutation,
 } from "@/hooks/api/useEventosApi";
 import { safeCloseDialog } from "@/hooks/ui/useDialogClose";
-import type {
-  EventoAdminDto,
-  FestaCatalogoPacoteB2c,
-} from "@/types/festa.types";
+import type { EventoAdminDto } from "@/types/festa.types";
 
 const extraItemSchema = z.object({
   extra_id: z.string().nullable().optional(),
@@ -51,6 +50,7 @@ export const eventoAdminFormSchema = z.object({
   galeria_publica: z.boolean().default(true),
   moderacao_previa: z.boolean().default(false),
   permite_envio_midias: z.boolean().default(true),
+  permite_video: z.boolean().default(false),
   valor_pacote_reais: z.coerce.number().min(0),
   desconto_reais: z.coerce.number().min(0),
   valor_sinal_reais: z.coerce.number().min(0),
@@ -61,16 +61,25 @@ export const eventoAdminFormSchema = z.object({
 export type EventoAdminFormValues = z.infer<typeof eventoAdminFormSchema>;
 
 export function useEventoAdminForm(
+  open: boolean,
   eventoEdicao: EventoAdminDto | null,
-  pacotes: FestaCatalogoPacoteB2c[],
   onSuccessClose: () => void
 ) {
+  const catalogoQuery = useCatalogoPublicoQuery(open);
+  const pacotes = catalogoQuery.data?.pacotes_b2c ?? [];
+  const extrasCatalogo = catalogoQuery.data?.extras_b2c ?? [];
+  const temas = catalogoQuery.data?.temas ?? [];
+
   const criarMutation = useCriarEventoMutation();
   const atualizarMutation = useAtualizarEventoMutation();
 
   const pacotePadrao =
     pacotes.find((p) => p.tipo_pacote === FESTA_PACOTE_TIPO.COMPLETO) ??
     pacotes[0];
+  const precoPadraoReais = pacotePadrao ? pacotePadrao.preco_centavos / 100 : 127;
+  const sinalPadraoReais = pacotePadrao
+    ? Math.round(pacotePadrao.preco_centavos / 2) / 100
+    : 63.5;
 
   const form = useForm<EventoAdminFormValues>({
     resolver: zodResolver(eventoAdminFormSchema),
@@ -93,13 +102,10 @@ export function useEventoAdminForm(
       galeria_publica: true,
       moderacao_previa: false,
       permite_envio_midias: true,
-      valor_pacote_reais: pacotePadrao
-        ? pacotePadrao.preco_centavos / 100
-        : 127,
+      permite_video: false,
+      valor_pacote_reais: precoPadraoReais,
       desconto_reais: 0,
-      valor_sinal_reais: pacotePadrao
-        ? Math.round(pacotePadrao.preco_centavos / 2) / 100
-        : 63.5,
+      valor_sinal_reais: sinalPadraoReais,
       observacoes_internas: "",
       extras: [],
     },
@@ -110,9 +116,13 @@ export function useEventoAdminForm(
     name: "extras",
   });
 
+  const { reset } = form;
+  const eventoId = eventoEdicao?.id ?? null;
+
   useEffect(() => {
+    if (!open) return;
     if (eventoEdicao) {
-      form.reset({
+      reset({
         slug: eventoEdicao.slug,
         titulo: eventoEdicao.titulo,
         subtitulo: eventoEdicao.subtitulo ?? "",
@@ -131,6 +141,7 @@ export function useEventoAdminForm(
         galeria_publica: eventoEdicao.galeria_publica,
         moderacao_previa: eventoEdicao.moderacao_previa,
         permite_envio_midias: eventoEdicao.permite_envio_midias,
+        permite_video: eventoEdicao.permite_video,
         valor_pacote_reais: eventoEdicao.valor_pacote_centavos / 100,
         desconto_reais: eventoEdicao.desconto_centavos / 100,
         valor_sinal_reais: eventoEdicao.valor_sinal_centavos / 100,
@@ -142,8 +153,35 @@ export function useEventoAdminForm(
           preco_unitario_reais: ex.preco_unitario_centavos / 100,
         })),
       });
+    } else {
+      reset({
+        slug: "",
+        titulo: "",
+        subtitulo: "",
+        boas_vindas: "",
+        nome_aniversariante: "",
+        idade_aniversariante: "",
+        data_evento: new Date().toISOString().slice(0, 10),
+        pacote: FESTA_PACOTE_TIPO.COMPLETO,
+        status_pedido: FESTA_STATUS_PEDIDO.AGUARDANDO_SINAL,
+        tema_id: "",
+        nome_anfitriao: "",
+        telefone_anfitriao: "",
+        email_anfitriao: "",
+        cor_primaria: "#e6007e",
+        cor_secundaria: "#7b3fe4",
+        galeria_publica: true,
+        moderacao_previa: false,
+        permite_envio_midias: true,
+        permite_video: false,
+        valor_pacote_reais: precoPadraoReais,
+        desconto_reais: 0,
+        valor_sinal_reais: sinalPadraoReais,
+        observacoes_internas: "",
+        extras: [],
+      });
     }
-  }, [eventoEdicao, form]);
+  }, [open, eventoId, precoPadraoReais, sinalPadraoReais, reset]);
 
   const selecionarPacoteTipo = (tipo: EventoAdminFormValues["pacote"]) => {
     form.setValue("pacote", tipo);
@@ -180,6 +218,7 @@ export function useEventoAdminForm(
         galeria_publica: values.galeria_publica,
         moderacao_previa: values.moderacao_previa,
         permite_envio_midias: values.permite_envio_midias,
+        permite_video: values.permite_video,
         valor_pacote_centavos: Math.round(values.valor_pacote_reais * 100),
         desconto_centavos: Math.round(values.desconto_reais * 100),
         valor_sinal_centavos: Math.round(values.valor_sinal_reais * 100),
@@ -209,10 +248,13 @@ export function useEventoAdminForm(
         error instanceof Error ? error.message : "Erro ao salvar evento"
       );
     }
-  });
+  }, notificarErrosFormulario);
 
   return {
     form,
+    pacotes,
+    extrasCatalogo,
+    temas,
     extrasArray,
     selecionarPacoteTipo,
     onSubmit,

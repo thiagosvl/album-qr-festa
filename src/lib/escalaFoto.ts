@@ -5,14 +5,8 @@ import {
 } from "@/constants";
 
 export const ESCALA_MAXIMA_FOTO = 3;
-
-/**
- * Limite para "afastar" a foto: com 0.75 um vídeo 3:4 cabe inteiro na largura
- * do quadro 9:16, e as faixas que sobram em cima e embaixo ficam sob a moldura.
- */
 const ESCALA_MINIMA_PERMITIDA = 0.75;
 
-/** Escala (sobre o "preencher") em que a foto ocupa exatamente a largura do quadro. */
 export function calcularEscalaAjusteLargura(
   larguraFonte: number,
   alturaFonte: number
@@ -44,7 +38,6 @@ export function limitarEscala(
   );
 }
 
-/** Escala com que a foto tirada pela câmera abre na revisão: a mesma do visor. */
 export function calcularEscalaInicialCaptura(
   larguraFonte: number,
   alturaFonte: number

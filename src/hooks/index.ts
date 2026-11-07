@@ -1,3 +1,4 @@
+export * from "./api/useAuthRecuperacaoApi";
 export * from "./api/useCatalogoApi";
 export * from "./api/useEventosApi";
 export * from "./api/useGestaoApi";
@@ -7,14 +8,33 @@ export * from "./api/useParceiroB2bApi";
 
 export * from "./business/useComposicaoCanvas";
 export * from "./business/useCalculosPedido";
+export * from "./business/useGeradorDisplayQr";
+export * from "./business/useEnvioVideoCurto";
 
-export * from "./form/useEventoAdminForm";
+export * from "./form/useAdminLoginForm";
 export * from "./form/useBriefingPaiForm";
+export * from "./form/useEventoAdminForm";
+export * from "./form/useEventoParceiroB2bForm";
+export * from "./form/useExtraB2cForm";
+export * from "./form/useOperadorParceiroForm";
+export * from "./form/usePacoteB2cForm";
 export * from "./form/usePagamentoManualForm";
+export * from "./form/useParceiroB2bForm";
+export * from "./form/useParceiroLoginForm";
+export * from "./form/usePlanoB2bForm";
+export * from "./form/useRecuperarSenhaForm";
+export * from "./form/useTemaCatalogoForm";
 
-export * from "./ui/useDialogClose";
-export * from "./ui/useConvidadoViewModel";
-export * from "./ui/useTelaoViewModel";
-export * from "./ui/useGestaoPaiViewModel";
 export * from "./ui/useAdminEventosViewModel";
+export * from "./ui/useConvidadoCameraStream";
+export * from "./ui/useConvidadoRevisaoViewModel";
+export * from "./ui/useConvidadoViewModel";
+export * from "./ui/useDialogClose";
+export * from "./ui/useExtrasEventoAdminViewModel";
+export * from "./ui/useGestaoPaiViewModel";
+export * from "./ui/useImpersonateBridgeViewModel";
+export * from "./ui/useMidiasEventoAdminViewModel";
+export * from "./ui/useMidiaViewerViewModel";
+export * from "./ui/useMoldurasEventoViewModel";
 export * from "./ui/useParceiroPortalViewModel";
+export * from "./ui/useTelaoViewModel";

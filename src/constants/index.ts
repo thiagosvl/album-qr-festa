@@ -23,33 +23,33 @@ export const FESTA_CANVAS_CONFIG = {
   THUMB_QUALITY: 0.72,
 } as const;
 
-/** Como o visor da câmera encaixa o quadro do sensor (3:4) no formato da foto (9:16). */
 export const ENQUADRAMENTO_CAMERA = {
-  /** Quadro inteiro na largura: campo de visão máximo, faixas desfocadas em cima e embaixo. */
   QUADRO_INTEIRO: "QUADRO_INTEIRO",
-  /** Tela cheia: corta as laterais do quadro (parece mais "aproximado"). */
   PREENCHER: "PREENCHER",
 } as const;
 export type EnquadramentoCamera =
   (typeof ENQUADRAMENTO_CAMERA)[keyof typeof ENQUADRAMENTO_CAMERA];
 
-/** Chaves de comportamento da câmera do convidado (trocar aqui, sem mexer nos componentes). */
 export const CAMERA_CONFIG = {
   ENQUADRAMENTO: ENQUADRAMENTO_CAMERA.PREENCHER as EnquadramentoCamera,
-  /** Botão para alternar entre as lentes traseiras (principal / ultra-wide) quando o aparelho expõe mais de uma. */
   PERMITIR_TROCA_LENTE: true,
-  /** `?diagcamera=1` na URL mostra resolução, lentes e versão sobre o visor. */
   PARAMETRO_DIAGNOSTICO: "diagcamera",
 } as const;
 
 export const FESTA_ROUTES = {
   HOME: "/",
+  LOGIN: "/login",
+  DEMO_CONVIDADO: "/e/demo",
+  LEGACY_ADMIN: "/e/admin",
+  LEGACY_PARCEIRO: "/e/parceiro",
   EVENTO_CONVIDADO: "/e/:slug",
   EVENTO_TELAO: "/telao/:slug",
   GESTAO_PAI: "/gestao/:token",
   ADMIN_LOGIN: "/admin/login",
   ADMIN_DASHBOARD: "/admin",
+  PARCEIRO_LOGIN: "/parceiro/login",
   PARCEIRO_PORTAL: "/parceiro",
+  IMPERSONATE_BRIDGE: "/impersonate-bridge",
 } as const;
 
 export const STORAGE_KEYS = {
@@ -60,7 +60,14 @@ export const STORAGE_KEYS = {
   ADMIN_FILTRO_STATUS: "@albumqrfesta:admin_filtro_status",
   ADMIN_ABA_ATIVA: "@albumqrfesta:admin_aba_ativa",
   GESTAO_DICA_DISPENSADA: "@albumqrfesta:gestao_dica_dispensada",
-  PARCEIRO_SELECIONADO_ID: "@albumqrfesta:parceiro_selecionado_id",
+  PARCEIRO_IMPERSONATING: "@albumqrfesta:parceiro_is_impersonating",
+} as const;
+
+export const FESTA_TIPO_PERFIL = {
+  ADMIN: "ADMIN",
+  ANFITRIAO: "ANFITRIAO",
+  PARCEIRO_ADMIN: "PARCEIRO_ADMIN",
+  PARCEIRO_OPERADOR: "PARCEIRO_OPERADOR",
 } as const;
 
 export const FESTA_PACOTE_TIPO = {
@@ -142,6 +149,62 @@ export const FESTA_ADMIN_TABS = {
 export type FestaAdminTab =
   (typeof FESTA_ADMIN_TABS)[keyof typeof FESTA_ADMIN_TABS];
 
+export const FESTA_PARCEIRO_TABS = {
+  EVENTOS: "EVENTOS",
+  CREDITOS: "CREDITOS",
+  EQUIPE: "EQUIPE",
+  MARCA: "MARCA",
+} as const;
+
+export type FestaParceiroTab =
+  (typeof FESTA_PARCEIRO_TABS)[keyof typeof FESTA_PARCEIRO_TABS];
+
+export const FESTA_GESTAO_PAI_TABS = {
+  MODERACAO: "MODERACAO",
+  BRIEFING: "BRIEFING",
+  ACESSO_QR: "ACESSO_QR",
+} as const;
+
+export type FestaGestaoPaiTab =
+  (typeof FESTA_GESTAO_PAI_TABS)[keyof typeof FESTA_GESTAO_PAI_TABS];
+
+export const FESTA_FILTRO_MODERACAO = {
+  TODAS: "TODAS",
+  VISIVEIS: "VISIVEIS",
+  PENDENTES: "PENDENTES",
+  OCULTAS: "OCULTAS",
+} as const;
+
+export type FestaFiltroModeracao =
+  (typeof FESTA_FILTRO_MODERACAO)[keyof typeof FESTA_FILTRO_MODERACAO];
+
+export const FESTA_FILTRO_MIDIA_ADMIN = {
+  TODAS: "TODAS",
+  VISIVEIS: "VISIVEIS",
+  PENDENTES: "PENDENTES",
+  OCULTAS: "OCULTAS",
+  DEMO: "DEMO",
+} as const;
+
+export type FestaFiltroMidiaAdmin =
+  (typeof FESTA_FILTRO_MIDIA_ADMIN)[keyof typeof FESTA_FILTRO_MIDIA_ADMIN];
+
+export const FESTA_MODO_TELAO = {
+  MOSAICO: "MOSAICO",
+  SLIDESHOW: "SLIDESHOW",
+} as const;
+
+export type FestaModoTelao =
+  (typeof FESTA_MODO_TELAO)[keyof typeof FESTA_MODO_TELAO];
+
+export const FESTA_ABA_GALERIA_CONVIDADO = {
+  MURAL: "MURAL",
+  MINHAS: "MINHAS",
+} as const;
+
+export type FestaAbaGaleriaConvidado =
+  (typeof FESTA_ABA_GALERIA_CONVIDADO)[keyof typeof FESTA_ABA_GALERIA_CONVIDADO];
+
 export const FESTA_DIALOG_NAMES = {
   CONFIRM_ACTION: "confirmActionDialog",
   EVENTO_FORM: "eventoFormDialog",
@@ -155,7 +218,10 @@ export const FESTA_DIALOG_NAMES = {
   EXTRA_B2C_FORM: "extraB2cFormDialog",
   TEMA_CATALOGO_FORM: "temaCatalogoFormDialog",
   PARCEIRO_B2B_FORM: "parceiroB2bFormDialog",
+  PLANO_B2B_FORM: "planoB2bFormDialog",
   EVENTO_PARCEIRO_B2B_FORM: "eventoParceiroB2bFormDialog",
+  OPERADOR_PARCEIRO_FORM: "operadorParceiroFormDialog",
+  RECUPERAR_SENHA: "recuperarSenhaDialog",
 } as const;
 
 export type FestaDialogName =

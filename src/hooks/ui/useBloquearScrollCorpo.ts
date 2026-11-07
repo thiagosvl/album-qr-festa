@@ -1,9 +1,5 @@
 import { useEffect } from "react";
 
-/**
- * Trava a rolagem da página enquanto uma tela em camada (câmera, revisão)
- * está aberta, para não existirem duas rolagens ao mesmo tempo.
- */
 export function useBloquearScrollCorpo(ativo = true): void {
   useEffect(() => {
     if (!ativo) return;

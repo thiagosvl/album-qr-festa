@@ -1,38 +1,23 @@
 import { useState } from "react";
-import { Lock, Sparkles } from "lucide-react";
-import { useNavigate } from "react-router-dom";
-import { toast } from "sonner";
-import { FESTA_ROUTES } from "@/constants";
+import { Eye, EyeOff, KeyRound, Lock, Sparkles } from "lucide-react";
 import { Banner } from "@/components/ui/Banner";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { supabase } from "@/integrations/supabase/client";
+import { useAdminLoginForm } from "@/hooks/form/useAdminLoginForm";
 
 export function AdminLoginPage() {
-  const navigate = useNavigate();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState(false);
-
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    try {
-      const { error } = await supabase.auth.signInWithPassword({
-        email: email.trim(),
-        password,
-      });
-      if (error) {
-        toast.error("Credenciais inválidas. Verifique seu e-mail e senha.");
-        return;
-      }
-      toast.success("Bem-vindo ao Backoffice Álbum QR Festa!");
-      navigate(FESTA_ROUTES.ADMIN_DASHBOARD, { replace: true });
-    } finally {
-      setLoading(false);
-    }
-  };
+  const [mostrarSenha, setMostrarSenha] = useState(false);
+  const { form, onSubmit, handleAbrirRecuperacaoSenha, isSubmitting } =
+    useAdminLoginForm();
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
@@ -50,34 +35,75 @@ export function AdminLoginPage() {
             description="Entre com sua conta administrativa vinculada em festa_usuarios."
           />
 
-          <form onSubmit={handleLogin} className="space-y-4">
-            <div className="space-y-1.5">
-              <label className="text-xs font-bold">E-mail</label>
-              <Input
-                type="email"
-                required
-                placeholder="seu-email@dominio.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+          <Form {...form}>
+            <form onSubmit={onSubmit} noValidate className="space-y-4">
+              <FormField
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>E-mail *</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="email"
+                        placeholder="seu-email@dominio.com"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
-            </div>
 
-            <div className="space-y-1.5">
-              <label className="text-xs font-bold">Senha</label>
-              <Input
-                type="password"
-                required
-                placeholder="••••••••"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
+              <FormField
+                control={form.control}
+                name="password"
+                render={({ field }) => (
+                  <FormItem>
+                    <div className="flex items-center justify-between">
+                      <FormLabel>Senha *</FormLabel>
+                      <button
+                        type="button"
+                        onClick={handleAbrirRecuperacaoSenha}
+                        className="inline-flex items-center gap-1 text-xs font-semibold text-primary hover:underline"
+                      >
+                        <KeyRound className="w-3 h-3" />
+                        <span>Esqueci minha senha</span>
+                      </button>
+                    </div>
+                    <FormControl>
+                      <div className="relative">
+                        <Input
+                          type={mostrarSenha ? "text" : "password"}
+                          placeholder="••••••••"
+                          className="pr-10"
+                          {...field}
+                        />
+                        <button
+                          type="button"
+                          tabIndex={-1}
+                          onClick={() => setMostrarSenha((prev) => !prev)}
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                        >
+                          {mostrarSenha ? (
+                            <EyeOff className="w-4 h-4" />
+                          ) : (
+                            <Eye className="w-4 h-4" />
+                          )}
+                        </button>
+                      </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
-            </div>
 
-            <Button type="submit" disabled={loading} className="w-full">
-              <Lock className="w-4 h-4" />
-              <span>{loading ? "Entrando..." : "Entrar no Painel"}</span>
-            </Button>
-          </form>
+              <Button type="submit" loading={isSubmitting} className="w-full">
+                <Lock className="w-4 h-4" />
+                <span>{isSubmitting ? "Entrando..." : "Entrar no Painel"}</span>
+              </Button>
+            </form>
+          </Form>
         </CardContent>
       </Card>
     </div>

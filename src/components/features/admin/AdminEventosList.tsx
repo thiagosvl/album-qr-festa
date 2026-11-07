@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { FESTA_STATUS_PEDIDO } from "@/constants";
+import { Banner } from "@/components/ui/Banner";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -53,6 +54,16 @@ export function AdminEventosList({
           />
         ))}
       </div>
+    );
+  }
+
+  if (eventos.length === 0) {
+    return (
+      <Banner
+        variant="info"
+        title="Nenhum evento encontrado"
+        description="Ajuste os filtros de busca ou clique em 'Novo Pedido / Evento' no topo da página para cadastrar uma festa."
+      />
     );
   }
 

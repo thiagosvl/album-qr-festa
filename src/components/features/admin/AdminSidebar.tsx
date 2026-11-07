@@ -1,6 +1,7 @@
 import {
   Building2,
   CalendarHeart,
+  Crown,
   ExternalLink,
   LogOut,
   Package,
@@ -11,7 +12,6 @@ import {
 import { Link } from "react-router-dom";
 import {
   FESTA_ADMIN_TABS,
-  FESTA_ROUTES,
   type FestaAdminTab,
 } from "@/constants";
 
@@ -20,6 +20,7 @@ interface AdminSidebarProps {
   onChangeAba: (aba: FestaAdminTab) => void;
   totalEventos: number;
   totalParceiros: number;
+  tokenDemoGestao?: string | null;
   onLogout: () => void;
 }
 
@@ -28,6 +29,7 @@ export function AdminSidebar({
   onChangeAba,
   totalEventos,
   totalParceiros,
+  tokenDemoGestao,
   onLogout,
 }: AdminSidebarProps) {
   const navItems: {
@@ -66,7 +68,7 @@ export function AdminSidebar({
   ];
 
   return (
-    <aside className="w-full lg:w-72 shrink-0 bg-[#130d1e] text-[#f9f6fb] lg:min-h-screen flex flex-col justify-between border-b lg:border-b-0 lg:border-r border-white/10">
+    <aside className="w-full lg:w-72 shrink-0 bg-ameixa text-white lg:min-h-screen flex flex-col justify-between border-b lg:border-b-0 lg:border-r border-white/10">
       <div className="p-5 space-y-6">
         <div className="flex items-center justify-between lg:justify-start gap-3">
           <div className="flex items-center gap-3">
@@ -146,8 +148,8 @@ export function AdminSidebar({
       </div>
 
       <div className="hidden lg:block p-5 space-y-3 border-t border-white/10">
-        <p className="text-[11px] uppercase tracking-wider text-white/45 font-bold">
-          Atalhos Rápidos & Demo
+        <p className="text-xs text-white/55 font-semibold">
+          Atalhos rápidos e demonstração
         </p>
 
         <div className="space-y-1.5">
@@ -172,16 +174,19 @@ export function AdminSidebar({
             <ExternalLink className="w-3.5 h-3.5 text-white/50" />
           </Link>
 
-          <Link
-            to={FESTA_ROUTES.PARCEIRO_PORTAL}
-            className="flex items-center justify-between px-3 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-xs font-medium text-white/85 transition-colors"
-          >
-            <span className="flex items-center gap-1.5">
-              <Building2 className="w-3.5 h-3.5 text-amber-400" />
-              <span>Portal do Parceiro B2B</span>
-            </span>
-            <ExternalLink className="w-3.5 h-3.5 text-white/50" />
-          </Link>
+          {tokenDemoGestao && (
+            <Link
+              to={`/gestao/${tokenDemoGestao}`}
+              target="_blank"
+              className="flex items-center justify-between px-3 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-xs font-medium text-white/85 transition-colors"
+            >
+              <span className="flex items-center gap-1.5">
+                <Crown className="w-3.5 h-3.5 text-amber-400" />
+                <span>Painel dos Pais Demo</span>
+              </span>
+              <ExternalLink className="w-3.5 h-3.5 text-white/50" />
+            </Link>
+          )}
         </div>
 
         <button
