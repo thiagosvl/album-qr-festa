@@ -6,6 +6,7 @@ import {
   Save,
   Upload,
 } from "lucide-react";
+import { FESTA_DESTINO_UPLOAD_EXTRA } from "@/constants";
 import { Banner } from "@/components/ui/Banner";
 import { Badge } from "@/components/ui/badge";
 import { BaseDialog } from "@/components/ui/BaseDialog";
@@ -141,13 +142,15 @@ export function ExtrasEventoAdminDialog({
                         <Input placeholder="https://..." {...field} />
                       </FormControl>
                       <label className="shrink-0 inline-flex items-center gap-1.5 px-3.5 h-10 rounded-[18px] border border-border bg-muted/60 text-xs font-bold cursor-pointer hover:bg-muted">
-                        {vm.enviandoDestino === "capa" ? (
+                        {vm.enviandoDestino ===
+                        FESTA_DESTINO_UPLOAD_EXTRA.CAPA ? (
                           <Loader2 className="w-3.5 h-3.5 animate-spin" />
                         ) : (
                           <Upload className="w-3.5 h-3.5" />
                         )}
                         <span>
-                          {vm.enviandoDestino === "capa"
+                          {vm.enviandoDestino ===
+                          FESTA_DESTINO_UPLOAD_EXTRA.CAPA
                             ? "Enviando..."
                             : "Subir Capa"}
                         </span>
@@ -159,7 +162,11 @@ export function ExtrasEventoAdminDialog({
                           onChange={(e) => {
                             const f = e.target.files?.[0];
                             e.target.value = "";
-                            if (f) vm.handleUploadArquivo(f, "capa");
+                            if (f)
+                              vm.handleUploadArquivo(
+                                f,
+                                FESTA_DESTINO_UPLOAD_EXTRA.CAPA
+                              );
                           }}
                         />
                       </label>
@@ -183,13 +190,14 @@ export function ExtrasEventoAdminDialog({
                         <Input placeholder="https://..." {...field} />
                       </FormControl>
                       <label className="shrink-0 inline-flex items-center gap-1.5 px-3.5 h-10 rounded-[18px] border border-border bg-muted/60 text-xs font-bold cursor-pointer hover:bg-muted">
-                        {vm.enviandoDestino === "pdf" ? (
+                        {vm.enviandoDestino ===
+                        FESTA_DESTINO_UPLOAD_EXTRA.PDF ? (
                           <Loader2 className="w-3.5 h-3.5 animate-spin" />
                         ) : (
                           <Upload className="w-3.5 h-3.5" />
                         )}
                         <span>
-                          {vm.enviandoDestino === "pdf"
+                          {vm.enviandoDestino === FESTA_DESTINO_UPLOAD_EXTRA.PDF
                             ? "Enviando..."
                             : "Subir Arte"}
                         </span>
@@ -201,7 +209,11 @@ export function ExtrasEventoAdminDialog({
                           onChange={(e) => {
                             const f = e.target.files?.[0];
                             e.target.value = "";
-                            if (f) vm.handleUploadArquivo(f, "pdf");
+                            if (f)
+                              vm.handleUploadArquivo(
+                                f,
+                                FESTA_DESTINO_UPLOAD_EXTRA.PDF
+                              );
                           }}
                         />
                       </label>

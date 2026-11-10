@@ -13,7 +13,7 @@ export function useSolicitarRecuperacaoMutation() {
         "/api/auth/recuperacao/solicitar",
         {
           method: "POST",
-          body: JSON.stringify(payload),
+          body: payload,
         }
       ),
   });
@@ -26,7 +26,7 @@ export function useValidarCodigoRecuperacaoMutation() {
         "/api/auth/recuperacao/validar",
         {
           method: "POST",
-          body: JSON.stringify(payload),
+          body: payload,
         }
       ),
   });
@@ -39,7 +39,7 @@ export function useResetarSenhaRecuperacaoMutation() {
         "/api/auth/recuperacao/resetar",
         {
           method: "POST",
-          body: JSON.stringify(payload),
+          body: payload,
         }
       ),
   });

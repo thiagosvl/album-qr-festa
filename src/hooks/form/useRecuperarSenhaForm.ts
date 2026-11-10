@@ -4,7 +4,12 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
-import { FESTA_ROUTES, FESTA_TIPO_PERFIL } from "@/constants";
+import {
+  FESTA_ETAPA_RECUPERACAO_SENHA,
+  FESTA_ROUTES,
+  FESTA_TIPO_PERFIL,
+  type FestaEtapaRecuperacaoSenha,
+} from "@/constants";
 import { notificarErrosFormulario } from "@/components/ui/form";
 import {
   useResetarSenhaRecuperacaoMutation,
@@ -15,14 +20,7 @@ import { safeCloseDialog } from "@/hooks/ui/useDialogClose";
 import { supabase } from "@/integrations/supabase/client";
 import { cpfCnpjMask } from "@/lib/masks";
 
-export const FESTA_ETAPA_RECUPERACAO_SENHA = {
-  IDENTIFICACAO: 1,
-  VALIDAR_CODIGO: 2,
-  NOVA_SENHA: 3,
-} as const;
-
-export type FestaEtapaRecuperacaoSenha =
-  (typeof FESTA_ETAPA_RECUPERACAO_SENHA)[keyof typeof FESTA_ETAPA_RECUPERACAO_SENHA];
+export { FESTA_ETAPA_RECUPERACAO_SENHA, type FestaEtapaRecuperacaoSenha };
 
 const identificacaoSchema = z.object({
   identificador: z

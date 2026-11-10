@@ -12,6 +12,7 @@ import {
 import { Link } from "react-router-dom";
 import {
   FESTA_ADMIN_TABS,
+  FESTA_ROUTES,
   type FestaAdminTab,
 } from "@/constants";
 
@@ -154,7 +155,7 @@ export function AdminSidebar({
 
         <div className="space-y-1.5">
           <Link
-            to="/e/demo"
+            to={FESTA_ROUTES.DEMO_CONVIDADO}
             target="_blank"
             className="flex items-center justify-between px-3 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-xs font-medium text-white/85 transition-colors"
           >
@@ -163,7 +164,7 @@ export function AdminSidebar({
           </Link>
 
           <Link
-            to="/telao/demo"
+            to={FESTA_ROUTES.DEMO_TELAO}
             target="_blank"
             className="flex items-center justify-between px-3 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-xs font-medium text-white/85 transition-colors"
           >

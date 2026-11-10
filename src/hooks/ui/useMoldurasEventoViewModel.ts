@@ -1,61 +1,35 @@
 import { useState } from "react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
 import { toast } from "sonner";
 import {
-  FESTA_BUCKET_MIDIAS,
+  FESTA_ACAO_MOLDURA,
   FESTA_DIALOG_NAMES,
-  SUPABASE_ANON_KEY,
-  SUPABASE_URL,
+  type FestaAcaoMoldura,
 } from "@/constants";
-import { notificarErrosFormulario } from "@/components/ui/form";
 import { useLayout } from "@/contexts/LayoutContext";
 import {
   useAtualizarMolduraMutation,
-  useCriarMolduraMutation,
   useExcluirMolduraMutation,
   useMoldurasEventoQuery,
   useReordenarMoldurasMutation,
 } from "@/hooks/api/useMoldurasApi";
-import { uploadBlobComProgresso } from "@/hooks/business/useComposicaoCanvas";
-import { gerarUuidLocal } from "@/lib/utils";
+import {
+  useMolduraForm,
+  type NovaMolduraFormValues,
+} from "@/hooks/form/useMolduraForm";
 import type { EventoAdminDto, MolduraDto } from "@/types/festa.types";
 
-const novaMolduraSchema = z.object({
-  nome: z.string().min(2, "Informe o título da moldura"),
-  arquivo: z
-    .instanceof(File, { message: "Selecione um arquivo PNG transparente" })
-    .refine((file) => file.type === "image/png" || file.name.endsWith(".png"), {
-      message: "O arquivo deve estar em formato PNG",
-    }),
-});
-
-export type NovaMolduraFormValues = z.infer<typeof novaMolduraSchema>;
-
-export type TipoAcaoMoldura = "ATIVA" | "EXCLUIR";
+export type { NovaMolduraFormValues };
+export type TipoAcaoMoldura = FestaAcaoMoldura;
 
 export function useMoldurasEventoViewModel(evento: EventoAdminDto | null) {
   const { openDialog } = useLayout();
-  const [enviando, setEnviando] = useState(false);
   const [acaoMoldura, setAcaoMoldura] = useState<{
     id: string;
     tipo: TipoAcaoMoldura;
   } | null>(null);
 
-  const form = useForm<NovaMolduraFormValues>({
-    resolver: zodResolver(novaMolduraSchema),
-    defaultValues: {
-      nome: "",
-    },
-  });
-
   const moldurasQuery = useMoldurasEventoQuery(
     evento?.id,
-    evento?.token_gestao
-  );
-  const criarMutation = useCriarMolduraMutation(
-    evento?.id ?? "",
     evento?.token_gestao
   );
   const atualizarMutation = useAtualizarMolduraMutation(
@@ -74,37 +48,11 @@ export function useMoldurasEventoViewModel(evento: EventoAdminDto | null) {
   const molduras = moldurasQuery.data ?? [];
   const ativasCount = molduras.filter((m) => m.ativa).length;
 
-  const handleUploadMoldura = form.handleSubmit(async (values) => {
-    if (!evento) return;
-    setEnviando(true);
-    try {
-      const idUnico = gerarUuidLocal();
-      const storagePath = `${evento.slug}/midias/molduras/${idUnico}.png`;
-      await uploadBlobComProgresso(
-        SUPABASE_URL,
-        SUPABASE_ANON_KEY,
-        FESTA_BUCKET_MIDIAS,
-        storagePath,
-        values.arquivo
-      );
-
-      await criarMutation.mutateAsync({
-        nome: values.nome.trim(),
-        arquivo_path: storagePath,
-        ordem: molduras.length + 1,
-        ativa: ativasCount < evento.limite_molduras,
-      });
-
-      form.reset({ nome: "" });
-      toast.success("Moldura PNG 1080x1920 adicionada com sucesso!");
-    } catch (error) {
-      toast.error(
-        error instanceof Error ? error.message : "Erro ao adicionar moldura"
-      );
-    } finally {
-      setEnviando(false);
-    }
-  }, notificarErrosFormulario);
+  const { form, enviando, handleUploadMoldura } = useMolduraForm(
+    evento,
+    molduras.length,
+    ativasCount
+  );
 
   const moverOrdem = async (indexAtual: number, direcao: -1 | 1) => {
     const novoIndex = indexAtual + direcao;
@@ -126,7 +74,7 @@ export function useMoldurasEventoViewModel(evento: EventoAdminDto | null) {
   };
 
   const alternarAtivaMoldura = async (moldura: MolduraDto) => {
-    setAcaoMoldura({ id: moldura.id, tipo: "ATIVA" });
+    setAcaoMoldura({ id: moldura.id, tipo: FESTA_ACAO_MOLDURA.ATIVA });
     try {
       await atualizarMutation.mutateAsync({
         molduraId: moldura.id,
@@ -148,7 +96,7 @@ export function useMoldurasEventoViewModel(evento: EventoAdminDto | null) {
       confirmLabel: "Sim, Excluir Moldura",
       variant: "destructive",
       onConfirm: async () => {
-        setAcaoMoldura({ id: molduraId, tipo: "EXCLUIR" });
+        setAcaoMoldura({ id: molduraId, tipo: FESTA_ACAO_MOLDURA.EXCLUIR });
         try {
           await excluirMutation.mutateAsync(molduraId);
           toast.success("Moldura excluída");

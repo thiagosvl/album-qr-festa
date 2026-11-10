@@ -4,6 +4,7 @@ import { toast } from "sonner";
 import {
   FESTA_ADMIN_TABS,
   FESTA_DIALOG_NAMES,
+  FESTA_FILTRO_STATUS_TODOS,
   FESTA_ROUTES,
   FESTA_STATUS_PEDIDO,
   FESTA_TIPO_PERFIL,
@@ -42,8 +43,8 @@ export function useAdminEventosViewModel() {
   );
   const [busca, setBusca] = useState<string>("");
   const [filtroStatus, setFiltroStatus] = useState<
-    FestaStatusPedidoEnum | "TODOS"
-  >("TODOS");
+    FestaStatusPedidoEnum | typeof FESTA_FILTRO_STATUS_TODOS
+  >(FESTA_FILTRO_STATUS_TODOS);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
@@ -113,7 +114,8 @@ export function useAdminEventosViewModel() {
     const termo = busca.trim().toLowerCase();
     return eventos.filter((ev) => {
       const bateStatus =
-        filtroStatus === "TODOS" || ev.status_pedido === filtroStatus;
+        filtroStatus === FESTA_FILTRO_STATUS_TODOS ||
+        ev.status_pedido === filtroStatus;
       const bateBusca =
         !termo ||
         ev.titulo.toLowerCase().includes(termo) ||

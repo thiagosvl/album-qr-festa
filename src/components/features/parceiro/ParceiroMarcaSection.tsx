@@ -11,7 +11,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import type { ParceiroMarcaFormValues } from "@/hooks/ui/useParceiroPortalViewModel";
+import type { ParceiroMarcaFormValues } from "@/hooks/form/useParceiroMarcaForm";
 import { cpfCnpjMask, phoneMask } from "@/lib/masks";
 
 interface ParceiroMarcaSectionProps {

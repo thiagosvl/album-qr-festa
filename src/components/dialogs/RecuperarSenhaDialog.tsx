@@ -1,13 +1,11 @@
-import { useState } from "react";
 import {
   ArrowLeft,
   CheckCircle2,
-  Eye,
-  EyeOff,
   KeyRound,
   Mail,
   RefreshCw,
 } from "lucide-react";
+import { RecuperarSenhaNovaSenhaStep } from "@/components/dialogs/recuperar-senha/RecuperarSenhaNovaSenhaStep";
 import { RecuperarSenhaOtpInput } from "@/components/dialogs/recuperar-senha/RecuperarSenhaOtpInput";
 import { BaseDialog } from "@/components/ui/BaseDialog";
 import { Banner } from "@/components/ui/Banner";
@@ -40,9 +38,6 @@ export function RecuperarSenhaDialog({
   onClose,
   payload,
 }: RecuperarSenhaDialogProps) {
-  const [mostrarNovaSenha, setMostrarNovaSenha] = useState(false);
-  const [mostrarConfirmacaoSenha, setMostrarConfirmacaoSenha] = useState(false);
-
   const {
     etapa,
     emailMascarado,
@@ -238,98 +233,11 @@ export function RecuperarSenhaDialog({
       )}
 
       {etapa === FESTA_ETAPA_RECUPERACAO_SENHA.NOVA_SENHA && (
-        <Form {...formNovaSenha}>
-          <form onSubmit={onSubmitNovaSenha} noValidate>
-            <BaseDialog.Body className="space-y-4">
-              <Banner
-                variant="success"
-                title="Código validado com sucesso"
-                description="Escolha sua nova senha. Ao concluir, você entrará automaticamente no painel."
-              />
-
-              <FormField
-                control={formNovaSenha.control}
-                name="nova_senha"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Nova Senha *</FormLabel>
-                    <FormControl>
-                      <div className="relative">
-                        <Input
-                          type={mostrarNovaSenha ? "text" : "password"}
-                          placeholder="Mínimo de 6 caracteres"
-                          disabled={isLoading}
-                          className="pr-10"
-                          {...field}
-                        />
-                        <button
-                          type="button"
-                          tabIndex={-1}
-                          onClick={() => setMostrarNovaSenha((prev) => !prev)}
-                          className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                        >
-                          {mostrarNovaSenha ? (
-                            <EyeOff className="w-4 h-4" />
-                          ) : (
-                            <Eye className="w-4 h-4" />
-                          )}
-                        </button>
-                      </div>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={formNovaSenha.control}
-                name="confirmar_senha"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Confirmar Nova Senha *</FormLabel>
-                    <FormControl>
-                      <div className="relative">
-                        <Input
-                          type={mostrarConfirmacaoSenha ? "text" : "password"}
-                          placeholder="Repita a nova senha"
-                          disabled={isLoading}
-                          className="pr-10"
-                          {...field}
-                        />
-                        <button
-                          type="button"
-                          tabIndex={-1}
-                          onClick={() =>
-                            setMostrarConfirmacaoSenha((prev) => !prev)
-                          }
-                          className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                        >
-                          {mostrarConfirmacaoSenha ? (
-                            <EyeOff className="w-4 h-4" />
-                          ) : (
-                            <Eye className="w-4 h-4" />
-                          )}
-                        </button>
-                      </div>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </BaseDialog.Body>
-
-            <BaseDialog.Footer>
-              <Button type="submit" loading={isLoading} className="w-full">
-                <CheckCircle2 className="w-4 h-4" />
-                <span>
-                  {isLoading
-                    ? "Salvando e entrando..."
-                    : "Salvar Senha e Entrar"}
-                </span>
-              </Button>
-            </BaseDialog.Footer>
-          </form>
-        </Form>
+        <RecuperarSenhaNovaSenhaStep
+          form={formNovaSenha}
+          isLoading={isLoading}
+          onSubmit={onSubmitNovaSenha}
+        />
       )}
     </BaseDialog>
   );

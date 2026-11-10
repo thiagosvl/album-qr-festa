@@ -2,9 +2,11 @@ import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import {
   API_BASE_URL,
+  FESTA_ACAO_MIDIA,
   FESTA_DIALOG_NAMES,
   FESTA_FILTRO_MIDIA_ADMIN,
   FESTA_STATUS_MODERACAO,
+  type FestaAcaoMidia,
   type FestaFiltroMidiaAdmin,
 } from "@/constants";
 import { useLayout } from "@/contexts/LayoutContext";
@@ -18,7 +20,7 @@ import {
 } from "@/hooks/api/useMidiasApi";
 import type { EventoAdminDto, MidiaDto } from "@/types/festa.types";
 
-export type TipoAcaoMidiaAdmin = "VISIBILIDADE" | "PIN" | "EXCLUIR";
+export type TipoAcaoMidiaAdmin = FestaAcaoMidia;
 
 export function useMidiasEventoAdminViewModel(evento: EventoAdminDto | null) {
   const { openDialog } = useLayout();
@@ -75,7 +77,7 @@ export function useMidiasEventoAdminViewModel(evento: EventoAdminDto | null) {
   const handleToggleVisibilidade = async (midia: MidiaDto) => {
     const visivel =
       midia.status_moderacao === FESTA_STATUS_MODERACAO.APROVADA;
-    setAcaoMidia({ id: midia.id, tipo: "VISIBILIDADE" });
+    setAcaoMidia({ id: midia.id, tipo: FESTA_ACAO_MIDIA.VISIBILIDADE });
     try {
       await moderarMutation.mutateAsync({
         midiaId: midia.id,
@@ -93,7 +95,7 @@ export function useMidiasEventoAdminViewModel(evento: EventoAdminDto | null) {
 
   const handleToggleFixadaDemo = async (midia: MidiaDto) => {
     const novoFixada = !midia.fixada_demo;
-    setAcaoMidia({ id: midia.id, tipo: "PIN" });
+    setAcaoMidia({ id: midia.id, tipo: FESTA_ACAO_MIDIA.PIN });
     try {
       await moderarMutation.mutateAsync({
         midiaId: midia.id,
@@ -166,7 +168,7 @@ export function useMidiasEventoAdminViewModel(evento: EventoAdminDto | null) {
       confirmLabel: "Sim, Excluir Foto",
       variant: "destructive",
       onConfirm: async () => {
-        setAcaoMidia({ id: midia.id, tipo: "EXCLUIR" });
+        setAcaoMidia({ id: midia.id, tipo: FESTA_ACAO_MIDIA.EXCLUIR });
         try {
           await excluirMutation.mutateAsync(midia.id);
           toast.success("Foto removida");

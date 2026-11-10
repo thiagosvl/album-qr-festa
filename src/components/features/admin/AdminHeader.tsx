@@ -1,4 +1,5 @@
 import { LogOut, Plus, Search, Sparkles } from "lucide-react";
+import { FESTA_FILTRO_STATUS_TODOS } from "@/constants";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { NativeSelect } from "@/components/ui/native-select";
@@ -8,8 +9,10 @@ import type { FestaStatusPedidoEnum } from "@/types/festa.types";
 interface AdminHeaderProps {
   busca: string;
   onChangeBusca: (termo: string) => void;
-  filtroStatus: FestaStatusPedidoEnum | "TODOS";
-  onChangeFiltroStatus: (status: FestaStatusPedidoEnum | "TODOS") => void;
+  filtroStatus: FestaStatusPedidoEnum | typeof FESTA_FILTRO_STATUS_TODOS;
+  onChangeFiltroStatus: (
+    status: FestaStatusPedidoEnum | typeof FESTA_FILTRO_STATUS_TODOS
+  ) => void;
   onNovoEvento: () => void;
   onLogout: () => void;
 }
@@ -74,11 +77,13 @@ export function AdminHeader({
             value={filtroStatus}
             onChange={(e) =>
               onChangeFiltroStatus(
-                e.target.value as FestaStatusPedidoEnum | "TODOS"
+                e.target.value as
+                  | FestaStatusPedidoEnum
+                  | typeof FESTA_FILTRO_STATUS_TODOS
               )
             }
           >
-            <option value="TODOS">Todos os Status</option>
+            <option value={FESTA_FILTRO_STATUS_TODOS}>Todos os Status</option>
             {(Object.keys(STATUS_PEDIDO_LABELS) as FestaStatusPedidoEnum[]).map(
               (st) => (
                 <option key={st} value={st}>

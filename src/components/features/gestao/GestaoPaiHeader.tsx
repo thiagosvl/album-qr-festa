@@ -9,6 +9,7 @@ import {
   Unlock,
 } from "lucide-react";
 import { Link } from "react-router-dom";
+import { FESTA_GESTAO_PAI_TABS } from "@/constants";
 import {
   PACOTE_TIPO_LABELS,
   STATUS_PEDIDO_LABELS,
@@ -44,9 +45,21 @@ export function GestaoPaiHeader({
   const envioPausado = !evento.permite_envio_midias;
 
   const abas = [
-    { id: "MODERACAO" as const, rotulo: `Fotos (${totalMidias})`, Icone: Images },
-    { id: "BRIEFING" as const, rotulo: "Tema e molduras", Icone: Sparkles },
-    { id: "ACESSO_QR" as const, rotulo: "QR Code e telão", Icone: QrCode },
+    {
+      id: FESTA_GESTAO_PAI_TABS.MODERACAO,
+      rotulo: `Fotos (${totalMidias})`,
+      Icone: Images,
+    },
+    {
+      id: FESTA_GESTAO_PAI_TABS.BRIEFING,
+      rotulo: "Tema e molduras",
+      Icone: Sparkles,
+    },
+    {
+      id: FESTA_GESTAO_PAI_TABS.ACESSO_QR,
+      rotulo: "QR Code e telão",
+      Icone: QrCode,
+    },
   ];
 
   return (

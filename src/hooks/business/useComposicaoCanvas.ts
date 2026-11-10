@@ -1,6 +1,11 @@
 import { FESTA_CANVAS_CONFIG } from "@/constants";
 import { limitarEscala } from "@/lib/escalaFoto";
 
+export {
+  prepararArquivoCompartilhamento,
+  uploadBlobComProgresso,
+} from "@/lib/uploadStorage";
+
 export interface TransformacaoFoto {
   scale: number;
   offsetX: number;
@@ -116,20 +121,36 @@ function obterFundoReduzido(
   sourceWidth: number,
   sourceHeight: number
 ): HTMLCanvasElement {
-  const emCache = fonteFoto instanceof HTMLVideoElement ? undefined : cacheFundos.get(fonteFoto);
+  const emCache =
+    fonteFoto instanceof HTMLVideoElement
+      ? undefined
+      : cacheFundos.get(fonteFoto);
   if (emCache) return emCache;
   const { FULL_WIDTH, FULL_HEIGHT } = FESTA_CANVAS_CONFIG;
   const reduzido = document.createElement("canvas");
   reduzido.width = LARGURA_FUNDO_DESFOCADO;
-  reduzido.height = Math.round((LARGURA_FUNDO_DESFOCADO * FULL_HEIGHT) / FULL_WIDTH);
+  reduzido.height = Math.round(
+    (LARGURA_FUNDO_DESFOCADO * FULL_HEIGHT) / FULL_WIDTH
+  );
   const ctx = reduzido.getContext("2d");
   if (ctx) {
-    const escala = Math.max(reduzido.width / sourceWidth, reduzido.height / sourceHeight);
+    const escala = Math.max(
+      reduzido.width / sourceWidth,
+      reduzido.height / sourceHeight
+    );
     const w = sourceWidth * escala;
     const h = sourceHeight * escala;
-    ctx.drawImage(fonteFoto, (reduzido.width - w) / 2, (reduzido.height - h) / 2, w, h);
+    ctx.drawImage(
+      fonteFoto,
+      (reduzido.width - w) / 2,
+      (reduzido.height - h) / 2,
+      w,
+      h
+    );
   }
-  if (!(fonteFoto instanceof HTMLVideoElement)) cacheFundos.set(fonteFoto, reduzido);
+  if (!(fonteFoto instanceof HTMLVideoElement)) {
+    cacheFundos.set(fonteFoto, reduzido);
+  }
   return reduzido;
 }
 
@@ -299,65 +320,5 @@ export async function carregarArquivoComExifCorrigido(
     return await carregarImagemCors(objectUrl);
   } finally {
     URL.revokeObjectURL(objectUrl);
-  }
-}
-
-export function uploadBlobComProgresso(
-  supabaseUrl: string,
-  anonKey: string,
-  bucket: string,
-  storagePath: string,
-  blob: Blob,
-  onProgress?: (percent: number) => void
-): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const encodedPath = storagePath
-      .split("/")
-      .map((segment) => encodeURIComponent(segment))
-      .join("/");
-    const endpoint = `${supabaseUrl}/storage/v1/object/${bucket}/${encodedPath}`;
-
-    const xhr = new XMLHttpRequest();
-    xhr.open("POST", endpoint, true);
-    xhr.setRequestHeader("Authorization", `Bearer ${anonKey}`);
-    xhr.setRequestHeader("apikey", anonKey);
-    xhr.setRequestHeader("Content-Type", blob.type || "image/jpeg");
-
-    xhr.upload.onprogress = (event) => {
-      if (event.lengthComputable && onProgress) {
-        const pct = Math.round((event.loaded / event.total) * 100);
-        onProgress(pct);
-      }
-    };
-
-    xhr.onload = () => {
-      if (xhr.status >= 200 && xhr.status < 300) {
-        const publicUrl = `${supabaseUrl}/storage/v1/object/public/${bucket}/${encodedPath}`;
-        resolve(publicUrl);
-      } else {
-        reject(
-          new Error(`Falha ao enviar imagem para o servidor (${xhr.status})`)
-        );
-      }
-    };
-
-    xhr.onerror = () => {
-      reject(new Error("Erro de conexão durante o envio da foto"));
-    };
-
-    xhr.send(blob);
-  });
-}
-
-export async function prepararArquivoCompartilhamento(
-  urlImagem: string,
-  nomeArquivo = "lembranca-festa.jpg"
-): Promise<File | null> {
-  try {
-    const response = await fetch(urlImagem, { mode: "cors" });
-    const blob = await response.blob();
-    return new File([blob], nomeArquivo, { type: blob.type || "image/jpeg" });
-  } catch {
-    return null;
   }
 }

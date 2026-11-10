@@ -5,6 +5,7 @@ import {
   Plus,
   Trash2,
 } from "lucide-react";
+import { FESTA_ACAO_MOLDURA } from "@/constants";
 import { Banner } from "@/components/ui/Banner";
 import { Badge } from "@/components/ui/badge";
 import { BaseDialog } from "@/components/ui/BaseDialog";
@@ -181,7 +182,7 @@ export function MoldurasEventoDialog({
                     size="sm"
                     loading={
                       vm.acaoMoldura?.id === moldura.id &&
-                      vm.acaoMoldura?.tipo === "ATIVA"
+                      vm.acaoMoldura?.tipo === FESTA_ACAO_MOLDURA.ATIVA
                     }
                     disabled={vm.acaoMoldura?.id === moldura.id}
                     className="flex-1 h-7 text-[11px] px-2"
@@ -195,7 +196,7 @@ export function MoldurasEventoDialog({
                     size="icon"
                     loading={
                       vm.acaoMoldura?.id === moldura.id &&
-                      vm.acaoMoldura?.tipo === "EXCLUIR"
+                      vm.acaoMoldura?.tipo === FESTA_ACAO_MOLDURA.EXCLUIR
                     }
                     disabled={vm.acaoMoldura?.id === moldura.id}
                     className="h-7 w-7 rounded-lg"

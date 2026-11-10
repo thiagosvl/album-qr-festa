@@ -40,6 +40,7 @@ export const FESTA_ROUTES = {
   HOME: "/",
   LOGIN: "/login",
   DEMO_CONVIDADO: "/e/demo",
+  DEMO_TELAO: "/telao/demo",
   LEGACY_ADMIN: "/e/admin",
   LEGACY_PARCEIRO: "/e/parceiro",
   EVENTO_CONVIDADO: "/e/:slug",
@@ -204,6 +205,59 @@ export const FESTA_ABA_GALERIA_CONVIDADO = {
 
 export type FestaAbaGaleriaConvidado =
   (typeof FESTA_ABA_GALERIA_CONVIDADO)[keyof typeof FESTA_ABA_GALERIA_CONVIDADO];
+
+export const FESTA_MODO_CONVIDADO = {
+  GALERIA: "GALERIA",
+  CAMERA: "CAMERA",
+  REVISAO: "REVISAO",
+} as const;
+
+export type FestaModoConvidado =
+  (typeof FESTA_MODO_CONVIDADO)[keyof typeof FESTA_MODO_CONVIDADO];
+
+export const FESTA_TELA_CONVIDADO = {
+  INICIO: "INICIO",
+  MURAL: "MURAL",
+} as const;
+
+export type FestaTelaConvidado =
+  (typeof FESTA_TELA_CONVIDADO)[keyof typeof FESTA_TELA_CONVIDADO];
+
+export const FESTA_FILTRO_STATUS_TODOS = "TODOS" as const;
+
+export const FESTA_ACAO_MIDIA = {
+  VISIBILIDADE: "VISIBILIDADE",
+  PIN: "PIN",
+  EXCLUIR: "EXCLUIR",
+} as const;
+
+export type FestaAcaoMidia =
+  (typeof FESTA_ACAO_MIDIA)[keyof typeof FESTA_ACAO_MIDIA];
+
+export const FESTA_ACAO_MOLDURA = {
+  ATIVA: "ATIVA",
+  EXCLUIR: "EXCLUIR",
+} as const;
+
+export type FestaAcaoMoldura =
+  (typeof FESTA_ACAO_MOLDURA)[keyof typeof FESTA_ACAO_MOLDURA];
+
+export const FESTA_DESTINO_UPLOAD_EXTRA = {
+  CAPA: "capa",
+  PDF: "pdf",
+} as const;
+
+export type FestaDestinoUploadExtra =
+  (typeof FESTA_DESTINO_UPLOAD_EXTRA)[keyof typeof FESTA_DESTINO_UPLOAD_EXTRA];
+
+export const FESTA_ETAPA_RECUPERACAO_SENHA = {
+  IDENTIFICACAO: 1,
+  VALIDAR_CODIGO: 2,
+  NOVA_SENHA: 3,
+} as const;
+
+export type FestaEtapaRecuperacaoSenha =
+  (typeof FESTA_ETAPA_RECUPERACAO_SENHA)[keyof typeof FESTA_ETAPA_RECUPERACAO_SENHA];
 
 export const FESTA_DIALOG_NAMES = {
   CONFIRM_ACTION: "confirmActionDialog",
