@@ -1,4 +1,4 @@
-# Álbum QR Festa: guia visual
+# Festalgia: guia visual
 
 Uma só identidade para landing, convidado, telão e gestão dos pais: **ingresso de festa com foto e legenda**. O admin e o portal do parceiro usam os mesmos tokens e ganham o tratamento completo numa segunda fase.
 
