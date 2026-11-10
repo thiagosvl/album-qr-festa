@@ -1,3 +1,5 @@
+export const NOME_MARCA = "Festalgia" as const;
+
 export const API_BASE_URL =
   import.meta.env.VITE_API_URL || "http://localhost:3005";
 
@@ -54,14 +56,14 @@ export const FESTA_ROUTES = {
 } as const;
 
 export const STORAGE_KEYS = {
-  CONVIDADO_SESSAO_ID: "@albumqrfesta:convidado_sessao_id",
-  CONVIDADO_NOME_AUTOR: "@albumqrfesta:convidado_nome_autor",
-  CONVIDADO_CURTIDAS: "@albumqrfesta:convidado_curtidas",
-  CONVIDADO_MINHAS_MIDIAS: "@albumqrfesta:convidado_minhas_midias",
-  ADMIN_FILTRO_STATUS: "@albumqrfesta:admin_filtro_status",
-  ADMIN_ABA_ATIVA: "@albumqrfesta:admin_aba_ativa",
-  GESTAO_DICA_DISPENSADA: "@albumqrfesta:gestao_dica_dispensada",
-  PARCEIRO_IMPERSONATING: "@albumqrfesta:parceiro_is_impersonating",
+  CONVIDADO_SESSAO_ID: "@festalgia:convidado_sessao_id",
+  CONVIDADO_NOME_AUTOR: "@festalgia:convidado_nome_autor",
+  CONVIDADO_CURTIDAS: "@festalgia:convidado_curtidas",
+  CONVIDADO_MINHAS_MIDIAS: "@festalgia:convidado_minhas_midias",
+  ADMIN_FILTRO_STATUS: "@festalgia:admin_filtro_status",
+  ADMIN_ABA_ATIVA: "@festalgia:admin_aba_ativa",
+  GESTAO_DICA_DISPENSADA: "@festalgia:gestao_dica_dispensada",
+  PARCEIRO_IMPERSONATING: "@festalgia:parceiro_is_impersonating",
 } as const;
 
 export const FESTA_TIPO_PERFIL = {

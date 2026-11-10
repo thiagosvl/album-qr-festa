@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { NativeSelect } from "@/components/ui/native-select";
 import { STATUS_PEDIDO_LABELS } from "@/hooks/business/useCalculosPedido";
 import type { FestaStatusPedidoEnum } from "@/types/festa.types";
+import { NOME_MARCA } from "@/constants";
 
 interface AdminHeaderProps {
   busca: string;
@@ -35,7 +36,7 @@ export function AdminHeader({
             </div>
             <div>
               <h1 className="font-display text-xl sm:text-2xl font-bold">
-                Álbum QR Festa • Backoffice Admin
+                {NOME_MARCA} • Backoffice Admin
               </h1>
               <p className="text-xs text-muted-foreground">
                 Gestão comercial de pedidos B2C, sinal 50%, molduras PNG e links

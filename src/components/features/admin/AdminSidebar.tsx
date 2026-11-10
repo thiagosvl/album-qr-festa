@@ -10,6 +10,7 @@ import {
   Tv,
 } from "lucide-react";
 import { Link } from "react-router-dom";
+import { NOME_MARCA } from "@/constants";
 import {
   FESTA_ADMIN_TABS,
   FESTA_ROUTES,
@@ -78,7 +79,7 @@ export function AdminSidebar({
             </div>
             <div>
               <h1 className="font-display text-lg font-extrabold tracking-tight text-white">
-                Álbum QR Festa
+                {NOME_MARCA}
               </h1>
               <p className="text-[11px] text-white/60 font-medium">
                 Backoffice Admin • B2C & B2B
