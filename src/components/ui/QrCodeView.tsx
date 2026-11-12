@@ -1,3 +1,4 @@
+import { CORES_ARTE } from "@/constants";
 import { useEffect, useState } from "react";
 import QRCode from "qrcode";
 
@@ -21,8 +22,8 @@ export function QrCodeView({
       margin: 1,
       errorCorrectionLevel: "H",
       color: {
-        dark: "#1F1D2B",
-        light: "#FFFFFF",
+        dark: CORES_ARTE.QR_TINTA,
+        light: CORES_ARTE.QR_FUNDO,
       },
     })
       .then((url) => {

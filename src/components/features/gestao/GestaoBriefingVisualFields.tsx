@@ -123,7 +123,7 @@ export function GestaoBriefingVisualFields({
                       {...field}
                     />
                   </FormControl>
-                  <label className="shrink-0 inline-flex items-center gap-1.5 px-3.5 h-10 rounded-full bg-secondary text-secondary-foreground text-sm font-semibold cursor-pointer transition hover:bg-uva hover:text-white">
+                  <label className="shrink-0 inline-flex items-center gap-1.5 px-3.5 h-10 rounded-full bg-secondary text-secondary-foreground text-sm font-semibold cursor-pointer transition hover:bg-primary hover:text-primary-foreground">
                     <Upload className="w-3.5 h-3.5" />
                     <span>
                       {enviandoCapa ? "Enviando..." : "Enviar foto"}
@@ -189,7 +189,7 @@ export function GestaoBriefingVisualFields({
           <label className="flex items-center gap-2 text-xs font-medium cursor-pointer">
             <input
               type="checkbox"
-              className="h-4 w-4 rounded accent-uva"
+              className="h-4 w-4 rounded accent-primary"
               {...form.register("galeria_publica")}
             />
             <span>
@@ -200,7 +200,7 @@ export function GestaoBriefingVisualFields({
           <label className="flex items-center gap-2 text-xs font-medium cursor-pointer">
             <input
               type="checkbox"
-              className="h-4 w-4 rounded accent-uva"
+              className="h-4 w-4 rounded accent-primary"
               {...form.register("moderacao_previa")}
             />
             <span>

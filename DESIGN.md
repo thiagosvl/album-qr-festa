@@ -91,3 +91,14 @@ Exceções que ficam brancas de propósito: o ladrilho do QR Code (precisa de co
 - **Cartão de pedido:** selos, título, link em mono, total com barra de pagamento (`success`), e a fileira de ações separada por linha. Excluir é ícone `destructive`.
 - **KPIs:** ícone em chip `*-soft`, valor em Bricolage 800.
 - **Saldo do parceiro:** número grande em Gema na sidebar.
+
+## Sem cor fixa
+
+- Telas internas (admin, parceiro, gestão, diálogos e `components/ui`): só tokens semânticos (`background`, `card`, `primary`, `muted`, `success`..., `sidebar-*`, `scrim-*`, `qr`, `gema`/`gema-foreground`). Nada de `bg-white`, `text-ameixa`, `uva`, `rosa`, `emerald-*` ou hex.
+- Todas as telas: sem hex, `rgb()` nem paleta do Tailwind (`black`, `slate`, `sky`...). Camada sobre foto ou câmera é `scrim`; ladrilho do QR é `qr`; papel do convite é `convite-papel`.
+- Arquivos gerados em canvas (plaquinha do QR, foto composta) não leem CSS: as cores ficam em `CORES_ARTE` (`src/constants`).
+- `npm run verificar:cores` falha se aparecer cor fixa. Exceção pontual: comentário `cor-fixa: motivo` na linha.
+
+## Login
+
+Uma tela só (`/parceiro/login`, `LoginPage`) para parceiros e equipe Festalgia; `/login` e `/admin/login` redirecionam para ela. O perfil (`/api/auth/me`) decide o destino: admin vai para `/admin`, parceiro e operador para `/parceiro`. A tela não menciona o admin. Desktop: painel de marca à esquerda e formulário à direita. Tablet: cartão centralizado. Celular: formulário direto no fundo, campos de 48px com texto de 16px (evita zoom no iOS).

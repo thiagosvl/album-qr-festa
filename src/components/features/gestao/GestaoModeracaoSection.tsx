@@ -147,7 +147,7 @@ export function GestaoModeracaoSection({
       </div>
 
       {selecionadasIds.size > 0 && (
-        <div className="fixed bottom-4 inset-x-4 z-40 mx-auto flex max-w-xl flex-wrap items-center gap-2 rounded-3xl sm:rounded-full bg-sidebar p-2.5 text-white shadow-palco ring-1 ring-white/15 sm:pl-5">
+        <div className="fixed bottom-4 inset-x-4 z-40 mx-auto flex max-w-xl flex-wrap items-center gap-2 rounded-3xl sm:rounded-full bg-sidebar p-2.5 text-sidebar-foreground shadow-palco ring-1 ring-sidebar-foreground/15 sm:pl-5">
           <span className="mr-auto pl-2 sm:pl-0 text-sm font-semibold">
             {selecionadasIds.size === 1
               ? "1 foto selecionada"
@@ -157,7 +157,7 @@ export function GestaoModeracaoSection({
             type="button"
             disabled={moderandoLote}
             onClick={() => onModerarLote(FESTA_STATUS_MODERACAO.APROVADA)}
-            className={`${BOTAO} bg-white text-ameixa`}
+            className={`${BOTAO} bg-sidebar-foreground text-sidebar`}
           >
             {moderandoLote ? (
               <Loader2 className="h-3.5 w-3.5 animate-spin" />
@@ -170,7 +170,7 @@ export function GestaoModeracaoSection({
             type="button"
             disabled={moderandoLote}
             onClick={() => onModerarLote(FESTA_STATUS_MODERACAO.OCULTA)}
-            className={`${BOTAO} bg-white/15 text-white`}
+            className={`${BOTAO} bg-sidebar-foreground/15 text-sidebar-foreground`}
           >
             {moderandoLote ? (
               <Loader2 className="h-3.5 w-3.5 animate-spin" />
@@ -183,7 +183,7 @@ export function GestaoModeracaoSection({
             type="button"
             disabled={moderandoLote}
             onClick={onLimparSelecao}
-            className={`${BOTAO} text-white/80 hover:text-white`}
+            className={`${BOTAO} text-sidebar-foreground/80 hover:text-sidebar-foreground`}
           >
             Cancelar
           </button>

@@ -47,30 +47,30 @@ export function MidiaViewerDialog({
       onOpenChange={(isOpen) => {
         if (!isOpen) safeCloseDialog(onClose);
       }}
-      className="sm:max-w-[500px] bg-ameixa text-white border-white/15 shadow-palco"
+      className="sm:max-w-[500px] bg-scrim text-scrim-foreground border-scrim-foreground/15 shadow-palco"
     >
       <BaseDialog.Header
         title={vm.midia.autor || "Convidado da Festa"}
         subtitle={subtitulo}
         icon={User}
         onClose={onClose}
-        className="bg-ameixa border-white/10 text-white [&_h2]:text-white [&_p]:text-white/70 [&_button]:bg-white/15 [&_button]:text-white [&_button:hover]:bg-white/25"
+        className="bg-scrim border-scrim-foreground/10 text-scrim-foreground [&_h2]:text-scrim-foreground [&_p]:text-scrim-foreground/70 [&_button]:bg-scrim-foreground/15 [&_button]:text-scrim-foreground [&_button:hover]:bg-scrim-foreground/25"
       />
 
-      <BaseDialog.Body className="relative p-3 sm:p-4 bg-black/55 flex items-center justify-center overflow-hidden">
+      <BaseDialog.Body className="relative p-3 sm:p-4 bg-scrim/55 flex items-center justify-center overflow-hidden">
         {vm.totalMidias > 1 && (
           <button
             type="button"
             onClick={vm.irParaAnterior}
             aria-label="Foto anterior"
             title="Foto anterior (←)"
-            className="absolute left-3 z-20 grid h-10 w-10 place-items-center rounded-full bg-white/90 text-ameixa shadow-palco transition hover:scale-105 active:scale-95"
+            className="absolute left-3 z-20 grid h-10 w-10 place-items-center rounded-full bg-scrim-foreground/90 text-scrim shadow-palco transition hover:scale-105 active:scale-95"
           >
             <ChevronLeft className="h-5 w-5" />
           </button>
         )}
 
-        <div className="relative flex items-center justify-center overflow-hidden rounded-2xl ring-2 ring-white/20 shadow-palco bg-ameixa">
+        <div className="relative flex items-center justify-center overflow-hidden rounded-2xl ring-2 ring-scrim-foreground/20 shadow-palco bg-scrim">
           {vm.midia.tipo_midia === FESTA_TIPO_MIDIA.VIDEO ? (
             <video
               key={vm.midia.id}
@@ -97,14 +97,14 @@ export function MidiaViewerDialog({
             onClick={vm.irParaProxima}
             aria-label="Próxima foto"
             title="Próxima foto (→)"
-            className="absolute right-3 z-20 grid h-10 w-10 place-items-center rounded-full bg-white/90 text-ameixa shadow-palco transition hover:scale-105 active:scale-95"
+            className="absolute right-3 z-20 grid h-10 w-10 place-items-center rounded-full bg-scrim-foreground/90 text-scrim shadow-palco transition hover:scale-105 active:scale-95"
           >
             <ChevronRight className="h-5 w-5" />
           </button>
         )}
       </BaseDialog.Body>
 
-      <BaseDialog.Footer className="bg-ameixa border-white/10 justify-between">
+      <BaseDialog.Footer className="bg-scrim border-scrim-foreground/10 justify-between">
         <div className="flex items-center gap-2">
           {payload.onToggleCurtida ? (
             <Button
@@ -126,7 +126,7 @@ export function MidiaViewerDialog({
               </span>
             </Button>
           ) : (
-            <span className="inline-flex h-9 items-center gap-1.5 rounded-full bg-white/12 px-3.5 text-xs font-bold text-white">
+            <span className="inline-flex h-9 items-center gap-1.5 rounded-full bg-scrim-foreground/12 px-3.5 text-xs font-bold text-scrim-foreground">
               <Heart
                 className="w-4 h-4 fill-current"
                 style={{ color: corDestaque }}

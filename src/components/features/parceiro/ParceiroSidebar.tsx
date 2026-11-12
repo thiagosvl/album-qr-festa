@@ -76,7 +76,7 @@ export function ParceiroSidebar({
         <div className="flex items-center justify-between gap-3">
           <div className="flex min-w-0 items-center gap-3">
             <div
-              className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-2xl text-white shadow-md ring-1 ring-white/15"
+              className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-2xl text-scrim-foreground shadow-md ring-1 ring-sidebar-foreground/15"
               style={{
                 backgroundColor:
                   parceiro?.cor_marca ?? FESTA_CORES_PADRAO.PARCEIRO_MARCA,
@@ -93,10 +93,10 @@ export function ParceiroSidebar({
               )}
             </div>
             <div className="min-w-0">
-              <h1 className="truncate font-display text-base font-extrabold text-white">
+              <h1 className="truncate font-display text-base font-extrabold text-sidebar-foreground">
                 {parceiro?.nome_empresa ?? "Portal do parceiro"}
               </h1>
-              <p className="truncate text-[11px] text-white/55">
+              <p className="truncate text-[11px] text-sidebar-foreground/55">
                 {parceiro?.email_acesso ??
                   parceiro?.email ??
                   "Buffets e fotógrafos"}
@@ -110,28 +110,28 @@ export function ParceiroSidebar({
               type="button"
               onClick={onLogout}
               aria-label="Sair da conta"
-              className="grid h-9 w-9 place-items-center rounded-full bg-white/10 text-white/80 transition-colors hover:bg-white/15"
+              className="grid h-9 w-9 place-items-center rounded-full bg-sidebar-foreground/10 text-sidebar-foreground/80 transition-colors hover:bg-sidebar-foreground/15"
             >
               <LogOut className="h-4 w-4" />
             </button>
           </div>
         </div>
 
-        <div className="space-y-3 rounded-3xl border border-white/10 bg-white/[0.06] p-4">
+        <div className="space-y-3 rounded-3xl border border-sidebar-foreground/10 bg-sidebar-foreground/[0.06] p-4">
           <div className="flex items-end justify-between gap-2">
             <div>
-              <p className="text-xs text-white/60">Saldo disponível</p>
+              <p className="text-xs text-sidebar-foreground/60">Saldo disponível</p>
               <p className="font-display text-3xl font-extrabold leading-none tabular-nums text-gema">
                 {parceiro?.saldo_creditos ?? 0}
-                <span className="ml-1.5 text-sm font-semibold text-white/70">
+                <span className="ml-1.5 text-sm font-semibold text-sidebar-foreground/70">
                   {(parceiro?.saldo_creditos ?? 0) === 1 ? "crédito" : "créditos"}
                 </span>
               </p>
             </div>
           </div>
-          <p className="text-[11px] text-white/55">
+          <p className="text-[11px] text-sidebar-foreground/55">
             Plano atual:{" "}
-            <strong className="font-semibold text-white">
+            <strong className="font-semibold text-sidebar-foreground">
               {parceiro?.plano?.nome ?? "Pacote de créditos"}
             </strong>
           </p>
@@ -170,7 +170,7 @@ export function ParceiroSidebar({
           <button
             type="button"
             onClick={onLogout}
-            className="inline-flex h-9 items-center gap-2 rounded-full bg-white/[0.08] px-3.5 text-xs font-semibold text-white/80 transition-colors hover:bg-white/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gema"
+            className="inline-flex h-9 items-center gap-2 rounded-full bg-sidebar-foreground/[0.08] px-3.5 text-xs font-semibold text-sidebar-foreground/80 transition-colors hover:bg-sidebar-foreground/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gema"
           >
             <LogOut className="h-3.5 w-3.5" />
             Sair

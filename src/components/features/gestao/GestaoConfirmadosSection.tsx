@@ -45,7 +45,7 @@ export function GestaoConfirmadosSection({
           <p className="text-xs font-semibold text-muted-foreground">
             Total de Pessoas
           </p>
-          <p className="mt-1 font-display text-3xl font-extrabold text-uva">
+          <p className="mt-1 font-display text-3xl font-extrabold text-primary">
             {vm.totalPessoas}
           </p>
         </div>

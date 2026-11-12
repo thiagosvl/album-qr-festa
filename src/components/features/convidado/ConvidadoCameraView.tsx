@@ -41,7 +41,7 @@ const CLASSES_VIDEO: Record<EnquadramentoCamera, string> = {
 };
 
 const BOTAO_ICONE =
-  "grid h-12 w-12 place-items-center rounded-full bg-black/35 text-white backdrop-blur-sm transition hover:bg-black/50 active:scale-95";
+  "grid h-12 w-12 place-items-center rounded-full bg-scrim/35 text-white backdrop-blur-sm transition hover:bg-scrim/50 active:scale-95";
 
 export function ConvidadoCameraView({
   videoRef,
@@ -78,10 +78,10 @@ export function ConvidadoCameraView({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center overflow-hidden bg-black text-white">
+    <div className="fixed inset-0 z-50 flex items-center justify-center overflow-hidden bg-scrim text-white">
       <div className="relative aspect-[9/16] w-[min(100vw,calc(100dvh*9/16))] overflow-hidden bg-ameixa">
         {!cameraErro ? (
-          <div className="absolute inset-0 flex items-center justify-center overflow-hidden bg-black">
+          <div className="absolute inset-0 flex items-center justify-center overflow-hidden bg-scrim">
             {quadroInteiro && (
               <video
                 ref={videoFundoRef}
@@ -120,12 +120,12 @@ export function ConvidadoCameraView({
         )}
 
         {diagnostico && (
-          <p className="absolute inset-x-0 top-20 z-30 whitespace-pre-line break-words bg-black/70 px-2 py-1 text-center text-[11px] text-white">
+          <p className="absolute inset-x-0 top-20 z-30 whitespace-pre-line break-words bg-scrim/70 px-2 py-1 text-center text-[11px] text-white">
             {diagnostico}
           </p>
         )}
 
-        <div className="absolute inset-x-0 top-0 z-20 flex items-center justify-between bg-gradient-to-b from-black/40 to-transparent px-4 pb-6 pt-[max(0.75rem,env(safe-area-inset-top))]">
+        <div className="absolute inset-x-0 top-0 z-20 flex items-center justify-between bg-gradient-to-b from-scrim/40 to-transparent px-4 pb-6 pt-[max(0.75rem,env(safe-area-inset-top))]">
           <div className="flex items-center gap-2">
             {suportaTorch ? (
               <button
@@ -161,7 +161,7 @@ export function ConvidadoCameraView({
           </button>
         </div>
 
-        <div className="absolute inset-x-0 bottom-0 z-20 space-y-3 bg-gradient-to-t from-black/60 via-black/25 to-transparent px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-10">
+        <div className="absolute inset-x-0 bottom-0 z-20 space-y-3 bg-gradient-to-t from-scrim/60 via-scrim/25 to-transparent px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-10">
           <SeletorMolduras
             molduras={molduras}
             molduraSelecionadaId={molduraSelecionadaId}

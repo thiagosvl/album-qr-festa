@@ -1,4 +1,4 @@
-import { FESTA_CANVAS_CONFIG } from "@/constants";
+import { CORES_ARTE, FESTA_CANVAS_CONFIG } from "@/constants";
 import { limitarEscala } from "@/lib/escalaFoto";
 
 export {
@@ -113,7 +113,7 @@ function desenharFoto(
 }
 
 const LARGURA_FUNDO_DESFOCADO = 24;
-const ESCURECER_FUNDO = "rgba(0, 0, 0, 0.35)";
+const ESCURECER_FUNDO = CORES_ARTE.ESCURECER_FUNDO_FOTO;
 const cacheFundos = new WeakMap<object, HTMLCanvasElement>();
 
 function obterFundoReduzido(
@@ -199,7 +199,7 @@ export function desenharPreviewNoCanvas(
   if (!ctx) return;
   const escala = canvas.width / FESTA_CANVAS_CONFIG.FULL_WIDTH;
   ctx.imageSmoothingQuality = "high";
-  ctx.fillStyle = "#111111";
+  ctx.fillStyle = CORES_ARTE.FUNDO_FOTO;
   ctx.fillRect(0, 0, canvas.width, canvas.height);
   ctx.save();
   ctx.scale(escala, escala);
@@ -245,7 +245,7 @@ export async function renderizarFotoComMoldura(
     throw new Error("Contexto 2D indisponível neste dispositivo");
   }
 
-  ctxFull.fillStyle = "#111111";
+  ctxFull.fillStyle = CORES_ARTE.FUNDO_FOTO;
   ctxFull.fillRect(0, 0, targetW, targetH);
 
   desenharFundoDesfocado(

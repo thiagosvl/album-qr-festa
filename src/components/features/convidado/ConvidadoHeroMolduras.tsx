@@ -71,7 +71,7 @@ export function ConvidadoHeroMolduras({
           className="absolute inset-0"
           style={{
             background:
-              "linear-gradient(to top, #fdfbff 2%, rgba(253,251,255,0) 55%)",
+              "linear-gradient(to top, hsl(var(--papel)) 2%, hsl(var(--papel) / 0) 55%)",
           }}
           aria-hidden="true"
         />

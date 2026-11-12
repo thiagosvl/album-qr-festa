@@ -1,5 +1,5 @@
 import QRCode from "qrcode";
-import { FESTA_CORES_PADRAO } from "@/constants";
+import { CORES_ARTE, FESTA_CORES_PADRAO } from "@/constants";
 
 export interface DadosDisplayQrEvento {
   slug: string;
@@ -64,7 +64,7 @@ export async function baixarPlaquinhaQrCodePng(
   ctx.fillStyle = gradFundo;
   ctx.fillRect(0, 0, largura, altura);
 
-  ctx.fillStyle = "rgba(255, 255, 255, 0.10)";
+  ctx.fillStyle = CORES_ARTE.PLAQUINHA_CIRCULO;
   ctx.beginPath();
   ctx.arc(160, 180, 260, 0, Math.PI * 2);
   ctx.fill();
@@ -78,11 +78,11 @@ export async function baixarPlaquinhaQrCodePng(
   const cardH = altura - cardY * 2;
 
   ctx.save();
-  ctx.shadowColor = "rgba(31, 16, 43, 0.28)";
+  ctx.shadowColor = CORES_ARTE.PLAQUINHA_SOMBRA;
   ctx.shadowBlur = 48;
   ctx.shadowOffsetY = 20;
   desenharRetanguloArredondado(ctx, cardX, cardY, cardW, cardH, 56);
-  ctx.fillStyle = "#FDFBFF";
+  ctx.fillStyle = CORES_ARTE.PLAQUINHA_CARTAO;
   ctx.fill();
   ctx.restore();
 
@@ -94,12 +94,12 @@ export async function baixarPlaquinhaQrCodePng(
   ctx.fillStyle = dados.cor_primaria || FESTA_CORES_PADRAO.PRIMARIA;
   ctx.fill();
 
-  ctx.fillStyle = "#FFFFFF";
+  ctx.fillStyle = CORES_ARTE.PLAQUINHA_TEXTO_SELO;
   ctx.font = "800 24px Inter, sans-serif";
   ctx.textAlign = "center";
   ctx.fillText("ÁLBUM DIGITAL AO VIVO", largura / 2, pillY + 41);
 
-  ctx.fillStyle = "#1E1028";
+  ctx.fillStyle = CORES_ARTE.PLAQUINHA_TITULO;
   ctx.font = "800 68px 'Bricolage Grotesque', Inter, sans-serif";
   const tituloCurto =
     dados.titulo.length > 26
@@ -113,7 +113,7 @@ export async function baixarPlaquinhaQrCodePng(
     ctx.fillText(dados.subtitulo.slice(0, 42), largura / 2, 392);
   }
 
-  ctx.fillStyle = "#5C4D68";
+  ctx.fillStyle = CORES_ARTE.PLAQUINHA_TEXTO_SUAVE;
   ctx.font = "600 30px Inter, sans-serif";
   ctx.fillText(
     "Aponte a câmera do celular para o QR Code abaixo:",
@@ -126,7 +126,7 @@ export async function baixarPlaquinhaQrCodePng(
   const qrBoxY = 520;
 
   desenharRetanguloArredondado(ctx, qrBoxX, qrBoxY, qrBoxSize, qrBoxSize, 44);
-  ctx.fillStyle = "#FFFFFF";
+  ctx.fillStyle = CORES_ARTE.QR_FUNDO;
   ctx.fill();
   ctx.lineWidth = 8;
   ctx.strokeStyle = dados.cor_primaria || FESTA_CORES_PADRAO.PRIMARIA;
@@ -137,8 +137,8 @@ export async function baixarPlaquinhaQrCodePng(
     margin: 1,
     errorCorrectionLevel: "H",
     color: {
-      dark: "#1E1028",
-      light: "#FFFFFF",
+      dark: CORES_ARTE.QR_TINTA,
+      light: CORES_ARTE.QR_FUNDO,
     },
   });
   const qrImg = await carregarImagemDataUrl(qrDataUrl);
@@ -153,16 +153,16 @@ export async function baixarPlaquinhaQrCodePng(
   let passoY = 1235;
   for (const textoPasso of passos) {
     desenharRetanguloArredondado(ctx, 150, passoY - 46, largura - 300, 74, 24);
-    ctx.fillStyle = "#F5EFFA";
+    ctx.fillStyle = CORES_ARTE.PLAQUINHA_PASSO;
     ctx.fill();
 
-    ctx.fillStyle = "#1E1028";
+    ctx.fillStyle = CORES_ARTE.PLAQUINHA_TITULO;
     ctx.font = "700 27px Inter, sans-serif";
     ctx.fillText(textoPasso, largura / 2, passoY);
     passoY += 96;
   }
 
-  ctx.fillStyle = "#7A6A86";
+  ctx.fillStyle = CORES_ARTE.PLAQUINHA_URL;
   ctx.font = "600 24px monospace";
   ctx.fillText(dados.urlPublica, largura / 2, 1620);
 

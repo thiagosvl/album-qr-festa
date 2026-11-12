@@ -85,7 +85,7 @@ export function GestaoAcessoQrSection({ evento }: GestaoAcessoQrSectionProps) {
           <p className="mt-1 text-sm text-muted-foreground">
             Imprima e deixe nas mesas, na entrada e na lembrancinha.
           </p>
-          <div className="mx-auto mt-5 w-fit rounded-3xl bg-white p-3 ring-1 ring-border">
+          <div className="mx-auto mt-5 w-fit rounded-3xl bg-qr p-3 ring-1 ring-border">
             <QrCodeView value={urlPublica} size={200} />
           </div>
           <div
@@ -118,7 +118,7 @@ export function GestaoAcessoQrSection({ evento }: GestaoAcessoQrSectionProps) {
             <button
               type="button"
               disabled={baixandoPlaquinha}
-              className="inline-flex h-10 items-center gap-2 rounded-full bg-rosa-vivo px-4 text-sm font-semibold text-ameixa disabled:pointer-events-none disabled:opacity-50"
+              className="inline-flex h-10 items-center gap-2 rounded-full bg-gema px-4 text-sm font-semibold text-gema-foreground disabled:pointer-events-none disabled:opacity-50"
               onClick={() => {
                 setBaixandoPlaquinha(true);
                 baixarPlaquinhaQrCodePng({

@@ -116,7 +116,7 @@ export function QrCodeLinksDialog({
       <BaseDialog.Body className="space-y-5">
         {evento.inclui_galeria && (
           <div className="flex flex-col items-center justify-center p-5 rounded-2xl bg-muted/40 border border-border/60 gap-3">
-            <div className="p-4 bg-white rounded-2xl shadow-sm border">
+            <div className="p-4 bg-qr rounded-2xl shadow-sm border">
               <QrCodeView value={urlConvidado} size={180} />
             </div>
             <p className="text-xs font-bold text-muted-foreground text-center">

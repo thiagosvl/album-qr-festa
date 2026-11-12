@@ -15,7 +15,6 @@ export * from "./business/useEventoAdminPayload";
 export * from "./business/useGeradorDisplayQr";
 export * from "./business/useEnvioVideoCurto";
 
-export * from "./form/useAdminLoginForm";
 export * from "./form/useBriefingPaiForm";
 export * from "./form/useConfirmacaoRsvpForm";
 export * from "./form/useEventoAdminForm";
@@ -28,7 +27,7 @@ export * from "./form/usePacoteB2cForm";
 export * from "./form/useProdutoB2cForm";
 export * from "./form/usePagamentoManualForm";
 export * from "./form/useParceiroB2bForm";
-export * from "./form/useParceiroLoginForm";
+export * from "./form/useLoginForm";
 export * from "./form/useParceiroMarcaForm";
 export * from "./form/usePlanoB2bForm";
 export * from "./form/useRecuperarSenhaForm";

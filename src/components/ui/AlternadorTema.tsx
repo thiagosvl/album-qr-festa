@@ -28,7 +28,7 @@ export function AlternadorTema({
       aria-label="Tema da interface"
       className={cn(
         "inline-flex items-center gap-0.5 rounded-full p-0.5",
-        naSidebar ? "bg-white/10" : "bg-muted",
+        naSidebar ? "bg-sidebar-foreground/10" : "bg-muted",
         className
       )}
     >
@@ -47,10 +47,10 @@ export function AlternadorTema({
               "grid h-7 w-7 place-items-center rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
               ativo
                 ? naSidebar
-                  ? "bg-gema text-ameixa"
+                  ? "bg-gema text-gema-foreground"
                   : "bg-card text-foreground shadow-sm dark:bg-accent"
                 : naSidebar
-                  ? "text-white/60 hover:text-white"
+                  ? "text-sidebar-foreground/60 hover:text-sidebar-foreground"
                   : "text-muted-foreground hover:text-foreground"
             )}
           >

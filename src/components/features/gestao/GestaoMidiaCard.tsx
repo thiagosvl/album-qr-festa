@@ -33,10 +33,10 @@ export function GestaoMidiaCard({
   const pendente = midia.status_moderacao === FESTA_STATUS_MODERACAO.PENDENTE;
   const situacao = visivel ? "Visível" : pendente ? "Pendente" : "Oculta";
   const corSituacao = visivel
-    ? "bg-white text-ameixa"
+    ? "bg-scrim-foreground text-scrim"
     : pendente
-      ? "bg-gema text-ameixa"
-      : "bg-ameixa text-white";
+      ? "bg-gema text-gema-foreground"
+      : "bg-scrim text-scrim-foreground";
 
   return (
     <article
@@ -44,7 +44,7 @@ export function GestaoMidiaCard({
         selecionada ? "ring-4 ring-primary" : ""
       }`}
     >
-      <div className="relative aspect-[9/16] bg-ameixa">
+      <div className="relative aspect-[9/16] bg-scrim">
         <button
           type="button"
           onClick={() => onVisualizarMidia(midia)}
@@ -72,7 +72,7 @@ export function GestaoMidiaCard({
             />
           )}
           {midia.tipo_midia === FESTA_TIPO_MIDIA.VIDEO && (
-            <span className="absolute bottom-2.5 right-2.5 inline-flex items-center gap-1 rounded-full bg-black/75 px-2 py-0.5 text-[10px] font-bold text-white">
+            <span className="absolute bottom-2.5 right-2.5 inline-flex items-center gap-1 rounded-full bg-scrim/75 px-2 py-0.5 text-[10px] font-bold text-scrim-foreground">
               <Play className="h-2.5 w-2.5 fill-current" />
               Vídeo
             </span>
@@ -128,7 +128,7 @@ export function GestaoMidiaCard({
             disabled={acaoMidia?.id === midia.id}
             onClick={() => onExcluirMidia(midia.id)}
             aria-label="Excluir foto"
-            className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-danger-soft text-danger transition hover:bg-destructive hover:text-white disabled:pointer-events-none disabled:opacity-50"
+            className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-danger-soft text-danger transition hover:bg-destructive hover:text-destructive-foreground disabled:pointer-events-none disabled:opacity-50"
           >
             {acaoMidia?.id === midia.id &&
             acaoMidia?.tipo === FESTA_ACAO_MIDIA.EXCLUIR ? (

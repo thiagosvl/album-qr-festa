@@ -10,13 +10,12 @@ import { Toaster } from "sonner";
 import { FESTA_ROUTES } from "@/constants";
 import { LayoutContextProvider } from "@/contexts/LayoutContext";
 import { AdminEventosPage } from "@/pages/AdminEventosPage";
-import { AdminLoginPage } from "@/pages/AdminLoginPage";
 import { ConvidadoPage } from "@/pages/ConvidadoPage";
 import ConvitePublicoPage from "@/pages/ConvitePublicoPage";
 import { GestaoPaiPage } from "@/pages/GestaoPaiPage";
 import { ImpersonateBridgePage } from "@/pages/ImpersonateBridgePage";
 import { ParceiroB2bPlaceholderPage } from "@/pages/ParceiroB2bPlaceholderPage";
-import { ParceiroLoginPage } from "@/pages/ParceiroLoginPage";
+import { LoginPage } from "@/pages/LoginPage";
 import { TelaoPage } from "@/pages/TelaoPage";
 import { LayoutProvider } from "@/providers/LayoutProvider";
 import { rotaAceitaTema } from "@/lib/tema";
@@ -85,11 +84,11 @@ export function App() {
               />
               <Route
                 path={FESTA_ROUTES.LOGIN}
-                element={<ParceiroLoginPage />}
+                element={<Navigate to={FESTA_ROUTES.PARCEIRO_LOGIN} replace />}
               />
               <Route
-                path={FESTA_ROUTES.ADMIN_LOGIN}
-                element={<AdminLoginPage />}
+                path={FESTA_ROUTES.LEGACY_ADMIN_LOGIN}
+                element={<Navigate to={FESTA_ROUTES.PARCEIRO_LOGIN} replace />}
               />
               <Route
                 path={FESTA_ROUTES.ADMIN_DASHBOARD}
@@ -97,7 +96,7 @@ export function App() {
               />
               <Route
                 path={FESTA_ROUTES.PARCEIRO_LOGIN}
-                element={<ParceiroLoginPage />}
+                element={<LoginPage />}
               />
               <Route
                 path={FESTA_ROUTES.IMPERSONATE_BRIDGE}

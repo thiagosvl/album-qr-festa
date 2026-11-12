@@ -1,3 +1,4 @@
+import { COR_DESTAQUE_MOLDURA_PADRAO } from "@/constants";
 import { Ban } from "lucide-react";
 import type { MolduraDto } from "@/types/festa.types";
 
@@ -34,7 +35,7 @@ export function SeletorMolduras({
   molduraSelecionadaId,
   onSelectMoldura,
   variante = VARIANTE_SELETOR.ESCURO,
-  corDestaque = "#ffffff",
+  corDestaque = COR_DESTAQUE_MOLDURA_PADRAO,
   tamanho = TAMANHO_SELETOR.PADRAO,
 }: SeletorMoldurasProps) {
   const claro = variante === VARIANTE_SELETOR.CLARO;

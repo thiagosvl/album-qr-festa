@@ -63,7 +63,7 @@ export const FESTA_ROUTES = {
   EVENTO_TELAO: "/telao/:codigoUrl/:slug",
   EVENTO_TELAO_CURTO: "/telao/:slug",
   GESTAO_PAI: "/gestao/:token",
-  ADMIN_LOGIN: "/admin/login",
+  LEGACY_ADMIN_LOGIN: "/admin/login",
   ADMIN_DASHBOARD: "/admin",
   PARCEIRO_LOGIN: "/parceiro/login",
   PARCEIRO_PORTAL: "/parceiro",
@@ -93,9 +93,27 @@ export type Tema = (typeof TEMA)[keyof typeof TEMA];
 export const TEMA_CLASSE_ESCURO = "dark" as const;
 
 export const TEMA_COR_BARRA = {
-  CLARO: "#54074B",
+  CLARO: "#54074B", // cor-fixa: meta theme-color precisa de hex
   ESCURO: "#150716",
 } as const;
+
+/** Cores de arquivos gerados em canvas (plaquinha do QR, foto composta). Canvas não lê CSS, então ficam aqui. */
+export const CORES_ARTE = {
+  FUNDO_FOTO: "#111111",
+  ESCURECER_FUNDO_FOTO: "rgba(0, 0, 0, 0.35)",
+  PLAQUINHA_CIRCULO: "rgba(255, 255, 255, 0.10)",
+  PLAQUINHA_SOMBRA: "rgba(31, 16, 43, 0.28)",
+  PLAQUINHA_CARTAO: "#FDFBFF",
+  PLAQUINHA_TEXTO_SELO: "#FFFFFF",
+  PLAQUINHA_TITULO: "#1E1028",
+  PLAQUINHA_TEXTO_SUAVE: "#5C4D68",
+  PLAQUINHA_URL: "#7A6A86",
+  PLAQUINHA_PASSO: "#F5EFFA",
+  QR_TINTA: "#1E1028",
+  QR_FUNDO: "#FFFFFF",
+} as const;
+
+export const COR_DESTAQUE_MOLDURA_PADRAO = "#ffffff" as const;
 
 /** Só admin, parceiro e gestão dos pais aceitam tema escuro. Convidado, convite e telão ficam sempre claros. */
 export const TEMA_ROTAS_PREFIXOS = [

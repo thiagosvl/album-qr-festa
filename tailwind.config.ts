@@ -20,13 +20,29 @@ export default {
         festive: ["Bricolage Grotesque Variable", "Inter", "sans-serif"],
       },
       colors: {
-        ameixa: { DEFAULT: "#240A21", suave: "#664763" },
-        algodao: "#ffe4f0",
-        uva: { DEFAULT: "#54074B", claro: "#EFE6F6" },
-        rosa: { DEFAULT: "#e6007e", vivo: "#ff4f9a" },
-        gema: "#F7AF1F",
-        papel: "#fdfbff",
-        whatsapp: { DEFAULT: "#25d366", escuro: "#1ebe5a" },
+        ameixa: { DEFAULT: "hsl(var(--ameixa))", suave: "hsl(var(--ameixa-suave))" },
+        algodao: "hsl(var(--algodao))",
+        uva: { DEFAULT: "hsl(var(--uva))", claro: "hsl(var(--uva-claro))" },
+        rosa: { DEFAULT: "hsl(var(--rosa))", vivo: "hsl(var(--rosa-vivo))" },
+        gema: {
+          DEFAULT: "hsl(var(--gema))",
+          foreground: "hsl(var(--gema-foreground))",
+        },
+        papel: "hsl(var(--papel))",
+        whatsapp: {
+          DEFAULT: "hsl(var(--whatsapp))",
+          escuro: "hsl(var(--whatsapp-escuro))",
+          foreground: "hsl(var(--whatsapp-foreground))",
+        },
+        "convite-papel": {
+          DEFAULT: "hsl(var(--convite-papel))",
+          claro: "hsl(var(--convite-papel-claro))",
+        },
+        scrim: {
+          DEFAULT: "hsl(var(--scrim))",
+          foreground: "hsl(var(--scrim-foreground))",
+        },
+        qr: "hsl(var(--qr-fundo))",
         bar: "hsl(var(--bar))",
         success: {
           DEFAULT: "hsl(var(--success))",

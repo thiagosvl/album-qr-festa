@@ -34,7 +34,7 @@ interface AdminSidebarProps {
 }
 
 const LINK_ATALHO =
-  "flex items-center rounded-2xl bg-white/[0.05] px-3 py-2 transition-colors hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gema";
+  "flex items-center rounded-2xl bg-sidebar-foreground/[0.05] px-3 py-2 transition-colors hover:bg-sidebar-foreground/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gema";
 
 export function AdminSidebar({
   abaAtiva,
@@ -87,7 +87,7 @@ export function AdminSidebar({
             <h1>
               <LogoFestalgia fundo={LOGO_FUNDO.ESCURO} className="h-9 w-auto" />
             </h1>
-            <p className="text-xs font-medium text-white/50">Painel administrativo</p>
+            <p className="text-xs font-medium text-sidebar-foreground/50">Painel administrativo</p>
           </div>
 
           <div className="flex items-center gap-2 lg:hidden">
@@ -96,7 +96,7 @@ export function AdminSidebar({
               type="button"
               onClick={onLogout}
               aria-label="Sair"
-              className="grid h-9 w-9 place-items-center rounded-full bg-white/10 text-white/80 transition-colors hover:bg-white/15"
+              className="grid h-9 w-9 place-items-center rounded-full bg-sidebar-foreground/10 text-sidebar-foreground/80 transition-colors hover:bg-sidebar-foreground/15"
             >
               <LogOut className="h-4 w-4" />
             </button>
@@ -127,7 +127,7 @@ export function AdminSidebar({
             <Link to={FESTA_ROUTES.DEMO_CONVIDADO} target="_blank" className={LINK_ATALHO}>
               <SidebarAtalho className="w-full">
                 <span>Álbum demo</span>
-                <ExternalLink className="h-3.5 w-3.5 text-white/40" />
+                <ExternalLink className="h-3.5 w-3.5 text-sidebar-foreground/40" />
               </SidebarAtalho>
             </Link>
 
@@ -137,7 +137,7 @@ export function AdminSidebar({
                   <Tv className="h-3.5 w-3.5 text-gema" />
                   Telão demo
                 </span>
-                <ExternalLink className="h-3.5 w-3.5 text-white/40" />
+                <ExternalLink className="h-3.5 w-3.5 text-sidebar-foreground/40" />
               </SidebarAtalho>
             </Link>
 
@@ -152,7 +152,7 @@ export function AdminSidebar({
                     <Crown className="h-3.5 w-3.5 text-gema" />
                     Painel dos pais demo
                   </span>
-                  <ExternalLink className="h-3.5 w-3.5 text-white/40" />
+                  <ExternalLink className="h-3.5 w-3.5 text-sidebar-foreground/40" />
                 </SidebarAtalho>
               </Link>
             )}
@@ -164,7 +164,7 @@ export function AdminSidebar({
           <button
             type="button"
             onClick={onLogout}
-            className="inline-flex h-9 items-center gap-2 rounded-full bg-white/[0.08] px-3.5 text-xs font-semibold text-white/80 transition-colors hover:bg-white/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gema"
+            className="inline-flex h-9 items-center gap-2 rounded-full bg-sidebar-foreground/[0.08] px-3.5 text-xs font-semibold text-sidebar-foreground/80 transition-colors hover:bg-sidebar-foreground/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gema"
           >
             <LogOut className="h-3.5 w-3.5" />
             Sair

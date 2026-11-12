@@ -86,7 +86,7 @@ export function GestaoPaiHeader({
           <div className="min-w-0">
             <div className="flex flex-wrap items-center gap-2 text-sm font-semibold text-muted-foreground">
               Painel dos anfitriões
-              <span className="rounded-full bg-gema px-2.5 py-0.5 text-xs font-bold text-ameixa">
+              <span className="rounded-full bg-gema px-2.5 py-0.5 text-xs font-bold text-gema-foreground">
                 {STATUS_PEDIDO_LABELS[evento.status_pedido]}
               </span>
               <AlternadorTema className="sm:hidden" />
@@ -115,7 +115,7 @@ export function GestaoPaiHeader({
                   onClick={onAlternarBloqueioUploads}
                   className={`${BOTAO} flex-1 sm:flex-initial ${
                     envioPausado
-                      ? "bg-rosa text-white"
+                      ? "bg-destructive text-destructive-foreground"
                       : "bg-card text-foreground ring-1 ring-border hover:ring-foreground/30"
                   }`}
                 >

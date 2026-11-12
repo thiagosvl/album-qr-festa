@@ -91,7 +91,7 @@ export function ConvitePresentesSection({
                 className="rounded-full border px-3.5 py-1.5 text-xs font-semibold text-ameixa shadow-sm"
                 style={{
                   borderColor: `${convite.cor_secundaria}88`,
-                  backgroundColor: "#FDFBF7",
+                  backgroundColor: "hsl(var(--convite-papel))",
                 }}
               >
                 {ideia}

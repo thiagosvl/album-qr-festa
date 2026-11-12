@@ -52,6 +52,30 @@
 
     --bar: 285 100% 99%;
 
+    /* Paleta da marca (única fonte; tailwind.config só referencia estas variáveis) */
+    --ameixa: 307 55% 9%;
+    --ameixa-suave: 307 18% 34%;
+    --algodao: 330 100% 94%;
+    --uva: 307 85% 18%;
+    --uva-claro: 274 47% 93%;
+    --rosa: 328 100% 45%;
+    --rosa-vivo: 333 100% 65%;
+    --gema: 40 93% 55%;
+    --gema-foreground: 307 55% 9%;
+    --papel: 270 100% 99%;
+    --whatsapp: 142 70% 49%;
+    --whatsapp-escuro: 142 73% 43%;
+    --whatsapp-foreground: 0 0% 100%;
+
+    /* Convite (papel creme) */
+    --convite-papel: 40 64% 98%;
+    --convite-papel-claro: 36 100% 99%;
+
+    /* Camadas sobre foto, câmera e visualizador; ladrilho do QR precisa ser claro nos dois temas */
+    --scrim: 307 40% 3%;
+    --scrim-foreground: 0 0% 100%;
+    --qr-fundo: 0 0% 100%;
+
     --success: 152 62% 26%;
     --success-soft: 152 60% 94%;
     --success-border: 152 45% 78%;

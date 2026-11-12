@@ -43,7 +43,7 @@ export function MidiaEventoAdminCard({
       <button
         type="button"
         onClick={() => onVisualizar(midia)}
-        className="aspect-[9/16] bg-ameixa relative block w-full text-left group overflow-hidden"
+        className="aspect-[9/16] bg-scrim relative block w-full text-left group overflow-hidden"
       >
         {midia.tipo_midia === FESTA_TIPO_MIDIA.VIDEO && !midia.url_miniatura ? (
           <video
