@@ -5,7 +5,7 @@ export const API_BASE_URL =
 
 export const SUPABASE_URL =
   import.meta.env.VITE_SUPABASE_URL ||
-  "https://ienvudutknvkqnhafzcs.supabase.co";
+  "https://hcgerxgyqzxmnccwmhhg.supabase.co";
 
 export const SUPABASE_ANON_KEY =
   import.meta.env.VITE_SUPABASE_ANON_KEY || "";
