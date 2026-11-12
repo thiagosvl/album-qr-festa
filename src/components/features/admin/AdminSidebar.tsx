@@ -103,14 +103,14 @@ export function AdminSidebar({
                 onClick={() => onChangeAba(item.id)}
                 className={`w-full text-left px-3.5 py-3 rounded-xl transition-all flex items-center justify-between gap-2 ${
                   ativo
-                    ? "bg-primary text-white shadow-lg shadow-primary/25"
+                    ? "bg-gema text-ameixa shadow-lg shadow-black/20"
                     : "text-white/75 hover:bg-white/8 hover:text-white"
                 }`}
               >
                 <div className="flex items-center gap-3 min-w-0">
                   <Icon
                     className={`w-4 h-4 shrink-0 ${
-                      ativo ? "text-white" : "text-primary"
+                      ativo ? "text-ameixa" : "text-gema"
                     }`}
                   />
                   <div className="min-w-0">
@@ -165,7 +165,7 @@ export function AdminSidebar({
             className="flex items-center justify-between px-3 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-xs font-medium text-white/85 transition-colors"
           >
             <span className="flex items-center gap-1.5">
-              <Tv className="w-3.5 h-3.5 text-primary" />
+              <Tv className="w-3.5 h-3.5 text-gema" />
               <span>Telão Demo (/telao/demo)</span>
             </span>
             <ExternalLink className="w-3.5 h-3.5 text-white/50" />

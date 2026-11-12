@@ -112,7 +112,7 @@ export function ParceiroSidebar({
             onClick={() => onChangeAba(FESTA_PARCEIRO_TABS.EVENTOS)}
             className={`px-3.5 py-2.5 rounded-xl text-left text-xs sm:text-sm font-bold flex items-center gap-2.5 transition-all ${
               abaAtiva === FESTA_PARCEIRO_TABS.EVENTOS
-                ? "bg-primary text-white"
+                ? "bg-gema text-ameixa"
                 : "text-white/75 hover:bg-white/10"
             }`}
           >
@@ -125,7 +125,7 @@ export function ParceiroSidebar({
             onClick={() => onChangeAba(FESTA_PARCEIRO_TABS.CREDITOS)}
             className={`px-3.5 py-2.5 rounded-xl text-left text-xs sm:text-sm font-bold flex items-center gap-2.5 transition-all ${
               abaAtiva === FESTA_PARCEIRO_TABS.CREDITOS
-                ? "bg-primary text-white"
+                ? "bg-gema text-ameixa"
                 : "text-white/75 hover:bg-white/10"
             }`}
           >
@@ -140,7 +140,7 @@ export function ParceiroSidebar({
                 onClick={() => onChangeAba(FESTA_PARCEIRO_TABS.EQUIPE)}
                 className={`px-3.5 py-2.5 rounded-xl text-left text-xs sm:text-sm font-bold flex items-center gap-2.5 transition-all ${
                   abaAtiva === FESTA_PARCEIRO_TABS.EQUIPE
-                    ? "bg-primary text-white"
+                    ? "bg-gema text-ameixa"
                     : "text-white/75 hover:bg-white/10"
                 }`}
               >
@@ -153,7 +153,7 @@ export function ParceiroSidebar({
                 onClick={() => onChangeAba(FESTA_PARCEIRO_TABS.MARCA)}
                 className={`px-3.5 py-2.5 rounded-xl text-left text-xs sm:text-sm font-bold flex items-center gap-2.5 transition-all ${
                   abaAtiva === FESTA_PARCEIRO_TABS.MARCA
-                    ? "bg-primary text-white"
+                    ? "bg-gema text-ameixa"
                     : "text-white/75 hover:bg-white/10"
                 }`}
               >

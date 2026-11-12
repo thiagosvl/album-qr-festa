@@ -5,7 +5,7 @@
 @layer base {
   :root {
     --background: 330 100% 98%;
-    --foreground: 268 50% 12%;
+    --foreground: 307 55% 9%;
 
     --safe-area-top: env(safe-area-inset-top, 0px);
     --safe-area-bottom: env(safe-area-inset-bottom, 0px);
@@ -13,42 +13,42 @@
     --safe-area-right: env(safe-area-inset-right, 0px);
 
     --card: 0 0% 100%;
-    --card-foreground: 268 50% 12%;
+    --card-foreground: 307 55% 9%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 268 50% 12%;
+    --popover-foreground: 307 55% 9%;
 
-    --primary: 262 83% 58%;
-    --primary-hover: 263 70% 42%;
+    --primary: 307 85% 18%;
+    --primary-hover: 307 85% 12%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 262 100% 95%;
-    --secondary-foreground: 263 70% 30%;
+    --secondary: 274 47% 93%;
+    --secondary-foreground: 307 85% 18%;
 
     --muted: 330 60% 95%;
-    --muted-foreground: 266 20% 38%;
+    --muted-foreground: 307 18% 34%;
 
-    --accent: 262 100% 95%;
-    --accent-foreground: 268 50% 12%;
+    --accent: 274 47% 93%;
+    --accent-foreground: 307 55% 9%;
 
     --destructive: 357 100% 45%;
     --destructive-foreground: 0 0% 100%;
 
     --border: 300 30% 90%;
     --input: 300 25% 85%;
-    --ring: 262 83% 58%;
+    --ring: 307 85% 18%;
 
     --radius: 1.125rem;
     --radius-xl: 1.5rem;
 
-    --sidebar-background: 261 40% 8%;
+    --sidebar-background: 307 60% 7%;
     --sidebar-foreground: 0 0% 100%;
-    --sidebar-primary: 262 83% 58%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 261 32% 15%;
+    --sidebar-primary: 40 93% 55%;
+    --sidebar-primary-foreground: 307 55% 9%;
+    --sidebar-accent: 307 40% 13%;
     --sidebar-accent-foreground: 0 0% 100%;
-    --sidebar-border: 261 28% 16%;
-    --sidebar-ring: 262 83% 58%;
+    --sidebar-border: 307 30% 15%;
+    --sidebar-ring: 40 93% 55%;
 
     --cor1: #e6007e;
     --cor2: #7b3fe4;
@@ -70,7 +70,7 @@
 
   * {
     scrollbar-width: thin;
-    scrollbar-color: rgba(123, 63, 228, 0.28) transparent;
+    scrollbar-color: rgba(84, 7, 75, 0.28) transparent;
   }
 
   *::-webkit-scrollbar {
@@ -89,14 +89,14 @@
   }
 
   *::-webkit-scrollbar-thumb {
-    background-color: rgba(123, 63, 228, 0.26);
+    background-color: rgba(84, 7, 75, 0.26);
     border-radius: 9999px;
     border: 2px solid transparent;
     background-clip: padding-box;
   }
 
   *::-webkit-scrollbar-thumb:hover {
-    background-color: rgba(123, 63, 228, 0.48);
+    background-color: rgba(84, 7, 75, 0.48);
   }
 }
 
