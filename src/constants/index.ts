@@ -5,10 +5,11 @@ export const API_BASE_URL =
 
 export const SUPABASE_URL =
   import.meta.env.VITE_SUPABASE_URL ||
-  "https://hcgerxgyqzxmnccwmhhg.supabase.co";
+  "https://nvhncylfoyougmjeswhy.supabase.co";
 
 export const SUPABASE_ANON_KEY =
-  import.meta.env.VITE_SUPABASE_ANON_KEY || "";
+  import.meta.env.VITE_SUPABASE_ANON_KEY ||
+  "sb_publishable_hQvL_3A9XYnQrIBz3-6t9Q_XeLLTEF6";
 
 export const WHATSAPP_COMERCIAL =
   import.meta.env.VITE_WHATSAPP_COMERCIAL || "5511962508068";
