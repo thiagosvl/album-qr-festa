@@ -33,18 +33,18 @@ export function GestaoMidiaCard({
   const pendente = midia.status_moderacao === FESTA_STATUS_MODERACAO.PENDENTE;
   const situacao = visivel ? "Visível" : pendente ? "Pendente" : "Oculta";
   const corSituacao = visivel
-    ? "bg-white text-ameixa"
+    ? "bg-scrim-foreground text-scrim"
     : pendente
-      ? "bg-gema text-ameixa"
-      : "bg-ameixa text-white";
+      ? "bg-gema text-gema-foreground"
+      : "bg-scrim text-scrim-foreground";
 
   return (
     <article
-      className={`flex flex-col overflow-hidden rounded-3xl bg-white shadow-card transition ${
-        selecionada ? "ring-4 ring-uva" : ""
+      className={`flex flex-col overflow-hidden rounded-3xl border border-border/60 bg-card shadow-card transition ${
+        selecionada ? "ring-4 ring-primary" : ""
       }`}
     >
-      <div className="relative aspect-[9/16] bg-ameixa">
+      <div className="relative aspect-[9/16] bg-scrim">
         <button
           type="button"
           onClick={() => onVisualizarMidia(midia)}
@@ -72,7 +72,7 @@ export function GestaoMidiaCard({
             />
           )}
           {midia.tipo_midia === FESTA_TIPO_MIDIA.VIDEO && (
-            <span className="absolute bottom-2.5 right-2.5 inline-flex items-center gap-1 rounded-full bg-black/75 px-2 py-0.5 text-[10px] font-bold text-white">
+            <span className="absolute bottom-2.5 right-2.5 inline-flex items-center gap-1 rounded-full bg-scrim/75 px-2 py-0.5 text-[10px] font-bold text-scrim-foreground">
               <Play className="h-2.5 w-2.5 fill-current" />
               Vídeo
             </span>
@@ -88,16 +88,16 @@ export function GestaoMidiaCard({
           checked={selecionada}
           onChange={() => onToggleSelecao(midia.id)}
           aria-label="Selecionar foto"
-          className="absolute right-2.5 top-2.5 h-5 w-5 cursor-pointer rounded accent-uva"
+          className="absolute right-2.5 top-2.5 h-5 w-5 cursor-pointer rounded accent-primary"
         />
       </div>
 
       <div className="space-y-2.5 p-3">
         <div className="flex items-center justify-between gap-2">
-          <p className="truncate text-[13px] font-semibold text-ameixa">
+          <p className="truncate text-[13px] font-semibold text-foreground">
             {midia.autor || "Convidado"}
           </p>
-          <span className="shrink-0 text-xs text-ameixa-suave tabular-nums">
+          <span className="shrink-0 text-xs text-muted-foreground tabular-nums">
             ♥ {midia.curtidas}
           </span>
         </div>
@@ -109,8 +109,8 @@ export function GestaoMidiaCard({
             onClick={() => onAlternarVisibilidade(midia)}
             className={`${BOTAO} flex-1 ${
               visivel
-                ? "bg-ameixa/[0.06] text-ameixa hover:bg-ameixa/10"
-                : "bg-uva text-white"
+                ? "bg-muted text-foreground hover:bg-accent"
+                : "bg-primary text-primary-foreground"
             }`}
           >
             {acaoMidia?.id === midia.id &&
@@ -128,7 +128,7 @@ export function GestaoMidiaCard({
             disabled={acaoMidia?.id === midia.id}
             onClick={() => onExcluirMidia(midia.id)}
             aria-label="Excluir foto"
-            className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-rosa/10 text-rosa transition hover:bg-rosa hover:text-white disabled:pointer-events-none disabled:opacity-50"
+            className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-danger-soft text-danger transition hover:bg-destructive hover:text-destructive-foreground disabled:pointer-events-none disabled:opacity-50"
           >
             {acaoMidia?.id === midia.id &&
             acaoMidia?.tipo === FESTA_ACAO_MIDIA.EXCLUIR ? (

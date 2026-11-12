@@ -77,12 +77,12 @@ export function AdminTemasSection({
 
                     <div className="flex items-center gap-2 pt-1">
                       <span
-                        className="w-5 h-5 rounded-full border border-black/15"
+                        className="w-5 h-5 rounded-full border border-foreground/15"
                         style={{ backgroundColor: tema.cor_primaria_padrao }}
                         title={`Primária: ${tema.cor_primaria_padrao}`}
                       />
                       <span
-                        className="w-5 h-5 rounded-full border border-black/15"
+                        className="w-5 h-5 rounded-full border border-foreground/15"
                         style={{
                           backgroundColor: tema.cor_secundaria_padrao,
                         }}

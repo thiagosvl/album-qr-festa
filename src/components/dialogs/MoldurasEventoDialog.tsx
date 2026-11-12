@@ -72,7 +72,7 @@ export function MoldurasEventoDialog({
             noValidate
             className="p-4 rounded-2xl border border-border/80 bg-muted/20 space-y-3"
           >
-            <p className="text-sm font-semibold text-ameixa-suave">
+            <p className="text-sm font-semibold text-muted-foreground">
               Adicionar nova moldura transparente
             </p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">

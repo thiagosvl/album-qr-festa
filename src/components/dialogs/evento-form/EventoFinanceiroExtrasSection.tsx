@@ -44,7 +44,7 @@ export function EventoFinanceiroExtrasSection({
 
   return (
     <div className="space-y-4 pt-3 border-t border-border/60">
-      <p className="text-sm font-semibold text-ameixa-suave">
+      <p className="text-sm font-semibold text-muted-foreground">
         Negociação financeira (pacote e desconto do pedido)
       </p>
 
@@ -107,7 +107,7 @@ export function EventoFinanceiroExtrasSection({
 
       <div className="space-y-2.5">
         <div className="flex flex-wrap items-center justify-between gap-2">
-          <p className="text-sm font-semibold text-ameixa-suave">
+          <p className="text-sm font-semibold text-muted-foreground">
             Extras avulsos e permissões técnicas
           </p>
           <div className="flex flex-wrap gap-1.5">

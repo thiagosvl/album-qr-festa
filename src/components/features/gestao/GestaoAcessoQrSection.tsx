@@ -34,28 +34,28 @@ export function GestaoAcessoQrSection({ evento }: GestaoAcessoQrSectionProps) {
   return (
     <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
       {evento.inclui_convite && (
-        <section className="flex flex-col justify-between rounded-card bg-white p-6 shadow-card sm:p-8">
+        <section className="flex flex-col justify-between rounded-card border border-border/60 bg-card p-6 shadow-card sm:p-8">
           <div>
-            <div className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-uva-claro text-uva">
+            <div className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-secondary text-secondary-foreground">
               <MailOpen className="h-6 w-6" />
             </div>
             <h2 className="mt-4 font-display text-2xl font-extrabold tracking-tight">
               Link do Convite Interativo
             </h2>
-            <p className="mt-1 text-sm text-ameixa-suave">
+            <p className="mt-1 text-sm text-muted-foreground">
               Envie este link para os seus convidados no WhatsApp para verem os
               detalhes da festa e confirmarem presença.
             </p>
           </div>
 
           <div className="mt-6 space-y-3">
-            <p className="break-all rounded-2xl bg-ameixa/[0.04] p-3 text-xs text-ameixa-suave">
+            <p className="break-all rounded-2xl bg-muted p-3 text-xs text-muted-foreground">
               {urlConvite}
             </p>
             <div className="flex flex-wrap gap-2">
               <button
                 type="button"
-                className="inline-flex h-10 items-center gap-2 rounded-full bg-uva-claro px-4 text-sm font-semibold text-uva transition hover:bg-uva hover:text-white"
+                className="inline-flex h-10 items-center gap-2 rounded-full bg-secondary px-4 text-sm font-semibold text-secondary-foreground transition hover:bg-primary hover:text-primary-foreground"
                 onClick={() => {
                   navigator.clipboard.writeText(urlConvite);
                   toast.success("Link do convite copiado!");
@@ -67,7 +67,7 @@ export function GestaoAcessoQrSection({ evento }: GestaoAcessoQrSectionProps) {
               <Link
                 to={gerarPathConviteEvento(evento.slug, evento.codigo_url)}
                 target="_blank"
-                className="inline-flex h-10 items-center gap-2 rounded-full bg-ameixa px-4 text-sm font-semibold text-white"
+                className="inline-flex h-10 items-center gap-2 rounded-full bg-primary px-4 text-sm font-semibold text-primary-foreground hover:bg-primary-hover"
               >
                 <ExternalLink className="h-4 w-4" />
                 Abrir convite
@@ -78,27 +78,27 @@ export function GestaoAcessoQrSection({ evento }: GestaoAcessoQrSectionProps) {
       )}
 
       {evento.inclui_galeria && (
-        <section className="relative overflow-hidden rounded-card bg-white p-6 text-center shadow-card sm:p-8">
+        <section className="relative overflow-hidden rounded-card border border-border/60 bg-card p-6 text-center shadow-card sm:p-8">
           <h2 className="font-display text-2xl font-extrabold tracking-tight">
             QR Code da festa
           </h2>
-          <p className="mt-1 text-sm text-ameixa-suave">
+          <p className="mt-1 text-sm text-muted-foreground">
             Imprima e deixe nas mesas, na entrada e na lembrancinha.
           </p>
-          <div className="mx-auto mt-5 w-fit rounded-3xl bg-white p-3 ring-1 ring-ameixa/10">
+          <div className="mx-auto mt-5 w-fit rounded-3xl bg-qr p-3 ring-1 ring-border">
             <QrCodeView value={urlPublica} size={200} />
           </div>
           <div
-            className="picotado mx-auto mt-6 text-ameixa/25"
+            className="picotado mx-auto mt-6 text-foreground/25"
             aria-hidden="true"
           />
-          <p className="mt-4 break-all text-xs text-ameixa-suave">
+          <p className="mt-4 break-all text-xs text-muted-foreground">
             {urlPublica}
           </p>
           <div className="mt-4 flex flex-wrap justify-center gap-2">
             <button
               type="button"
-              className="inline-flex h-10 items-center gap-2 rounded-full bg-uva-claro px-4 text-sm font-semibold text-uva transition hover:bg-uva hover:text-white"
+              className="inline-flex h-10 items-center gap-2 rounded-full bg-secondary px-4 text-sm font-semibold text-secondary-foreground transition hover:bg-primary hover:text-primary-foreground"
               onClick={() => {
                 navigator.clipboard.writeText(urlPublica);
                 toast.success("Link do álbum copiado");
@@ -110,7 +110,7 @@ export function GestaoAcessoQrSection({ evento }: GestaoAcessoQrSectionProps) {
             <Link
               to={gerarPathPublicoEvento(evento.slug, evento.codigo_url)}
               target="_blank"
-              className="inline-flex h-10 items-center gap-2 rounded-full bg-ameixa px-4 text-sm font-semibold text-white"
+              className="inline-flex h-10 items-center gap-2 rounded-full bg-primary px-4 text-sm font-semibold text-primary-foreground hover:bg-primary-hover"
             >
               <ExternalLink className="h-4 w-4" />
               Testar o álbum
@@ -118,7 +118,7 @@ export function GestaoAcessoQrSection({ evento }: GestaoAcessoQrSectionProps) {
             <button
               type="button"
               disabled={baixandoPlaquinha}
-              className="inline-flex h-10 items-center gap-2 rounded-full bg-rosa-vivo px-4 text-sm font-semibold text-ameixa disabled:pointer-events-none disabled:opacity-50"
+              className="inline-flex h-10 items-center gap-2 rounded-full bg-gema px-4 text-sm font-semibold text-gema-foreground disabled:pointer-events-none disabled:opacity-50"
               onClick={() => {
                 setBaixandoPlaquinha(true);
                 baixarPlaquinhaQrCodePng({
@@ -152,7 +152,7 @@ export function GestaoAcessoQrSection({ evento }: GestaoAcessoQrSectionProps) {
                 href={evento.qr_code_pdf_url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex h-10 items-center gap-2 rounded-full bg-uva-claro px-4 text-sm font-semibold text-uva"
+                className="inline-flex h-10 items-center gap-2 rounded-full bg-secondary px-4 text-sm font-semibold text-secondary-foreground"
               >
                 <Download className="h-4 w-4" />
                 Baixar plaquinha pronta
@@ -163,15 +163,15 @@ export function GestaoAcessoQrSection({ evento }: GestaoAcessoQrSectionProps) {
       )}
 
       {evento.inclui_galeria && (
-        <section className="flex flex-col justify-between rounded-card bg-white p-6 shadow-card sm:p-8">
+        <section className="flex flex-col justify-between rounded-card border border-border/60 bg-card p-6 shadow-card sm:p-8">
           <div>
-            <div className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-uva-claro text-uva">
+            <div className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-secondary text-secondary-foreground">
               <Tv className="h-6 w-6" />
             </div>
             <h2 className="mt-4 font-display text-2xl font-extrabold tracking-tight">
               Telão da festa
             </h2>
-            <p className="mt-1 text-sm text-ameixa-suave">
+            <p className="mt-1 text-sm text-muted-foreground">
               {evento.inclui_telao
                 ? "Abra na Smart TV ou no notebook ligado ao projetor. As fotos entram na hora."
                 : "O telão faz parte do Kit Completo e pode ser adicionado avulso quando quiser."}
@@ -179,14 +179,14 @@ export function GestaoAcessoQrSection({ evento }: GestaoAcessoQrSectionProps) {
           </div>
 
           <div className="mt-6 space-y-3">
-            <p className="break-all rounded-2xl bg-ameixa/[0.04] p-3 text-xs text-ameixa-suave">
+            <p className="break-all rounded-2xl bg-muted p-3 text-xs text-muted-foreground">
               {urlTelao}
             </p>
             {evento.inclui_telao && (
               <div className="flex flex-wrap gap-2">
                 <button
                   type="button"
-                  className="inline-flex h-10 items-center gap-2 rounded-full bg-uva-claro px-4 text-sm font-semibold text-uva transition hover:bg-uva hover:text-white"
+                  className="inline-flex h-10 items-center gap-2 rounded-full bg-secondary px-4 text-sm font-semibold text-secondary-foreground transition hover:bg-primary hover:text-primary-foreground"
                   onClick={() => {
                     navigator.clipboard.writeText(urlTelao);
                     toast.success("Link do telão copiado");
@@ -198,7 +198,7 @@ export function GestaoAcessoQrSection({ evento }: GestaoAcessoQrSectionProps) {
                 <Link
                   to={gerarPathTelaoEvento(evento.slug, evento.codigo_url)}
                   target="_blank"
-                  className="inline-flex h-10 items-center gap-2 rounded-full bg-ameixa px-4 text-sm font-semibold text-white"
+                  className="inline-flex h-10 items-center gap-2 rounded-full bg-primary px-4 text-sm font-semibold text-primary-foreground hover:bg-primary-hover"
                 >
                   <Tv className="h-4 w-4" />
                   Abrir o telão

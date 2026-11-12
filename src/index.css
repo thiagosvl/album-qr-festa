@@ -50,8 +50,116 @@
     --sidebar-border: 307 30% 15%;
     --sidebar-ring: 40 93% 55%;
 
+    --bar: 285 100% 99%;
+
+    /* Paleta da marca (única fonte; tailwind.config só referencia estas variáveis) */
+    --ameixa: 307 55% 9%;
+    --ameixa-suave: 307 18% 34%;
+    --algodao: 330 100% 94%;
+    --uva: 307 85% 18%;
+    --uva-claro: 274 47% 93%;
+    --rosa: 328 100% 45%;
+    --rosa-vivo: 333 100% 65%;
+    --gema: 40 93% 55%;
+    --gema-foreground: 307 55% 9%;
+    --papel: 270 100% 99%;
+    --whatsapp: 142 70% 49%;
+    --whatsapp-escuro: 142 73% 43%;
+    --whatsapp-foreground: 0 0% 100%;
+
+    /* Convite (papel creme) */
+    --convite-papel: 40 64% 98%;
+    --convite-papel-claro: 36 100% 99%;
+
+    /* Camadas sobre foto, câmera e visualizador; ladrilho do QR precisa ser claro nos dois temas */
+    --scrim: 307 40% 3%;
+    --scrim-foreground: 0 0% 100%;
+    --qr-fundo: 0 0% 100%;
+
+    --success: 152 62% 26%;
+    --success-soft: 152 60% 94%;
+    --success-border: 152 45% 78%;
+    --warning: 30 90% 28%;
+    --warning-soft: 43 100% 92%;
+    --warning-border: 40 80% 72%;
+    --info: 205 85% 30%;
+    --info-soft: 205 90% 94%;
+    --info-border: 205 60% 80%;
+    --danger: 352 80% 38%;
+    --danger-soft: 352 100% 96%;
+    --danger-border: 352 70% 85%;
+
+    --sombra-cor: 307 55% 9%;
+    --sombra-card: 0 12px 30px -14px hsl(var(--sombra-cor) / 0.22);
+    --sombra-suave: 0 12px 30px -12px hsl(var(--sombra-cor) / 0.25);
+    --sombra-modal: 0 30px 70px -24px hsl(var(--sombra-cor) / 0.45);
+    --sombra-palco: 0 40px 80px -30px hsl(var(--sombra-cor) / 0.45);
+
+    --scroll-thumb: rgba(84, 7, 75, 0.26);
+    --scroll-thumb-hover: rgba(84, 7, 75, 0.48);
+
     --cor1: #54074B;
     --cor2: #F7AF1F;
+  }
+
+  /* Tema escuro: só admin, parceiro e gestão dos pais (ver TEMA_ROTAS_PREFIXOS).
+     No escuro o Uva some, então a ação primária vira Gema, como no DESIGN.md. */
+  .dark {
+    --background: 307 45% 6%;
+    --foreground: 320 30% 94%;
+
+    --card: 307 32% 10%;
+    --card-foreground: 320 30% 94%;
+
+    --popover: 307 32% 11%;
+    --popover-foreground: 320 30% 94%;
+
+    --primary: 40 93% 55%;
+    --primary-hover: 40 93% 63%;
+    --primary-foreground: 307 55% 9%;
+
+    --secondary: 307 26% 17%;
+    --secondary-foreground: 320 35% 90%;
+
+    --muted: 307 26% 14%;
+    --muted-foreground: 310 14% 70%;
+
+    --accent: 307 26% 18%;
+    --accent-foreground: 320 30% 94%;
+
+    --destructive: 354 85% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 307 20% 19%;
+    --input: 307 18% 26%;
+    --ring: 40 93% 55%;
+
+    --bar: 307 40% 8%;
+
+    --sidebar-background: 307 55% 4%;
+    --sidebar-border: 307 28% 12%;
+
+    --success: 152 55% 62%;
+    --success-soft: 152 40% 13%;
+    --success-border: 152 32% 25%;
+    --warning: 43 95% 66%;
+    --warning-soft: 40 50% 13%;
+    --warning-border: 40 42% 27%;
+    --info: 200 85% 72%;
+    --info-soft: 205 45% 14%;
+    --info-border: 205 38% 27%;
+    --danger: 352 90% 73%;
+    --danger-soft: 352 45% 15%;
+    --danger-border: 352 38% 29%;
+
+    --sombra-cor: 307 70% 2%;
+    --sombra-card: 0 14px 32px -16px hsl(var(--sombra-cor) / 0.8);
+    --sombra-suave: 0 14px 32px -14px hsl(var(--sombra-cor) / 0.85);
+    --sombra-modal: 0 34px 80px -26px hsl(var(--sombra-cor) / 0.95);
+    --sombra-palco: 0 40px 80px -30px hsl(var(--sombra-cor) / 0.95);
+
+    --scroll-thumb: rgba(255, 255, 255, 0.2);
+    --scroll-thumb-hover: rgba(255, 255, 255, 0.36);
   }
 
   * {
@@ -70,7 +178,7 @@
 
   * {
     scrollbar-width: thin;
-    scrollbar-color: rgba(84, 7, 75, 0.28) transparent;
+    scrollbar-color: var(--scroll-thumb) transparent;
   }
 
   *::-webkit-scrollbar {
@@ -89,14 +197,14 @@
   }
 
   *::-webkit-scrollbar-thumb {
-    background-color: rgba(84, 7, 75, 0.26);
+    background-color: var(--scroll-thumb);
     border-radius: 9999px;
     border: 2px solid transparent;
     background-clip: padding-box;
   }
 
   *::-webkit-scrollbar-thumb:hover {
-    background-color: rgba(84, 7, 75, 0.48);
+    background-color: var(--scroll-thumb-hover);
   }
 }
 
@@ -128,7 +236,7 @@
   }
 
   .glass-surface {
-    @apply bg-white/85 backdrop-blur-md;
+    @apply bg-bar/85 backdrop-blur-md;
   }
 
   .no-scrollbar::-webkit-scrollbar {
@@ -152,6 +260,6 @@
   }
 
   .legenda-foto {
-    @apply flex items-center justify-between gap-2 bg-white px-3 py-2.5;
+    @apply flex items-center justify-between gap-2 bg-white px-3 py-2.5 text-ameixa;
   }
 }

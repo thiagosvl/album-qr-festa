@@ -4,6 +4,26 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <meta name="theme-color" content="#54074B" />
+    <script>
+      (function () {
+        try {
+          var rotas = ["/admin", "/parceiro", "/gestao", "/login", "/impersonate-bridge"];
+          var caminho = location.pathname;
+          var interna = rotas.some(function (r) {
+            return caminho === r || caminho.indexOf(r + "/") === 0;
+          });
+          if (!interna) return;
+          var salvo = localStorage.getItem("@festalgia:tema");
+          var escuro =
+            salvo === "ESCURO" ||
+            (salvo !== "CLARO" && matchMedia("(prefers-color-scheme: dark)").matches);
+          if (escuro) {
+            document.documentElement.classList.add("dark");
+            document.documentElement.style.colorScheme = "dark";
+          }
+        } catch (e) {}
+      })();
+    </script>
     <title>Festalgia · Fotos Ao Vivo</title>
     <link rel="icon" href="/favicon.ico" sizes="48x48" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />

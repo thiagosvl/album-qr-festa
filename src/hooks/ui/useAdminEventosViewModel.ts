@@ -50,7 +50,7 @@ export function useAdminEventosViewModel() {
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
       if (!data.session) {
-        navigate(FESTA_ROUTES.ADMIN_LOGIN, { replace: true });
+        navigate(FESTA_ROUTES.PARCEIRO_LOGIN, { replace: true });
       } else {
         setAutenticado(true);
       }
@@ -61,7 +61,7 @@ export function useAdminEventosViewModel() {
       (_event, session) => {
         if (!session) {
           setAutenticado(false);
-          navigate(FESTA_ROUTES.ADMIN_LOGIN, { replace: true });
+          navigate(FESTA_ROUTES.PARCEIRO_LOGIN, { replace: true });
         } else {
           setAutenticado(true);
         }
@@ -93,7 +93,7 @@ export function useAdminEventosViewModel() {
           return;
         }
         supabase.auth.signOut().finally(() => {
-          navigate(FESTA_ROUTES.ADMIN_LOGIN, { replace: true });
+          navigate(FESTA_ROUTES.PARCEIRO_LOGIN, { replace: true });
         });
       })
       .catch(() => {
@@ -103,7 +103,7 @@ export function useAdminEventosViewModel() {
             : "Sessão expirada ou acesso restrito a administradores."
         );
         supabase.auth.signOut().finally(() => {
-          navigate(FESTA_ROUTES.ADMIN_LOGIN, { replace: true });
+          navigate(FESTA_ROUTES.PARCEIRO_LOGIN, { replace: true });
         });
       });
   }, [eventosQuery.isError, eventosQuery.error, navigate]);
@@ -270,7 +270,7 @@ export function useAdminEventosViewModel() {
 
   const fazerLogout = async () => {
     await supabase.auth.signOut();
-    navigate(FESTA_ROUTES.ADMIN_LOGIN, { replace: true });
+    navigate(FESTA_ROUTES.PARCEIRO_LOGIN, { replace: true });
   };
 
   return {

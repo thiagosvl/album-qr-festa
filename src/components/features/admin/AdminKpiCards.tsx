@@ -21,32 +21,32 @@ interface AdminKpiCardsProps {
 export function AdminKpiCards({ kpis }: AdminKpiCardsProps) {
   const items = [
     {
-      titulo: "Faturamento Contratado",
+      titulo: "Faturamento contratado",
       valor: formatarMoedaCentavos(kpis.faturamentoTotalCentavos),
-      sub: `${kpis.totalEventos} evento(s) comercial(is)`,
+      sub: `${kpis.totalEventos} pedido(s) fechado(s)`,
       icon: DollarSign,
       color: "text-primary bg-primary/15",
     },
     {
-      titulo: "Total Recebido (Pix)",
+      titulo: "Recebido por Pix",
       valor: formatarMoedaCentavos(kpis.recebidoTotalCentavos),
-      sub: `${kpis.quitadosCount} pedido(s) 100% quitado(s)`,
+      sub: `${kpis.quitadosCount} pedido(s) quitado(s)`,
       icon: CheckCircle2,
-      color: "text-emerald-600 bg-emerald-50",
+      color: "text-success bg-success-soft",
     },
     {
-      titulo: "Saldo a Receber (Quitação)",
+      titulo: "Saldo a receber",
       valor: formatarMoedaCentavos(kpis.aReceberCentavos),
-      sub: "50% restantes antes da festa",
+      sub: "Os 50% finais, antes da festa",
       icon: Clock,
-      color: "text-amber-600 bg-amber-50",
+      color: "text-warning bg-warning-soft",
     },
     {
-      titulo: "Em Produção / Prontos",
+      titulo: "Festas em andamento",
       valor: String(kpis.emProducaoOuAtivos),
-      sub: "Festas ativas no pipeline",
+      sub: "Em produção ou prontas",
       icon: CalendarCheck2,
-      color: "text-sky-600 bg-sky-50",
+      color: "text-info bg-info-soft",
     },
   ];
 
@@ -58,15 +58,15 @@ export function AdminKpiCards({ kpis }: AdminKpiCardsProps) {
           <Card key={item.titulo}>
             <CardContent className="p-3.5 sm:p-5 flex flex-col sm:flex-row sm:items-center gap-2.5 sm:gap-4">
               <div
-                className={`w-10 h-10 sm:w-12 sm:h-12 rounded-2xl flex items-center justify-center shrink-0 ${item.color}`}
+                className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl sm:h-12 sm:w-12 ${item.color}`}
               >
                 <Icon className="w-5 h-5 sm:w-6 sm:h-6" />
               </div>
               <div className="min-w-0">
-                <p className="text-xs font-bold text-muted-foreground truncate">
+                <p className="truncate text-xs font-semibold text-muted-foreground">
                   {item.titulo}
                 </p>
-                <p className="font-display text-lg sm:text-xl font-bold text-foreground mt-0.5 tabular-nums truncate">
+                <p className="mt-0.5 truncate font-display text-xl font-extrabold tabular-nums tracking-tight text-foreground sm:text-2xl">
                   {item.valor}
                 </p>
                 <p className="text-[11px] text-muted-foreground mt-0.5 truncate">

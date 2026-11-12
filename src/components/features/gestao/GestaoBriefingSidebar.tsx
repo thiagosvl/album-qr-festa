@@ -94,7 +94,7 @@ export function GestaoBriefingSidebar({
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-muted-foreground">Valor pago</span>
-                <span className="font-bold text-emerald-700">
+                <span className="font-bold text-success">
                   {formatarMoedaCentavos(evento.valor_pago_centavos)}
                 </span>
               </div>

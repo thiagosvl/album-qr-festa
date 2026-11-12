@@ -104,7 +104,7 @@ export function ConvidadoRevisaoView({
         <div className="flex min-h-0 flex-1 items-center justify-center px-4 py-1">
           <div
             ref={vm.palcoRef}
-            className="relative aspect-[9/16] h-full max-h-full w-auto max-w-full cursor-grab touch-none select-none overflow-hidden rounded-[28px] bg-black shadow-palco ring-2 ring-white/70 active:cursor-grabbing"
+            className="relative aspect-[9/16] h-full max-h-full w-auto max-w-full cursor-grab touch-none select-none overflow-hidden rounded-[28px] bg-scrim shadow-palco ring-2 ring-white/70 active:cursor-grabbing"
             onPointerDown={vm.handlePointerDown}
             onPointerMove={vm.handlePointerMove}
             onPointerUp={vm.handlePointerRelease}
@@ -161,12 +161,12 @@ export function ConvidadoRevisaoView({
             type="button"
             disabled={enviando}
             onClick={onConfirmarEnvio}
-            style={{ backgroundColor: "var(--cor1, #54074B)" }}
+            style={{ backgroundColor: "var(--cor1)" }}
             className="relative flex h-12 w-full items-center justify-center gap-2 overflow-hidden rounded-full font-display text-base font-extrabold text-white transition active:scale-[0.98] disabled:pointer-events-none"
           >
             {enviando && (
               <span
-                className="absolute inset-y-0 left-0 bg-black/25 transition-all duration-200"
+                className="absolute inset-y-0 left-0 bg-scrim/25 transition-all duration-200"
                 style={{ width: `${progressoUpload}%` }}
                 aria-hidden="true"
               />

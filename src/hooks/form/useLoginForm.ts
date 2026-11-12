@@ -15,14 +15,28 @@ import { supabase } from "@/integrations/supabase/client";
 import { apiRequest } from "@/lib/api";
 import type { SessaoUsuarioAutenticadoDto } from "@/types/festa.types";
 
-const adminLoginSchema = z.object({
+const loginSchema = z.object({
   email: z.string().email("Informe um e-mail válido"),
   password: z.string().min(6, "A senha deve ter no mínimo 6 caracteres"),
 });
 
-export type AdminLoginFormValues = z.infer<typeof adminLoginSchema>;
+export type LoginFormValues = z.infer<typeof loginSchema>;
 
-export function useAdminLoginForm() {
+const MENSAGEM_SEM_ACESSO = "Esta conta não tem acesso ao painel.";
+
+function destinoDoPerfil(tipo: string): string | null {
+  if (tipo === FESTA_TIPO_PERFIL.ADMIN) return FESTA_ROUTES.ADMIN_DASHBOARD;
+  if (
+    tipo === FESTA_TIPO_PERFIL.PARCEIRO_ADMIN ||
+    tipo === FESTA_TIPO_PERFIL.PARCEIRO_OPERADOR
+  ) {
+    return FESTA_ROUTES.PARCEIRO_PORTAL;
+  }
+  return null;
+}
+
+/** Login único: parceiros e equipe Festalgia entram pela mesma tela e o perfil define o destino. */
+export function useLoginForm() {
   const navigate = useNavigate();
   const { openDialog } = useLayout();
 
@@ -33,18 +47,15 @@ export function useAdminLoginForm() {
         requireAuth: true,
       })
         .then((me) => {
-          const destino =
-            me.tipo_perfil === FESTA_TIPO_PERFIL.ADMIN
-              ? FESTA_ROUTES.ADMIN_DASHBOARD
-              : FESTA_ROUTES.PARCEIRO_PORTAL;
-          navigate(destino, { replace: true });
+          const destino = destinoDoPerfil(me.tipo_perfil);
+          if (destino) navigate(destino, { replace: true });
         })
         .catch(() => undefined);
     });
   }, [navigate]);
 
-  const form = useForm<AdminLoginFormValues>({
-    resolver: zodResolver(adminLoginSchema),
+  const form = useForm<LoginFormValues>({
+    resolver: zodResolver(loginSchema),
     defaultValues: {
       email: "",
       password: "",
@@ -56,6 +67,7 @@ export function useAdminLoginForm() {
       email: values.email.trim().toLowerCase(),
       password: values.password,
     });
+
     if (error) {
       toast.error("Credenciais inválidas. Verifique seu e-mail e senha.");
       return;
@@ -66,29 +78,21 @@ export function useAdminLoginForm() {
         requireAuth: true,
       });
 
-      if (me.tipo_perfil === FESTA_TIPO_PERFIL.ADMIN) {
-        toast.success(`Bem-vindo ao Backoffice, ${me.nome}!`);
-        navigate(FESTA_ROUTES.ADMIN_DASHBOARD, { replace: true });
-        return;
-      }
-
-      if (
-        me.tipo_perfil === FESTA_TIPO_PERFIL.PARCEIRO_ADMIN ||
-        me.tipo_perfil === FESTA_TIPO_PERFIL.PARCEIRO_OPERADOR
-      ) {
-        toast.success(`Bem-vindo ao Portal do Parceiro, ${me.nome}!`);
-        navigate(FESTA_ROUTES.PARCEIRO_PORTAL, { replace: true });
+      const destino = destinoDoPerfil(me.tipo_perfil);
+      if (destino) {
+        toast.success(`Bem-vindo, ${me.nome}!`);
+        navigate(destino, { replace: true });
         return;
       }
 
       await supabase.auth.signOut();
-      toast.error("Esta conta não possui acesso administrativo.");
+      toast.error(MENSAGEM_SEM_ACESSO);
     } catch (err) {
       await supabase.auth.signOut();
       toast.error(
         err instanceof Error
           ? err.message
-          : "Esta conta não possui permissão de acesso."
+          : MENSAGEM_SEM_ACESSO
       );
     }
   }, notificarErrosFormulario);
@@ -96,7 +100,7 @@ export function useAdminLoginForm() {
   const handleAbrirRecuperacaoSenha = () => {
     openDialog(FESTA_DIALOG_NAMES.RECUPERAR_SENHA, {
       identificadorInicial: form.getValues("email").trim(),
-      destinoRedirect: FESTA_ROUTES.ADMIN_DASHBOARD,
+      destinoRedirect: FESTA_ROUTES.PARCEIRO_LOGIN,
     });
   };
 

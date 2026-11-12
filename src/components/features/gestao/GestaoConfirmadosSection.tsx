@@ -41,31 +41,31 @@ export function GestaoConfirmadosSection({
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        <div className="p-4 rounded-2xl border border-ameixa/10 bg-white shadow-sm">
-          <p className="text-xs font-semibold text-ameixa-suave">
+        <div className="p-4 rounded-2xl border border-border bg-card shadow-sm">
+          <p className="text-xs font-semibold text-muted-foreground">
             Total de Pessoas
           </p>
-          <p className="mt-1 font-display text-3xl font-extrabold text-uva">
+          <p className="mt-1 font-display text-3xl font-extrabold text-primary">
             {vm.totalPessoas}
           </p>
         </div>
-        <div className="p-4 rounded-2xl border border-ameixa/10 bg-white shadow-sm">
-          <p className="text-xs font-semibold text-ameixa-suave">Adultos</p>
-          <p className="mt-1 font-display text-3xl font-extrabold text-ameixa">
+        <div className="p-4 rounded-2xl border border-border bg-card shadow-sm">
+          <p className="text-xs font-semibold text-muted-foreground">Adultos</p>
+          <p className="mt-1 font-display text-3xl font-extrabold text-foreground">
             {vm.totalAdultos}
           </p>
         </div>
-        <div className="p-4 rounded-2xl border border-ameixa/10 bg-white shadow-sm">
-          <p className="text-xs font-semibold text-ameixa-suave">Crianças</p>
-          <p className="mt-1 font-display text-3xl font-extrabold text-ameixa">
+        <div className="p-4 rounded-2xl border border-border bg-card shadow-sm">
+          <p className="text-xs font-semibold text-muted-foreground">Crianças</p>
+          <p className="mt-1 font-display text-3xl font-extrabold text-foreground">
             {vm.totalCriancas}
           </p>
         </div>
-        <div className="p-4 rounded-2xl border border-ameixa/10 bg-white shadow-sm">
-          <p className="text-xs font-semibold text-ameixa-suave">
+        <div className="p-4 rounded-2xl border border-border bg-card shadow-sm">
+          <p className="text-xs font-semibold text-muted-foreground">
             Famílias / Grupos
           </p>
-          <p className="mt-1 font-display text-3xl font-extrabold text-ameixa">
+          <p className="mt-1 font-display text-3xl font-extrabold text-foreground">
             {vm.totalGrupos}
           </p>
         </div>

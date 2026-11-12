@@ -57,7 +57,7 @@ export function ConviteRsvpSection({
             className="rounded-2xl border p-5"
             style={{
               borderColor: `${convite.cor_primaria}33`,
-              backgroundColor: "#FDFBF7",
+              backgroundColor: "hsl(var(--convite-papel))",
             }}
           >
             <CheckCircle2

@@ -99,7 +99,7 @@ export function EventoPersonalizacaoFields({
         <label className="flex items-center gap-2 text-xs font-medium cursor-pointer pt-4">
           <input
             type="checkbox"
-            className="rounded border-input accent-uva"
+            className="rounded border-input accent-primary"
             {...form.register("galeria_publica")}
           />
           <span>Galeria Pública</span>
@@ -107,7 +107,7 @@ export function EventoPersonalizacaoFields({
         <label className="flex items-center gap-2 text-xs font-medium cursor-pointer pt-4">
           <input
             type="checkbox"
-            className="rounded border-input accent-uva"
+            className="rounded border-input accent-primary"
             {...form.register("moderacao_previa")}
           />
           <span>Moderação Prévia</span>
@@ -115,7 +115,7 @@ export function EventoPersonalizacaoFields({
         <label className="flex items-center gap-2 text-xs font-medium cursor-pointer pt-4">
           <input
             type="checkbox"
-            className="rounded border-input accent-uva"
+            className="rounded border-input accent-primary"
             {...form.register("permite_envio_midias")}
           />
           <span>Uploads Abertos</span>
@@ -123,7 +123,7 @@ export function EventoPersonalizacaoFields({
         <label className="flex items-center gap-2 text-xs font-medium cursor-pointer pt-4">
           <input
             type="checkbox"
-            className="rounded border-input accent-uva"
+            className="rounded border-input accent-primary"
             {...form.register("permite_video")}
           />
           <span>Vídeos Curtos</span>

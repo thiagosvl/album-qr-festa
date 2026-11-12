@@ -60,7 +60,7 @@ function CardMidiaPreview({
           className="h-full w-full object-cover"
         />
       )}
-      <div className="pointer-events-none absolute inset-0 bg-black/20 transition-opacity group-hover:opacity-0" />
+      <div className="pointer-events-none absolute inset-0 bg-scrim/20 transition-opacity group-hover:opacity-0" />
     </button>
   );
 }
@@ -172,7 +172,7 @@ export function TelaoSlideshowStage({
               )}
 
               {!pausado && temMultiplas && (
-                <div className="absolute inset-x-0 bottom-0 z-30 h-1.5 bg-black/30">
+                <div className="absolute inset-x-0 bottom-0 z-30 h-1.5 bg-scrim/30">
                   <div
                     key={`${midiaDestaque.id}-${indiceAtual}`}
                     className="h-full bg-white"

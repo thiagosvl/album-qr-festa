@@ -44,7 +44,7 @@ export function EventoConviteConfigSection({
 
   return (
     <div className="space-y-4 pt-3 border-t border-border/60">
-      <p className="text-sm font-semibold text-ameixa-suave">
+      <p className="text-sm font-semibold text-muted-foreground">
         Configuração do Convite Interativo (/convite/slug)
       </p>
 

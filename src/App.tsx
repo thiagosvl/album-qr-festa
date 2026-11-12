@@ -1,18 +1,32 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
+import {
+  BrowserRouter,
+  Navigate,
+  Route,
+  Routes,
+  useLocation,
+} from "react-router-dom";
 import { Toaster } from "sonner";
 import { FESTA_ROUTES } from "@/constants";
 import { LayoutContextProvider } from "@/contexts/LayoutContext";
 import { AdminEventosPage } from "@/pages/AdminEventosPage";
-import { AdminLoginPage } from "@/pages/AdminLoginPage";
 import { ConvidadoPage } from "@/pages/ConvidadoPage";
 import ConvitePublicoPage from "@/pages/ConvitePublicoPage";
 import { GestaoPaiPage } from "@/pages/GestaoPaiPage";
 import { ImpersonateBridgePage } from "@/pages/ImpersonateBridgePage";
 import { ParceiroB2bPlaceholderPage } from "@/pages/ParceiroB2bPlaceholderPage";
-import { ParceiroLoginPage } from "@/pages/ParceiroLoginPage";
+import { LoginPage } from "@/pages/LoginPage";
 import { TelaoPage } from "@/pages/TelaoPage";
 import { LayoutProvider } from "@/providers/LayoutProvider";
+import { rotaAceitaTema } from "@/lib/tema";
+import { TemaProvider, useTema } from "@/providers/TemaProvider";
+
+function ToasterDoTema() {
+  const { escuro } = useTema();
+  const { pathname } = useLocation();
+  const tema = escuro && rotaAceitaTema(pathname) ? "dark" : "light";
+  return <Toaster position="top-center" richColors closeButton theme={tema} />;
+}
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -27,6 +41,7 @@ export function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
+        <TemaProvider>
         <LayoutContextProvider>
           <LayoutProvider>
             <Routes>
@@ -69,11 +84,11 @@ export function App() {
               />
               <Route
                 path={FESTA_ROUTES.LOGIN}
-                element={<ParceiroLoginPage />}
+                element={<Navigate to={FESTA_ROUTES.PARCEIRO_LOGIN} replace />}
               />
               <Route
-                path={FESTA_ROUTES.ADMIN_LOGIN}
-                element={<AdminLoginPage />}
+                path={FESTA_ROUTES.LEGACY_ADMIN_LOGIN}
+                element={<Navigate to={FESTA_ROUTES.PARCEIRO_LOGIN} replace />}
               />
               <Route
                 path={FESTA_ROUTES.ADMIN_DASHBOARD}
@@ -81,7 +96,7 @@ export function App() {
               />
               <Route
                 path={FESTA_ROUTES.PARCEIRO_LOGIN}
-                element={<ParceiroLoginPage />}
+                element={<LoginPage />}
               />
               <Route
                 path={FESTA_ROUTES.IMPERSONATE_BRIDGE}
@@ -96,9 +111,10 @@ export function App() {
                 element={<Navigate to={FESTA_ROUTES.DEMO_CONVIDADO} replace />}
               />
             </Routes>
-            <Toaster position="top-center" richColors closeButton />
+            <ToasterDoTema />
           </LayoutProvider>
         </LayoutContextProvider>
+        </TemaProvider>
       </BrowserRouter>
     </QueryClientProvider>
   );

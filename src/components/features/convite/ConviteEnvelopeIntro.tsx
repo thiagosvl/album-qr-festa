@@ -46,7 +46,7 @@ export function ConviteEnvelopeIntro({
             : "cursor-pointer visible opacity-100"
         }`}
         style={{
-          background: `radial-gradient(circle at 50% 25%, #FFFDF9 0%, #FDFBF7 55%, ${convite.cor_secundaria}26 100%)`,
+          background: `radial-gradient(circle at 50% 25%, hsl(var(--convite-papel-claro)) 0%, hsl(var(--convite-papel)) 55%, ${convite.cor_secundaria}26 100%)`,
         }}
       >
         <div className="mb-5 text-center">

@@ -122,7 +122,7 @@ export function ConvidadoMuralGrid({
                   />
                 )}
                 {ehVideo && (
-                  <span className="absolute right-2.5 top-2.5 inline-flex items-center gap-1 rounded-full bg-black/70 px-2.5 py-1 text-[11px] font-bold text-white backdrop-blur-sm">
+                  <span className="absolute right-2.5 top-2.5 inline-flex items-center gap-1 rounded-full bg-scrim/70 px-2.5 py-1 text-[11px] font-bold text-white backdrop-blur-sm">
                     <Play className="h-3 w-3 fill-current" />
                     {midia.duracao_segundos
                       ? `${midia.duracao_segundos}s`

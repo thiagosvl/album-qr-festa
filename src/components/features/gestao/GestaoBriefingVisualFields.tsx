@@ -37,7 +37,7 @@ export function GestaoBriefingVisualFields({
             name="tema_id"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-sm font-semibold text-ameixa-suave">
+                <FormLabel className="text-sm font-semibold text-muted-foreground">
                   Tema
                 </FormLabel>
                 <FormControl>
@@ -79,7 +79,7 @@ export function GestaoBriefingVisualFields({
           name="cor_primaria"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="text-sm font-semibold text-ameixa-suave">
+              <FormLabel className="text-sm font-semibold text-muted-foreground">
                 Cor principal
               </FormLabel>
               <FormControl>
@@ -94,7 +94,7 @@ export function GestaoBriefingVisualFields({
           name="cor_secundaria"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="text-sm font-semibold text-ameixa-suave">
+              <FormLabel className="text-sm font-semibold text-muted-foreground">
                 Cor secundária
               </FormLabel>
               <FormControl>
@@ -113,7 +113,7 @@ export function GestaoBriefingVisualFields({
             name="capa_url"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-sm font-semibold text-ameixa-suave">
+                <FormLabel className="text-sm font-semibold text-muted-foreground">
                   Foto de capa (opcional)
                 </FormLabel>
                 <div className="flex gap-2">
@@ -123,7 +123,7 @@ export function GestaoBriefingVisualFields({
                       {...field}
                     />
                   </FormControl>
-                  <label className="shrink-0 inline-flex items-center gap-1.5 px-3.5 h-10 rounded-full bg-uva-claro text-uva text-sm font-semibold cursor-pointer transition hover:bg-uva hover:text-white">
+                  <label className="shrink-0 inline-flex items-center gap-1.5 px-3.5 h-10 rounded-full bg-secondary text-secondary-foreground text-sm font-semibold cursor-pointer transition hover:bg-primary hover:text-primary-foreground">
                     <Upload className="w-3.5 h-3.5" />
                     <span>
                       {enviandoCapa ? "Enviando..." : "Enviar foto"}
@@ -152,7 +152,7 @@ export function GestaoBriefingVisualFields({
           name="tempo_slideshow_segundos"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="text-sm font-semibold text-ameixa-suave">
+              <FormLabel className="text-sm font-semibold text-muted-foreground">
                 Segundos por foto no telão
               </FormLabel>
               <FormControl>
@@ -169,7 +169,7 @@ export function GestaoBriefingVisualFields({
         name="boas_vindas"
         render={({ field }) => (
           <FormItem>
-            <FormLabel className="text-sm font-semibold text-ameixa-suave">
+            <FormLabel className="text-sm font-semibold text-muted-foreground">
               Frase de boas-vindas
             </FormLabel>
             <FormControl>
@@ -189,7 +189,7 @@ export function GestaoBriefingVisualFields({
           <label className="flex items-center gap-2 text-xs font-medium cursor-pointer">
             <input
               type="checkbox"
-              className="h-4 w-4 rounded accent-uva"
+              className="h-4 w-4 rounded accent-primary"
               {...form.register("galeria_publica")}
             />
             <span>
@@ -200,7 +200,7 @@ export function GestaoBriefingVisualFields({
           <label className="flex items-center gap-2 text-xs font-medium cursor-pointer">
             <input
               type="checkbox"
-              className="h-4 w-4 rounded accent-uva"
+              className="h-4 w-4 rounded accent-primary"
               {...form.register("moderacao_previa")}
             />
             <span>

@@ -14,10 +14,10 @@ const bannerVariants = cva(
   {
     variants: {
       variant: {
-        info: "bg-sky-500/[0.08] border-sky-500/20 text-foreground",
-        warning: "bg-amber-500/[0.08] border-amber-500/20 text-foreground",
-        danger: "bg-[#e7000b]/[0.08] border-[#e7000b]/20 text-foreground",
-        success: "bg-emerald-500/[0.08] border-emerald-500/20 text-foreground",
+        info: "bg-info-soft border-info-border text-foreground",
+        warning: "bg-warning-soft border-warning-border text-foreground",
+        danger: "bg-danger-soft border-danger-border text-foreground",
+        success: "bg-success-soft border-success-border text-foreground",
         neutral: "bg-muted border-border text-foreground",
       },
     },
@@ -36,11 +36,11 @@ const iconMap = {
 };
 
 const iconBoxMap = {
-  info: "bg-sky-500/15 text-sky-700",
-  warning: "bg-amber-500/15 text-amber-700",
-  danger: "bg-[#e7000b]/15 text-[#e7000b]",
-  success: "bg-emerald-500/15 text-emerald-700",
-  neutral: "bg-white text-muted-foreground border border-border",
+  info: "bg-info/15 text-info",
+  warning: "bg-warning/15 text-warning",
+  danger: "bg-danger/15 text-danger",
+  success: "bg-success/15 text-success",
+  neutral: "bg-card text-muted-foreground border border-border",
 };
 
 export interface BannerProps
