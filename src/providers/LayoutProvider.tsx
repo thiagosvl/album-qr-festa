@@ -6,6 +6,14 @@ import {
   type ConfirmActionDialogPayload,
 } from "@/components/dialogs/ConfirmActionDialog";
 import {
+  ConfirmacaoRsvpFormDialog,
+  type ConfirmacaoRsvpFormDialogPayload,
+} from "@/components/dialogs/ConfirmacaoRsvpFormDialog";
+import {
+  ConfirmacoesEventoDialog,
+  type ConfirmacoesEventoDialogPayload,
+} from "@/components/dialogs/ConfirmacoesEventoDialog";
+import {
   EventoFormDialog,
   type EventoFormDialogPayload,
 } from "@/components/dialogs/EventoFormDialog";
@@ -53,6 +61,10 @@ import {
   PlanoB2bFormDialog,
   type PlanoB2bFormDialogPayload,
 } from "@/components/dialogs/PlanoB2bFormDialog";
+import {
+  ProdutoB2cFormDialog,
+  type ProdutoB2cFormDialogPayload,
+} from "@/components/dialogs/ProdutoB2cFormDialog";
 import {
   QrCodeLinksDialog,
   type QrCodeLinksDialogPayload,
@@ -124,6 +136,30 @@ export function GlobalDialogsRenderer() {
         onClose={() => closeDialog(FESTA_DIALOG_NAMES.PACOTE_B2C_FORM)}
         payload={getDialogPayload<PacoteB2cFormDialogPayload>(
           FESTA_DIALOG_NAMES.PACOTE_B2C_FORM
+        )}
+      />
+
+      <ProdutoB2cFormDialog
+        open={isDialogOpen(FESTA_DIALOG_NAMES.PRODUTO_B2C_FORM)}
+        onClose={() => closeDialog(FESTA_DIALOG_NAMES.PRODUTO_B2C_FORM)}
+        payload={getDialogPayload<ProdutoB2cFormDialogPayload>(
+          FESTA_DIALOG_NAMES.PRODUTO_B2C_FORM
+        )}
+      />
+
+      <ConfirmacoesEventoDialog
+        open={isDialogOpen(FESTA_DIALOG_NAMES.CONFIRMACOES_EVENTO)}
+        onClose={() => closeDialog(FESTA_DIALOG_NAMES.CONFIRMACOES_EVENTO)}
+        payload={getDialogPayload<ConfirmacoesEventoDialogPayload>(
+          FESTA_DIALOG_NAMES.CONFIRMACOES_EVENTO
+        )}
+      />
+
+      <ConfirmacaoRsvpFormDialog
+        open={isDialogOpen(FESTA_DIALOG_NAMES.CONFIRMACAO_RSVP_FORM)}
+        onClose={() => closeDialog(FESTA_DIALOG_NAMES.CONFIRMACAO_RSVP_FORM)}
+        payload={getDialogPayload<ConfirmacaoRsvpFormDialogPayload>(
+          FESTA_DIALOG_NAMES.CONFIRMACAO_RSVP_FORM
         )}
       />
 

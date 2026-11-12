@@ -28,11 +28,6 @@ interface LogoFestalgiaProps {
   className?: string;
 }
 
-/**
- * Logo oficial da marca. `fundo` indica o fundo onde o logo será exibido:
- * CLARO usa roxo e dourado; ESCURO usa branco e dourado.
- * Defina a altura (ou largura) por `className`; a outra dimensão é automática.
- */
 export function LogoFestalgia({
   variante = LOGO_VARIANTE.HORIZONTAL,
   fundo = LOGO_FUNDO.CLARO,

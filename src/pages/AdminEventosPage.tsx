@@ -59,6 +59,7 @@ export function AdminEventosPage() {
                 onMidias={vm.abrirMidiasAdminDialog}
                 onExtras={vm.abrirExtrasAdminDialog}
                 onQrLinks={vm.abrirQrCodeLinksDialog}
+                onConfirmacoes={vm.abrirConfirmacoesEventoDialog}
                 onExcluir={vm.confirmarExclusaoEvento}
               />
             </>
@@ -66,8 +67,10 @@ export function AdminEventosPage() {
 
           {vm.abaAtiva === FESTA_ADMIN_TABS.CATALOGO_B2C && (
             <AdminCatalogoB2cSection
+              produtos={vm.catalogo?.produtos_b2c ?? []}
               pacotes={vm.catalogo?.pacotes_b2c ?? []}
               extras={vm.catalogo?.extras_b2c ?? []}
+              onEditarProduto={vm.abrirEditarProdutoDialog}
               onEditarPacote={vm.abrirEditarPacoteDialog}
               onNovoExtra={vm.abrirNovoExtraDialog}
               onEditarExtra={vm.abrirEditarExtraDialog}

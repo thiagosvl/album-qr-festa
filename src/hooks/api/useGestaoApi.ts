@@ -1,12 +1,13 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/api";
 import type { EventoGestaoDto } from "@/types/festa.types";
+import type { CamposConvitePayload } from "./useEventosApi";
 
 export const GESTAO_QUERY_KEYS = {
   byToken: (token: string) => ["festa", "gestao", token] as const,
 };
 
-export interface AtualizarBriefingPaiPayload {
+export interface AtualizarBriefingPaiPayload extends CamposConvitePayload {
   titulo?: string;
   subtitulo?: string | null;
   boas_vindas?: string | null;
@@ -48,10 +49,13 @@ export function useAtualizarBriefingMutation(token: string) {
         queryKey: GESTAO_QUERY_KEYS.byToken(token),
       });
       queryClient.invalidateQueries({
-        queryKey: ["festa", "evento", "publico", updated.evento.slug],
+        queryKey: ["festa", "evento", "publico"],
       });
       queryClient.invalidateQueries({
-        queryKey: ["festa", "midias", "publicas", updated.evento.slug],
+        queryKey: ["festa", "convite", "publico"],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["festa", "midias", "publicas"],
       });
     },
   });

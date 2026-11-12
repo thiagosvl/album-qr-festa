@@ -5,6 +5,7 @@ import type {
   FestaCatalogoExtraB2c,
   FestaCatalogoPacoteB2c,
   FestaCatalogoPlanoB2b,
+  FestaCatalogoProduto,
   FestaCategoriaTemaEnum,
   FestaEfeitoExtraEnum,
   FestaTemaCatalogo,
@@ -14,6 +15,18 @@ export const CATALOGO_QUERY_KEYS = {
   publico: ["festa", "catalogo", "publico"] as const,
   admin: ["festa", "catalogo", "admin"] as const,
 };
+
+export interface AtualizarProdutoB2cPayload {
+  nome_exibicao?: string;
+  descricao?: string | null;
+  preco_centavos?: number;
+  preco_ancora_centavos?: number | null;
+  custo_creditos_b2b?: number;
+  disponivel_b2b?: boolean;
+  limite_molduras_base?: number;
+  dias_validade_base?: number;
+  ativo?: boolean;
+}
 
 export interface AtualizarPacoteB2cPayload {
   nome_exibicao?: string;
@@ -33,6 +46,8 @@ export interface SalvarExtraB2cPayload {
   nome: string;
   descricao?: string | null;
   preco_centavos: number;
+  custo_creditos_b2b?: number;
+  disponivel_b2b?: boolean;
   efeito_tipo: FestaEfeitoExtraEnum;
   efeito_valor: number;
   ordem?: number;
@@ -86,6 +101,25 @@ export function useCatalogoAdminQuery(enabled = true) {
 function invalidarCatalogo(queryClient: ReturnType<typeof useQueryClient>) {
   queryClient.invalidateQueries({ queryKey: CATALOGO_QUERY_KEYS.admin });
   queryClient.invalidateQueries({ queryKey: CATALOGO_QUERY_KEYS.publico });
+}
+
+export function useAtualizarProdutoB2cMutation() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({
+      id,
+      payload,
+    }: {
+      id: string;
+      payload: AtualizarProdutoB2cPayload;
+    }) =>
+      apiRequest<FestaCatalogoProduto>(`/api/admin/catalogo/produtos/${id}`, {
+        method: "PATCH",
+        requireAuth: true,
+        body: payload,
+      }),
+    onSuccess: () => invalidarCatalogo(queryClient),
+  });
 }
 
 export function useAtualizarPacoteB2cMutation() {

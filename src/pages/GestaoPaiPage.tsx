@@ -2,6 +2,7 @@ import { useParams } from "react-router-dom";
 import { FESTA_GESTAO_PAI_TABS } from "@/constants";
 import { GestaoAcessoQrSection } from "@/components/features/gestao/GestaoAcessoQrSection";
 import { GestaoBriefingSection } from "@/components/features/gestao/GestaoBriefingSection";
+import { GestaoConfirmadosSection } from "@/components/features/gestao/GestaoConfirmadosSection";
 import { GestaoModeracaoSection } from "@/components/features/gestao/GestaoModeracaoSection";
 import { GestaoPaiHeader } from "@/components/features/gestao/GestaoPaiHeader";
 import { Banner } from "@/components/ui/Banner";
@@ -31,6 +32,11 @@ export function GestaoPaiPage() {
     );
   }
 
+  const apenasConvite =
+    vm.evento.inclui_convite && !vm.evento.inclui_galeria;
+  const apenasGaleria =
+    vm.evento.inclui_galeria && !vm.evento.inclui_convite;
+
   return (
     <div className="min-h-screen pb-16 flex flex-col">
       <GestaoPaiHeader
@@ -40,30 +46,55 @@ export function GestaoPaiPage() {
         onAlternarBloqueioUploads={vm.alternarBloqueioUploads}
         onBaixarZip={vm.baixarTodasEmZip}
         totalMidias={vm.midias.length}
+        totalConfirmadosPessoas={
+          vm.gestao.resumo_confirmacoes?.total_pessoas ?? 0
+        }
         pausandoEnvios={vm.pausandoEnvios}
         baixandoZip={vm.baixandoZip}
       />
 
-      <main className="flex-1 max-w-6xl w-full mx-auto px-4 py-6">
-        {vm.abaAtiva === FESTA_GESTAO_PAI_TABS.MODERACAO && (
-          <GestaoModeracaoSection
-            midias={vm.midiasFiltradas}
-            resumoMidias={vm.resumoMidias}
-            filtro={vm.filtroVisibilidade}
-            onChangeFiltro={vm.setFiltroVisibilidade}
-            selecionadasIds={vm.selecionadasIds}
-            onToggleSelecao={vm.alternarSelecaoMidia}
-            onLimparSelecao={vm.limparSelecao}
-            onModerarLote={vm.moderarSelecionadasEmLote}
-            onAprovarTodasPendentes={vm.aprovarTodasPendentes}
-            onVisualizarMidia={vm.abrirVisualizadorMidia}
-            onAlternarVisibilidade={vm.alternarVisibilidadeMidia}
-            onLimparFotosTeste={vm.limparFotosTeste}
-            onExcluirMidia={vm.excluirMidiaDefinitivamente}
-            acaoMidia={vm.acaoMidia}
-            moderandoLote={vm.moderandoLote}
+      <main className="flex-1 max-w-6xl w-full mx-auto px-4 py-6 space-y-6">
+        {apenasConvite && (
+          <Banner
+            variant="info"
+            title="Quer também a Galeria QR Code ao vivo na festa?"
+            description="Fale conosco no WhatsApp para ativar o mural de fotos com moldura da festa no mesmo painel."
           />
         )}
+
+        {apenasGaleria && (
+          <Banner
+            variant="info"
+            title="Precisa de Convite Interativo com Lista de Presença (RSVP)?"
+            description="Você pode adicionar o Convite Interativo animado ao seu evento a qualquer momento pelo nosso WhatsApp."
+          />
+        )}
+
+        {vm.abaAtiva === FESTA_GESTAO_PAI_TABS.MODERACAO &&
+          vm.evento.inclui_galeria && (
+            <GestaoModeracaoSection
+              midias={vm.midiasFiltradas}
+              resumoMidias={vm.resumoMidias}
+              filtro={vm.filtroVisibilidade}
+              onChangeFiltro={vm.setFiltroVisibilidade}
+              selecionadasIds={vm.selecionadasIds}
+              onToggleSelecao={vm.alternarSelecaoMidia}
+              onLimparSelecao={vm.limparSelecao}
+              onModerarLote={vm.moderarSelecionadasEmLote}
+              onAprovarTodasPendentes={vm.aprovarTodasPendentes}
+              onVisualizarMidia={vm.abrirVisualizadorMidia}
+              onAlternarVisibilidade={vm.alternarVisibilidadeMidia}
+              onLimparFotosTeste={vm.limparFotosTeste}
+              onExcluirMidia={vm.excluirMidiaDefinitivamente}
+              acaoMidia={vm.acaoMidia}
+              moderandoLote={vm.moderandoLote}
+            />
+          )}
+
+        {vm.abaAtiva === FESTA_GESTAO_PAI_TABS.CONVITE_CONFIRMADOS &&
+          vm.evento.inclui_convite && (
+            <GestaoConfirmadosSection token={token} evento={vm.evento} />
+          )}
 
         {vm.abaAtiva === FESTA_GESTAO_PAI_TABS.BRIEFING && (
           <GestaoBriefingSection

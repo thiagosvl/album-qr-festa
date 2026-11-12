@@ -1,5 +1,5 @@
 import { Sparkles } from "lucide-react";
-import { FESTA_PACOTE_TIPO } from "@/constants";
+import { EventoParceiroModulosSection } from "@/components/dialogs/evento-form/EventoParceiroModulosSection";
 import { Banner } from "@/components/ui/Banner";
 import { BaseDialog } from "@/components/ui/BaseDialog";
 import { Button } from "@/components/ui/button";
@@ -17,6 +17,9 @@ import { useEventoParceiroB2bForm } from "@/hooks/form/useEventoParceiroB2bForm"
 import { safeCloseDialog } from "@/hooks/ui/useDialogClose";
 import { phoneMask } from "@/lib/masks";
 import type {
+  EventoAdminDto,
+  FestaCatalogoExtraB2c,
+  FestaCatalogoProduto,
   FestaTemaCatalogo,
   ParceiroB2bAdminDto,
 } from "@/types/festa.types";
@@ -24,6 +27,9 @@ import type {
 export interface EventoParceiroB2bFormDialogPayload {
   parceiro: ParceiroB2bAdminDto;
   temas: FestaTemaCatalogo[];
+  produtosCatalogo?: FestaCatalogoProduto[];
+  extrasCatalogo?: FestaCatalogoExtraB2c[];
+  evento?: EventoAdminDto | null;
 }
 
 interface EventoParceiroB2bFormDialogProps {
@@ -39,8 +45,30 @@ export function EventoParceiroB2bFormDialog({
 }: EventoParceiroB2bFormDialogProps) {
   const parceiro = payload?.parceiro ?? null;
   const temas = payload?.temas ?? [];
-  const { form, pacoteSelecionado, custoCreditos, onSubmit, isSubmitting } =
-    useEventoParceiroB2bForm(open, parceiro, onClose);
+  const produtosCatalogo = payload?.produtosCatalogo ?? [];
+  const extrasCatalogo = (payload?.extrasCatalogo ?? []).filter(
+    (e) => e.disponivel_b2b && e.ativo
+  );
+  const eventoEdicao = payload?.evento ?? null;
+
+  const {
+    form,
+    incluiConvite,
+    extrasIdsSelecionados,
+    custoCreditos,
+    custoCreditosTotal,
+    creditosJaConsumidos,
+    alternarExtraB2b,
+    onSubmit,
+    isSubmitting,
+  } = useEventoParceiroB2bForm(
+    open,
+    parceiro,
+    onClose,
+    produtosCatalogo,
+    extrasCatalogo,
+    eventoEdicao
+  );
 
   if (!parceiro) return null;
 
@@ -51,10 +79,14 @@ export function EventoParceiroB2bFormDialog({
         if (!isOpen) safeCloseDialog(onClose);
       }}
       lockClose={isSubmitting}
-      className="sm:max-w-[560px]"
+      className="sm:max-w-[620px]"
     >
       <BaseDialog.Header
-        title="Ativar Novo Evento com Créditos B2B"
+        title={
+          eventoEdicao
+            ? "Editar / Fazer Upgrade do Evento B2B"
+            : "Ativar Novo Evento com Créditos B2B"
+        }
         subtitle={`${parceiro.nome_empresa} • Saldo disponível: ${parceiro.saldo_creditos} crédito(s)`}
         icon={Sparkles}
         onClose={onClose}
@@ -71,63 +103,36 @@ export function EventoParceiroB2bFormDialog({
               variant={
                 parceiro.saldo_creditos >= custoCreditos ? "info" : "warning"
               }
-              title={`Custo desta ativação: ${custoCreditos} crédito(s) (${pacoteSelecionado})`}
-              description="O álbum e o link de gestão do cliente são liberados imediatamente como Quitado."
+              title={
+                eventoEdicao
+                  ? `Diferença a debitar: ${custoCreditos} crédito(s) (Total: ${custoCreditosTotal} • Já consumido: ${creditosJaConsumidos})`
+                  : `Custo desta ativação: ${custoCreditos} crédito(s)`
+              }
+              description="Selecione Galeria QR Code, Convite Interativo ou ambos e opcionais extras."
+            />
+
+            <EventoParceiroModulosSection
+              form={form}
+              extrasCatalogo={extrasCatalogo}
+              extrasIdsSelecionados={extrasIdsSelecionados}
+              onAlternarExtra={alternarExtraB2b}
+            />
+
+            <FormField
+              control={form.control}
+              name="titulo"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Título da Festa *</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Ex: 5 Anos do Lucas" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
             />
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <FormField
-                control={form.control}
-                name="titulo"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Título da Festa *</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Ex: 5 Anos do Lucas" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="slug"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Slug da URL (/e/slug) *</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Ex: lucas-5-anos" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-              <FormField
-                control={form.control}
-                name="pacote"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Tipo do Evento</FormLabel>
-                    <FormControl>
-                      <NativeSelect className="text-xs" {...field}>
-                        <option value={FESTA_PACOTE_TIPO.BASICO}>
-                          Pacote Básico (
-                          {parceiro.plano?.custo_creditos_basico ?? 1} crédito)
-                        </option>
-                        <option value={FESTA_PACOTE_TIPO.COMPLETO}>
-                          Completo + Telão (
-                          {parceiro.plano?.custo_creditos_completo ?? 2}{" "}
-                          créditos)
-                        </option>
-                      </NativeSelect>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
               <FormField
                 control={form.control}
                 name="data_evento"
@@ -180,6 +185,50 @@ export function EventoParceiroB2bFormDialog({
                 )}
               />
             </div>
+
+            {incluiConvite && (
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 p-3 rounded-xl bg-muted/30 border border-border/60">
+                <FormField
+                  control={form.control}
+                  name="convite_horario_texto"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-xs">Horário da Festa</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Ex: Às 15h00" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="convite_nome_local"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-xs">Nome do Local</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Ex: Buffet Alegria" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="convite_endereco"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-xs">Endereço (Maps)</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Rua..." {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+            )}
 
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
               <FormField
@@ -288,8 +337,12 @@ export function EventoParceiroB2bFormDialog({
               disabled={parceiro.saldo_creditos < custoCreditos}
             >
               {isSubmitting
-                ? "Ativando..."
-                : `Ativar por ${custoCreditos} Crédito(s)`}
+                ? "Salvando..."
+                : eventoEdicao
+                  ? custoCreditos > 0
+                    ? `Salvar Upgrade (+${custoCreditos} Créd.)`
+                    : "Salvar Alterações"
+                  : `Ativar por ${custoCreditos} Crédito(s)`}
             </Button>
           </BaseDialog.Footer>
         </form>

@@ -7,6 +7,7 @@ import {
   QrCode,
   Sparkles,
   Trash2,
+  UserCheck,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { FESTA_STATUS_PEDIDO } from "@/constants";
@@ -14,10 +15,7 @@ import { Banner } from "@/components/ui/Banner";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import {
-  PACOTE_TIPO_LABELS,
-  STATUS_PEDIDO_LABELS,
-} from "@/hooks/business/useCalculosPedido";
+import { STATUS_PEDIDO_LABELS } from "@/hooks/business/useCalculosPedido";
 import { formatarDataBr, formatarMoedaCentavos } from "@/lib/utils";
 import type { EventoAdminDto } from "@/types/festa.types";
 
@@ -30,6 +28,7 @@ interface AdminEventosListProps {
   onMidias: (evento: EventoAdminDto) => void;
   onExtras: (evento: EventoAdminDto) => void;
   onQrLinks: (evento: EventoAdminDto) => void;
+  onConfirmacoes: (evento: EventoAdminDto) => void;
   onExcluir: (evento: EventoAdminDto) => void;
 }
 
@@ -42,6 +41,7 @@ export function AdminEventosList({
   onMidias,
   onExtras,
   onQrLinks,
+  onConfirmacoes,
   onExcluir,
 }: AdminEventosListProps) {
   if (isLoading) {
@@ -72,23 +72,31 @@ export function AdminEventosList({
       {eventos.map((ev) => {
         const quitado = ev.status_pedido === FESTA_STATUS_PEDIDO.PAGO_COMPLETO;
         return (
-          <Card key={ev.id} className="hover:border-primary/40 transition-colors">
+          <Card
+            key={ev.id}
+            className="hover:border-primary/40 transition-colors"
+          >
             <CardContent className="p-5 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
               <div className="space-y-1.5 min-w-0">
                 <div className="flex flex-wrap items-center gap-2">
-                  <Badge variant={ev.is_demo ? "warning" : quitado ? "success" : "tonal"}>
+                  <Badge
+                    variant={
+                      ev.is_demo ? "warning" : quitado ? "success" : "tonal"
+                    }
+                  >
                     {STATUS_PEDIDO_LABELS[ev.status_pedido]}
                   </Badge>
-                  <Badge variant="secondary">
-                    {PACOTE_TIPO_LABELS[ev.pacote]}
-                  </Badge>
+                  {ev.inclui_galeria && (
+                    <Badge variant="secondary">Galeria QR</Badge>
+                  )}
+                  {ev.inclui_convite && (
+                    <Badge variant="secondary">Convite + RSVP</Badge>
+                  )}
                   {ev.extras.length > 0 && (
-                    <Badge variant="tonal">
-                      +{ev.extras.length} extra(s)
-                    </Badge>
+                    <Badge variant="tonal">+{ev.extras.length} extra(s)</Badge>
                   )}
                   <span className="text-xs font-mono text-muted-foreground">
-                    /e/{ev.slug}
+                    /{ev.is_demo ? ev.slug : `${ev.codigo_url}/${ev.slug}`}
                   </span>
                 </div>
 
@@ -98,10 +106,19 @@ export function AdminEventosList({
 
                 <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground">
                   <span>Data: {formatarDataBr(ev.data_evento)}</span>
-                  <span>
-                    Molduras: {ev.molduras.length}/{ev.limite_molduras}
-                  </span>
-                  <span>Fotos no Álbum: {ev.total_midias}</span>
+                  {ev.inclui_galeria && (
+                    <>
+                      <span>
+                        Molduras: {ev.molduras.length}/{ev.limite_molduras}
+                      </span>
+                      <span>Fotos no Álbum: {ev.total_midias}</span>
+                    </>
+                  )}
+                  {ev.inclui_convite && (
+                    <span>
+                      Confirmados: {ev.total_confirmados_pessoas} pessoa(s)
+                    </span>
+                  )}
                   {ev.anfitriao?.nome && (
                     <span>Cliente: {ev.anfitriao.nome}</span>
                   )}
@@ -130,25 +147,41 @@ export function AdminEventosList({
                     <span>QR & Links</span>
                   </Button>
 
-                  <Button
-                    type="button"
-                    size="sm"
-                    variant="outline"
-                    onClick={() => onMolduras(ev)}
-                  >
-                    <Frame className="w-3.5 h-3.5" />
-                    <span>Molduras ({ev.molduras.length})</span>
-                  </Button>
+                  {ev.inclui_convite && (
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="outline"
+                      onClick={() => onConfirmacoes(ev)}
+                    >
+                      <UserCheck className="w-3.5 h-3.5" />
+                      <span>RSVP ({ev.total_confirmados_pessoas})</span>
+                    </Button>
+                  )}
 
-                  <Button
-                    type="button"
-                    size="sm"
-                    variant="outline"
-                    onClick={() => onMidias(ev)}
-                  >
-                    <ImageIcon className="w-3.5 h-3.5" />
-                    <span>Fotos ({ev.total_midias})</span>
-                  </Button>
+                  {ev.inclui_galeria && (
+                    <>
+                      <Button
+                        type="button"
+                        size="sm"
+                        variant="outline"
+                        onClick={() => onMolduras(ev)}
+                      >
+                        <Frame className="w-3.5 h-3.5" />
+                        <span>Molduras ({ev.molduras.length})</span>
+                      </Button>
+
+                      <Button
+                        type="button"
+                        size="sm"
+                        variant="outline"
+                        onClick={() => onMidias(ev)}
+                      >
+                        <ImageIcon className="w-3.5 h-3.5" />
+                        <span>Fotos ({ev.total_midias})</span>
+                      </Button>
+                    </>
+                  )}
 
                   <Button
                     type="button"
@@ -188,7 +221,18 @@ export function AdminEventosList({
                     asChild
                     className="h-9 w-9"
                   >
-                    <Link to={`/e/${ev.slug}`} target="_blank">
+                    <Link
+                      to={
+                        ev.inclui_galeria
+                          ? ev.is_demo
+                            ? `/e/${ev.slug}`
+                            : `/e/${ev.codigo_url}/${ev.slug}`
+                          : ev.is_demo
+                            ? `/convite/${ev.slug}`
+                            : `/convite/${ev.codigo_url}/${ev.slug}`
+                      }
+                      target="_blank"
+                    >
                       <ExternalLink className="w-4 h-4" />
                     </Link>
                   </Button>

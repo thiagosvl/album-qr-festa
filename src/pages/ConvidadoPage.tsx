@@ -38,8 +38,12 @@ function montarAvisos(evento: EventoPublicoDto, podeEnviar: boolean): string[] {
 }
 
 export function ConvidadoPage() {
-  const { slug = "demo" } = useParams<{ slug: string }>();
-  const vm = useConvidadoViewModel(slug);
+  const { codigoUrl, slug = "demo" } = useParams<{
+    codigoUrl?: string;
+    slug?: string;
+  }>();
+  const identificador = codigoUrl ?? slug;
+  const vm = useConvidadoViewModel(identificador);
 
   if (vm.isLoadingEvento) {
     return (

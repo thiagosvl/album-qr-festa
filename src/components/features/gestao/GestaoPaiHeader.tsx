@@ -4,16 +4,15 @@ import {
   Images,
   Loader2,
   Lock,
+  MailOpen,
   QrCode,
   Sparkles,
   Unlock,
+  UserCheck,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { FESTA_GESTAO_PAI_TABS } from "@/constants";
-import {
-  PACOTE_TIPO_LABELS,
-  STATUS_PEDIDO_LABELS,
-} from "@/hooks/business/useCalculosPedido";
+import { STATUS_PEDIDO_LABELS } from "@/hooks/business/useCalculosPedido";
 import type { AbaGestaoPai } from "@/hooks/ui/useGestaoPaiViewModel";
 import { formatarDataBr } from "@/lib/utils";
 import type { FestaEvento } from "@/types/festa.types";
@@ -25,6 +24,7 @@ interface GestaoPaiHeaderProps {
   onAlternarBloqueioUploads: () => void;
   onBaixarZip: () => void;
   totalMidias: number;
+  totalConfirmadosPessoas?: number;
   pausandoEnvios?: boolean;
   baixandoZip?: boolean;
 }
@@ -39,25 +39,41 @@ export function GestaoPaiHeader({
   onAlternarBloqueioUploads,
   onBaixarZip,
   totalMidias,
+  totalConfirmadosPessoas = 0,
   pausandoEnvios = false,
   baixandoZip = false,
 }: GestaoPaiHeaderProps) {
   const envioPausado = !evento.permite_envio_midias;
 
   const abas = [
-    {
-      id: FESTA_GESTAO_PAI_TABS.MODERACAO,
-      rotulo: `Fotos (${totalMidias})`,
-      Icone: Images,
-    },
+    ...(evento.inclui_galeria
+      ? [
+          {
+            id: FESTA_GESTAO_PAI_TABS.MODERACAO,
+            rotulo: `Fotos (${totalMidias})`,
+            Icone: Images,
+          },
+        ]
+      : []),
+    ...(evento.inclui_convite
+      ? [
+          {
+            id: FESTA_GESTAO_PAI_TABS.CONVITE_CONFIRMADOS,
+            rotulo: `Confirmados (${totalConfirmadosPessoas})`,
+            Icone: UserCheck,
+          },
+        ]
+      : []),
     {
       id: FESTA_GESTAO_PAI_TABS.BRIEFING,
-      rotulo: "Tema e molduras",
+      rotulo: evento.inclui_convite
+        ? "Personalizar festa e convite"
+        : "Tema e molduras",
       Icone: Sparkles,
     },
     {
       id: FESTA_GESTAO_PAI_TABS.ACESSO_QR,
-      rotulo: "QR Code e telão",
+      rotulo: "Links e QR Code",
       Icone: QrCode,
     },
   ];
@@ -77,62 +93,93 @@ export function GestaoPaiHeader({
               {evento.titulo}
             </h1>
             <p className="mt-2 text-sm text-ameixa-suave">
-              {formatarDataBr(evento.data_evento)}, pacote{" "}
-              {PACOTE_TIPO_LABELS[evento.pacote]}
+              {formatarDataBr(evento.data_evento)} •{" "}
+              {[
+                evento.inclui_galeria ? "Galeria QR Code" : null,
+                evento.inclui_convite ? "Convite Interativo" : null,
+              ]
+                .filter(Boolean)
+                .join(" + ")}
             </p>
           </div>
 
           <div className="flex flex-wrap items-center gap-2">
-            <button
-              type="button"
-              disabled={pausandoEnvios}
-              onClick={onAlternarBloqueioUploads}
-              className={`${BOTAO} flex-1 sm:flex-initial ${
-                envioPausado
-                  ? "bg-rosa text-white"
-                  : "bg-white text-ameixa ring-1 ring-ameixa/15 hover:ring-ameixa/30"
-              }`}
-            >
-              {pausandoEnvios ? (
-                <Loader2 className="h-4 w-4 shrink-0 animate-spin" />
-              ) : envioPausado ? (
-                <Lock className="h-4 w-4 shrink-0" />
-              ) : (
-                <Unlock className="h-4 w-4 shrink-0" />
-              )}
-              <span className="truncate">
-                {envioPausado ? "Reabrir envios" : "Pausar envios"}
-              </span>
-            </button>
+            {evento.inclui_galeria && (
+              <>
+                <button
+                  type="button"
+                  disabled={pausandoEnvios}
+                  onClick={onAlternarBloqueioUploads}
+                  className={`${BOTAO} flex-1 sm:flex-initial ${
+                    envioPausado
+                      ? "bg-rosa text-white"
+                      : "bg-white text-ameixa ring-1 ring-ameixa/15 hover:ring-ameixa/30"
+                  }`}
+                >
+                  {pausandoEnvios ? (
+                    <Loader2 className="h-4 w-4 shrink-0 animate-spin" />
+                  ) : envioPausado ? (
+                    <Lock className="h-4 w-4 shrink-0" />
+                  ) : (
+                    <Unlock className="h-4 w-4 shrink-0" />
+                  )}
+                  <span className="truncate">
+                    {envioPausado ? "Reabrir envios" : "Pausar envios"}
+                  </span>
+                </button>
 
-            <button
-              type="button"
-              disabled={totalMidias === 0 || baixandoZip}
-              onClick={onBaixarZip}
-              className={`${BOTAO} flex-1 sm:flex-initial bg-uva-claro text-uva hover:bg-uva hover:text-white`}
-            >
-              {baixandoZip ? (
-                <Loader2 className="h-4 w-4 shrink-0 animate-spin" />
-              ) : (
-                <Download className="h-4 w-4 shrink-0" />
-              )}
-              <span className="truncate">
-                {baixandoZip ? "Gerando .zip..." : "Baixar fotos"}
-              </span>
-            </button>
+                <button
+                  type="button"
+                  disabled={totalMidias === 0 || baixandoZip}
+                  onClick={onBaixarZip}
+                  className={`${BOTAO} flex-1 sm:flex-initial bg-uva-claro text-uva hover:bg-uva hover:text-white`}
+                >
+                  {baixandoZip ? (
+                    <Loader2 className="h-4 w-4 shrink-0 animate-spin" />
+                  ) : (
+                    <Download className="h-4 w-4 shrink-0" />
+                  )}
+                  <span className="truncate">
+                    {baixandoZip ? "Gerando .zip..." : "Baixar fotos"}
+                  </span>
+                </button>
 
-            <Link
-              to={`/e/${evento.slug}`}
-              target="_blank"
-              className={`${BOTAO} w-full sm:w-auto bg-ameixa text-white`}
-            >
-              <ExternalLink className="h-4 w-4 shrink-0" />
-              <span>Abrir álbum</span>
-            </Link>
+                <Link
+                  to={
+                    evento.slug === "demo"
+                      ? `/e/${evento.slug}`
+                      : `/e/${evento.codigo_url}/${evento.slug}`
+                  }
+                  target="_blank"
+                  className={`${BOTAO} w-full sm:w-auto bg-ameixa text-white`}
+                >
+                  <ExternalLink className="h-4 w-4 shrink-0" />
+                  <span>Abrir álbum</span>
+                </Link>
+              </>
+            )}
+
+            {evento.inclui_convite && (
+              <Link
+                to={
+                  evento.slug === "demo"
+                    ? `/convite/${evento.slug}`
+                    : `/convite/${evento.codigo_url}/${evento.slug}`
+                }
+                target="_blank"
+                className={`${BOTAO} w-full sm:w-auto bg-uva text-white hover:bg-uva/90`}
+              >
+                <MailOpen className="h-4 w-4 shrink-0" />
+                <span>Ver Convite</span>
+              </Link>
+            )}
           </div>
         </div>
 
-        <div className="no-scrollbar flex gap-1 overflow-x-auto rounded-full bg-ameixa/[0.06] p-1" role="tablist">
+        <div
+          className="no-scrollbar flex gap-1 overflow-x-auto rounded-full bg-ameixa/[0.06] p-1"
+          role="tablist"
+        >
           {abas.map(({ id, rotulo, Icone }) => {
             const ativa = abaAtiva === id;
             return (

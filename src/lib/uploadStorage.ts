@@ -7,11 +7,45 @@ interface UploadAssinadoDto {
   content_type: string;
 }
 
-const PREFIXOS_UPLOAD_AUTENTICADO = ["parceiros/", "catalogo/"];
+const PREFIXOS_UPLOAD_AUTENTICADO = [
+  "parceiros/",
+  "catalogo/",
+  "convite-rascunho/",
+];
+
+const MIME_POR_EXTENSAO: Record<string, string> = {
+  jpg: "image/jpeg",
+  jpeg: "image/jpeg",
+  png: "image/png",
+  webp: "image/webp",
+  pdf: "application/pdf",
+  mp4: "video/mp4",
+  mov: "video/quicktime",
+  webm: "video/webm",
+  mp3: "audio/mpeg",
+  wav: "audio/wav",
+  ogg: "audio/ogg",
+  m4a: "audio/mp4",
+};
+
+function resolverContentTypeArquivo(storagePath: string, blob: Blob): string {
+  const ext = storagePath.split(".").pop()?.toLowerCase() ?? "";
+  if (ext === "mp3" && (blob.type === "audio/mp3" || !blob.type)) {
+    return "audio/mpeg";
+  }
+  if (
+    ext === "m4a" &&
+    (blob.type === "audio/x-m4a" || blob.type === "audio/m4a" || !blob.type)
+  ) {
+    return "audio/mp4";
+  }
+  return blob.type || MIME_POR_EXTENSAO[ext] || "image/jpeg";
+}
 
 function solicitarUploadAssinado(
   storagePath: string,
-  blob: Blob
+  blob: Blob,
+  contentType: string
 ): Promise<UploadAssinadoDto> {
   const autenticado = PREFIXOS_UPLOAD_AUTENTICADO.some((prefixo) =>
     storagePath.startsWith(prefixo)
@@ -24,7 +58,7 @@ function solicitarUploadAssinado(
       requireAuth: autenticado,
       body: {
         path: storagePath,
-        content_type: blob.type || "image/jpeg",
+        content_type: contentType,
         tamanho_bytes: blob.size,
       },
     }
@@ -36,8 +70,8 @@ export async function uploadBlobComProgresso(
   blob: Blob,
   onProgress?: (percent: number) => void
 ): Promise<string> {
-  const contentType = blob.type || "image/jpeg";
-  const upload = await solicitarUploadAssinado(storagePath, blob);
+  const contentType = resolverContentTypeArquivo(storagePath, blob);
+  const upload = await solicitarUploadAssinado(storagePath, blob, contentType);
 
   await new Promise<void>((resolve, reject) => {
     const xhr = new XMLHttpRequest();

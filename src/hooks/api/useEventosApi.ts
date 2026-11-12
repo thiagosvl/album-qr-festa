@@ -3,6 +3,7 @@ import { apiRequest } from "@/lib/api";
 import type {
   EventoAdminDto,
   EventoPublicoDto,
+  FestaCodigoModuloEnum,
   FestaMetodoPagamentoEnum,
   FestaPacoteTipoEnum,
   FestaStatusPedidoEnum,
@@ -13,16 +14,44 @@ export const EVENTOS_QUERY_KEYS = {
   adminList: ["festa", "eventos", "admin"] as const,
 };
 
+export interface ProdutoPayloadInput {
+  produto_id?: string | null;
+  codigo_modulo: FestaCodigoModuloEnum;
+  nome: string;
+  preco_centavos: number;
+  custo_creditos_b2b?: number;
+}
+
 export interface ExtraPayloadInput {
   extra_id?: string | null;
   nome: string;
   quantidade: number;
   preco_unitario_centavos: number;
+  custo_creditos_b2b?: number;
   entregue?: boolean;
 }
 
-export interface CriarEventoPayload {
-  slug: string;
+export interface CamposConvitePayload {
+  convite_texto_chamada?: string | null;
+  convite_foto_url?: string | null;
+  convite_banner_topo_url?: string | null;
+  convite_musica_url?: string | null;
+  convite_audio_obrigado_url?: string | null;
+  convite_horario_inicio?: string | null;
+  convite_horario_texto?: string | null;
+  convite_nome_local?: string | null;
+  convite_endereco?: string | null;
+  convite_exibir_presentes?: boolean;
+  convite_titulo_tamanhos?: string | null;
+  convite_tamanho_calcado?: string | null;
+  convite_tamanho_roupa?: string | null;
+  convite_ideias_presentes?: string[];
+  convite_texto_prazo_rsvp?: string | null;
+  convite_whatsapp_contato?: string | null;
+}
+
+export interface CriarEventoPayload extends CamposConvitePayload {
+  slug?: string;
   titulo: string;
   subtitulo?: string | null;
   boas_vindas?: string | null;
@@ -43,7 +72,9 @@ export interface CriarEventoPayload {
     telefone?: string | null;
     email?: string | null;
   };
-  pacote: FestaPacoteTipoEnum;
+  pacote?: FestaPacoteTipoEnum | null;
+  inclui_galeria?: boolean;
+  inclui_convite?: boolean;
   status_pedido?: FestaStatusPedidoEnum;
   metodo_pagamento?: FestaMetodoPagamentoEnum;
   valor_pacote_centavos?: number;
@@ -51,6 +82,7 @@ export interface CriarEventoPayload {
   valor_sinal_centavos?: number;
   valor_pago_centavos?: number;
   observacoes_internas?: string | null;
+  produtos?: ProdutoPayloadInput[];
   extras?: ExtraPayloadInput[];
 }
 

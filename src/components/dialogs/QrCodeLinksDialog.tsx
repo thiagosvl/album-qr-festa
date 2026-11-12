@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { QrCodeView } from "@/components/ui/QrCodeView";
 import {
   gerarLinkWhatsappCliente,
+  gerarUrlConviteEvento,
   gerarUrlGestaoPai,
   gerarUrlPublicaEvento,
   gerarUrlTelaoEvento,
@@ -35,8 +36,9 @@ export function QrCodeLinksDialog({
   const evento = payload?.evento ?? null;
   if (!evento) return null;
 
-  const urlConvidado = gerarUrlPublicaEvento(evento.slug);
-  const urlTelao = gerarUrlTelaoEvento(evento.slug);
+  const urlConvidado = gerarUrlPublicaEvento(evento.slug, evento.codigo_url);
+  const urlConvite = gerarUrlConviteEvento(evento.slug, evento.codigo_url);
+  const urlTelao = gerarUrlTelaoEvento(evento.slug, evento.codigo_url);
   const urlGestaoPai = gerarUrlGestaoPai(evento.token_gestao);
 
   const copiarTexto = async (texto: string, rotulo: string) => {
@@ -46,12 +48,15 @@ export function QrCodeLinksDialog({
 
   const mensagemWhatsApp = [
     `Olá${evento.anfitriao?.nome ? `, ${evento.anfitriao.nome}` : ""}! 🎉`,
-    `Aqui estão os links oficiais do álbum digital da festa *${evento.titulo}*:`,
+    `Aqui estão os links oficiais da festa *${evento.titulo}*:`,
+    ...(evento.inclui_convite
+      ? ["", `💌 *Link do Convite Interativo (Enviar aos Convidados):*`, urlConvite]
+      : []),
+    ...(evento.inclui_galeria
+      ? ["", `📸 *Link do QR Code / Galeria Ao Vivo:*`, urlConvidado]
+      : []),
     "",
-    `📸 *Link do QR Code (Convidados):*`,
-    urlConvidado,
-    "",
-    `👑 *Painel Exclusivo dos Pais (Moderação e Download das fotos):*`,
+    `👑 *Painel Exclusivo dos Pais (Gestão, Lista de Presença e Fotos):*`,
     urlGestaoPai,
     ...(evento.inclui_telao
       ? ["", `📺 *Modo Telão / TV Ao Vivo:*`, urlTelao]
@@ -59,18 +64,30 @@ export function QrCodeLinksDialog({
   ].join("\n");
 
   const itensLinks = [
+    ...(evento.inclui_convite
+      ? [
+          {
+            titulo: "Link do Convite Interativo + RSVP (/convite/slug)",
+            url: urlConvite,
+          },
+        ]
+      : []),
+    ...(evento.inclui_galeria
+      ? [
+          {
+            titulo: "Link da Galeria QR Code das Mesas (/e/slug)",
+            url: urlConvidado,
+          },
+        ]
+      : []),
     {
-      titulo: "1. Link dos Convidados (QR Code das Mesas)",
-      url: urlConvidado,
-    },
-    {
-      titulo: "2. Link Secreto de Gestão dos Pais / Anfitrião",
+      titulo: "Link Secreto de Gestão dos Pais / Anfitrião",
       url: urlGestaoPai,
     },
     ...(evento.inclui_telao
       ? [
           {
-            titulo: "3. Link do Telão / TV em Tempo Real",
+            titulo: "Link do Telão / TV em Tempo Real",
             url: urlTelao,
           },
         ]
@@ -97,43 +114,47 @@ export function QrCodeLinksDialog({
         onClose={onClose}
       />
       <BaseDialog.Body className="space-y-5">
-        <div className="flex flex-col items-center justify-center p-5 rounded-2xl bg-muted/40 border border-border/60 gap-3">
-          <div className="p-4 bg-white rounded-2xl shadow-sm border">
-            <QrCodeView value={urlConvidado} size={180} />
+        {evento.inclui_galeria && (
+          <div className="flex flex-col items-center justify-center p-5 rounded-2xl bg-muted/40 border border-border/60 gap-3">
+            <div className="p-4 bg-white rounded-2xl shadow-sm border">
+              <QrCodeView value={urlConvidado} size={180} />
+            </div>
+            <p className="text-xs font-bold text-muted-foreground text-center">
+              Escaneie para abrir a câmera e galeria dos convidados
+            </p>
+            <Button
+              type="button"
+              size="sm"
+              variant="tonal"
+              loading={baixandoPlaquinha}
+              onClick={() => {
+                setBaixandoPlaquinha(true);
+                baixarPlaquinhaQrCodePng({
+                  slug: evento.slug,
+                  titulo: evento.titulo,
+                  subtitulo: evento.subtitulo,
+                  cor_primaria: evento.cor_primaria,
+                  cor_secundaria: evento.cor_secundaria,
+                  urlPublica: urlConvidado,
+                })
+                  .then(() =>
+                    toast.success(
+                      "Plaquinha QR Code pronta para impressão baixada!"
+                    )
+                  )
+                  .catch((err: Error) => toast.error(err.message))
+                  .finally(() => setBaixandoPlaquinha(false));
+              }}
+            >
+              <Download className="w-3.5 h-3.5" />
+              <span>
+                {baixandoPlaquinha
+                  ? "Gerando Plaquinha..."
+                  : "Baixar Plaquinha QR Pronta (PNG)"}
+              </span>
+            </Button>
           </div>
-          <p className="text-xs font-bold text-muted-foreground text-center">
-            Escaneie para abrir a câmera e galeria dos convidados
-          </p>
-          <Button
-            type="button"
-            size="sm"
-            variant="tonal"
-            loading={baixandoPlaquinha}
-            onClick={() => {
-              setBaixandoPlaquinha(true);
-              baixarPlaquinhaQrCodePng({
-                slug: evento.slug,
-                titulo: evento.titulo,
-                subtitulo: evento.subtitulo,
-                cor_primaria: evento.cor_primaria,
-                cor_secundaria: evento.cor_secundaria,
-                urlPublica: urlConvidado,
-              })
-                .then(() =>
-                  toast.success("Plaquinha QR Code pronta para impressão baixada!")
-                )
-                .catch((err: Error) => toast.error(err.message))
-                .finally(() => setBaixandoPlaquinha(false));
-            }}
-          >
-            <Download className="w-3.5 h-3.5" />
-            <span>
-              {baixandoPlaquinha
-                ? "Gerando Plaquinha..."
-                : "Baixar Plaquinha QR Pronta (PNG)"}
-            </span>
-          </Button>
-        </div>
+        )}
 
         <Banner
           variant="neutral"

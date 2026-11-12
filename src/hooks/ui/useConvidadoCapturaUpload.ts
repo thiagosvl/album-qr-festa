@@ -96,7 +96,7 @@ export function useConvidadoCapturaUpload({
     const toastId = toast.loading("Enviando vídeo curto para a festa...");
     try {
       const up = await validarEEnviarVideoCurto(
-        evento.slug,
+        evento.codigo_url || evento.slug,
         file,
         setProgressoUpload
       );
@@ -158,7 +158,7 @@ export function useConvidadoCapturaUpload({
         );
       }
       const up = await comporEEnviarFotoConvidado({
-        slugEvento: evento.slug,
+        slugEvento: evento.codigo_url || evento.slug,
         fonteCapturada,
         molduraSelecionada,
         transformacao,

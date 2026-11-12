@@ -1,4 +1,5 @@
 import { Sparkles } from "lucide-react";
+import { EventoConviteConfigSection } from "@/components/dialogs/evento-form/EventoConviteConfigSection";
 import { EventoDadosBasicosSection } from "@/components/dialogs/evento-form/EventoDadosBasicosSection";
 import { EventoFinanceiroExtrasSection } from "@/components/dialogs/evento-form/EventoFinanceiroExtrasSection";
 import { BaseDialog } from "@/components/ui/BaseDialog";
@@ -30,10 +31,16 @@ export function EventoFormDialog({
     extrasCatalogo,
     temas,
     extrasArray,
+    enviandoMidiaConvite,
+    alternarModuloProduto,
+    aplicarKitGaleriaCompleta,
     selecionarPacoteTipo,
+    enviarArquivoConvite,
     onSubmit,
     isSubmitting,
   } = useEventoAdminForm(open, eventoEdicao, onClose);
+
+  const incluiConvite = form.watch("inclui_convite");
 
   return (
     <BaseDialog
@@ -42,11 +49,11 @@ export function EventoFormDialog({
         if (!isOpen) safeCloseDialog(onClose);
       }}
       lockClose={isSubmitting}
-      className="sm:max-w-[720px]"
+      className="sm:max-w-[760px]"
     >
       <BaseDialog.Header
         title={eventoEdicao ? "Editar Evento" : "Novo Evento / Pedido B2C"}
-        subtitle="Configure pacote, limites de molduras, extras negociados e valores"
+        subtitle="Configure produtos (Galeria e/ou Convite), extras negociados e valores"
         icon={Sparkles}
         onClose={onClose}
         lockClose={isSubmitting}
@@ -63,7 +70,16 @@ export function EventoFormDialog({
               pacotes={pacotes}
               temas={temas}
               onSelectPacote={selecionarPacoteTipo}
+              onToggleModulo={alternarModuloProduto}
+              onAplicarKitCompleto={aplicarKitGaleriaCompleta}
             />
+            {incluiConvite && (
+              <EventoConviteConfigSection
+                form={form}
+                enviandoMidiaConvite={enviandoMidiaConvite}
+                onUploadArquivoConvite={enviarArquivoConvite}
+              />
+            )}
             <EventoFinanceiroExtrasSection
               form={form}
               extrasArray={extrasArray}

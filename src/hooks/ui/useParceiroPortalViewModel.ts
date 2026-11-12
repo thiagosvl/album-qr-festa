@@ -114,7 +114,25 @@ export function useParceiroPortalViewModel() {
     openDialog(FESTA_DIALOG_NAMES.EVENTO_PARCEIRO_B2B_FORM, {
       parceiro,
       temas: dados?.temas ?? [],
+      produtosCatalogo: dados?.produtos_b2c ?? [],
+      extrasCatalogo: dados?.extras_b2c ?? [],
+      evento: null,
     });
+  };
+
+  const abrirEditarEventoParceiro = (evento: EventoAdminDto) => {
+    if (!parceiro) return;
+    openDialog(FESTA_DIALOG_NAMES.EVENTO_PARCEIRO_B2B_FORM, {
+      parceiro,
+      temas: dados?.temas ?? [],
+      produtosCatalogo: dados?.produtos_b2c ?? [],
+      extrasCatalogo: dados?.extras_b2c ?? [],
+      evento,
+    });
+  };
+
+  const abrirConfirmacoesEvento = (evento: EventoAdminDto) => {
+    openDialog(FESTA_DIALOG_NAMES.CONFIRMACOES_EVENTO, { evento });
   };
 
   const abrirQrLinksEvento = (evento: EventoAdminDto) => {
@@ -174,6 +192,8 @@ export function useParceiroPortalViewModel() {
     setAbaAtiva,
     ...marcaState,
     abrirAtivarEventoDialog,
+    abrirEditarEventoParceiro,
+    abrirConfirmacoesEvento,
     abrirQrLinksEvento,
     abrirMoldurasEvento,
     abrirMidiasEvento,

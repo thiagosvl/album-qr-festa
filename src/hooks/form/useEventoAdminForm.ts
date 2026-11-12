@@ -1,16 +1,30 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useFieldArray, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { toast } from "sonner";
-import { FESTA_CORES_PADRAO, FESTA_PACOTE_TIPO, FESTA_STATUS_PEDIDO } from "@/constants";
+import {
+  FESTA_CODIGO_MODULO,
+  FESTA_CORES_PADRAO,
+  FESTA_DESTINO_UPLOAD_EXTRA,
+  FESTA_EFEITO_EXTRA,
+  FESTA_PACOTE_TIPO,
+  FESTA_STATUS_PEDIDO,
+  type FestaDestinoUploadExtra,
+} from "@/constants";
 import { notificarErrosFormulario } from "@/components/ui/form";
 import { useCatalogoPublicoQuery } from "@/hooks/api/useCatalogoApi";
 import {
   useAtualizarEventoMutation,
   useCriarEventoMutation,
 } from "@/hooks/api/useEventosApi";
+import { uploadBlobComProgresso } from "@/hooks/business/useComposicaoCanvas";
+import {
+  criarDefaultValuesEventoAdminForm,
+  montarPayloadEventoAdminForm,
+} from "@/hooks/business/useEventoAdminPayload";
 import { safeCloseDialog } from "@/hooks/ui/useDialogClose";
+import { gerarUuidLocal } from "@/lib/utils";
 import type { EventoAdminDto } from "@/types/festa.types";
 
 const extraItemSchema = z.object({
@@ -21,10 +35,7 @@ const extraItemSchema = z.object({
 });
 
 export const eventoAdminFormSchema = z.object({
-  slug: z
-    .string()
-    .min(2, "Slug deve ter no mínimo 2 caracteres")
-    .regex(/^[a-z0-9-]+$/, "Use apenas letras minúsculas, números e hífens"),
+  slug: z.string().optional(),
   titulo: z.string().min(2, "Informe o título da festa"),
   subtitulo: z.string().optional(),
   boas_vindas: z.string().optional(),
@@ -32,6 +43,8 @@ export const eventoAdminFormSchema = z.object({
   idade_aniversariante: z.string().optional(),
   data_evento: z.string().optional(),
   pacote: z.enum([FESTA_PACOTE_TIPO.BASICO, FESTA_PACOTE_TIPO.COMPLETO]),
+  inclui_galeria: z.boolean().default(true),
+  inclui_convite: z.boolean().default(false),
   status_pedido: z.enum([
     FESTA_STATUS_PEDIDO.AGUARDANDO_SINAL,
     FESTA_STATUS_PEDIDO.SINAL_PAGO,
@@ -56,6 +69,22 @@ export const eventoAdminFormSchema = z.object({
   valor_sinal_reais: z.coerce.number().min(0),
   observacoes_internas: z.string().optional(),
   extras: z.array(extraItemSchema).default([]),
+  convite_texto_chamada: z.string().optional(),
+  convite_foto_url: z.string().optional(),
+  convite_banner_topo_url: z.string().optional(),
+  convite_musica_url: z.string().optional(),
+  convite_audio_obrigado_url: z.string().optional(),
+  convite_horario_inicio: z.string().optional(),
+  convite_horario_texto: z.string().optional(),
+  convite_nome_local: z.string().optional(),
+  convite_endereco: z.string().optional(),
+  convite_exibir_presentes: z.boolean().default(true),
+  convite_titulo_tamanhos: z.string().optional(),
+  convite_tamanho_calcado: z.string().optional(),
+  convite_tamanho_roupa: z.string().optional(),
+  convite_ideias_presentes_texto: z.string().optional(),
+  convite_texto_prazo_rsvp: z.string().optional(),
+  convite_whatsapp_contato: z.string().optional(),
 });
 
 export type EventoAdminFormValues = z.infer<typeof eventoAdminFormSchema>;
@@ -65,7 +94,10 @@ export function useEventoAdminForm(
   eventoEdicao: EventoAdminDto | null,
   onSuccessClose: () => void
 ) {
+  const [enviandoMidiaConvite, setEnviandoMidiaConvite] =
+    useState<FestaDestinoUploadExtra | null>(null);
   const catalogoQuery = useCatalogoPublicoQuery(open);
+  const produtosCatalogo = catalogoQuery.data?.produtos_b2c ?? [];
   const pacotes = catalogoQuery.data?.pacotes_b2c ?? [];
   const extrasCatalogo = catalogoQuery.data?.extras_b2c ?? [];
   const temas = catalogoQuery.data?.temas ?? [];
@@ -73,42 +105,17 @@ export function useEventoAdminForm(
   const criarMutation = useCriarEventoMutation();
   const atualizarMutation = useAtualizarEventoMutation();
 
-  const pacotePadrao =
-    pacotes.find((p) => p.tipo_pacote === FESTA_PACOTE_TIPO.COMPLETO) ??
-    pacotes[0];
-  const precoPadraoReais = pacotePadrao ? pacotePadrao.preco_centavos / 100 : 127;
-  const sinalPadraoReais = pacotePadrao
-    ? Math.round(pacotePadrao.preco_centavos / 2) / 100
-    : 63.5;
+  const prodGaleria = produtosCatalogo.find(
+    (p) => p.codigo_modulo === FESTA_CODIGO_MODULO.GALERIA
+  );
+  const prodConvite = produtosCatalogo.find(
+    (p) => p.codigo_modulo === FESTA_CODIGO_MODULO.CONVITE
+  );
+  const precoGaleriaReais = prodGaleria ? prodGaleria.preco_centavos / 100 : 97;
 
   const form = useForm<EventoAdminFormValues>({
     resolver: zodResolver(eventoAdminFormSchema),
-    defaultValues: {
-      slug: "",
-      titulo: "",
-      subtitulo: "",
-      boas_vindas: "",
-      nome_aniversariante: "",
-      idade_aniversariante: "",
-      data_evento: new Date().toISOString().slice(0, 10),
-      pacote: FESTA_PACOTE_TIPO.COMPLETO,
-      status_pedido: FESTA_STATUS_PEDIDO.AGUARDANDO_SINAL,
-      tema_id: "",
-      nome_anfitriao: "",
-      telefone_anfitriao: "",
-      email_anfitriao: "",
-      cor_primaria: FESTA_CORES_PADRAO.PRIMARIA,
-      cor_secundaria: FESTA_CORES_PADRAO.SECUNDARIA,
-      galeria_publica: true,
-      moderacao_previa: false,
-      permite_envio_midias: true,
-      permite_video: false,
-      valor_pacote_reais: precoPadraoReais,
-      desconto_reais: 0,
-      valor_sinal_reais: sinalPadraoReais,
-      observacoes_internas: "",
-      extras: [],
-    },
+    defaultValues: criarDefaultValuesEventoAdminForm(precoGaleriaReais, null),
   });
 
   const extrasArray = useFieldArray({
@@ -121,115 +128,133 @@ export function useEventoAdminForm(
 
   useEffect(() => {
     if (!open) return;
-    if (eventoEdicao) {
-      reset({
-        slug: eventoEdicao.slug,
-        titulo: eventoEdicao.titulo,
-        subtitulo: eventoEdicao.subtitulo ?? "",
-        boas_vindas: eventoEdicao.boas_vindas ?? "",
-        nome_aniversariante: eventoEdicao.nome_aniversariante ?? "",
-        idade_aniversariante: eventoEdicao.idade_aniversariante ?? "",
-        data_evento: eventoEdicao.data_evento ?? "",
-        pacote: eventoEdicao.pacote,
-        status_pedido: eventoEdicao.status_pedido,
-        tema_id: eventoEdicao.tema_id ?? "",
-        nome_anfitriao: eventoEdicao.anfitriao?.nome ?? "",
-        telefone_anfitriao: eventoEdicao.anfitriao?.telefone ?? "",
-        email_anfitriao: eventoEdicao.anfitriao?.email ?? "",
-        cor_primaria: eventoEdicao.cor_primaria,
-        cor_secundaria: eventoEdicao.cor_secundaria,
-        galeria_publica: eventoEdicao.galeria_publica,
-        moderacao_previa: eventoEdicao.moderacao_previa,
-        permite_envio_midias: eventoEdicao.permite_envio_midias,
-        permite_video: eventoEdicao.permite_video,
-        valor_pacote_reais: eventoEdicao.valor_pacote_centavos / 100,
-        desconto_reais: eventoEdicao.desconto_centavos / 100,
-        valor_sinal_reais: eventoEdicao.valor_sinal_centavos / 100,
-        observacoes_internas: eventoEdicao.observacoes_internas ?? "",
-        extras: (eventoEdicao.extras ?? []).map((ex) => ({
-          extra_id: ex.extra_id,
-          nome: ex.nome,
-          quantidade: ex.quantidade,
-          preco_unitario_reais: ex.preco_unitario_centavos / 100,
-        })),
-      });
-    } else {
-      reset({
-        slug: "",
-        titulo: "",
-        subtitulo: "",
-        boas_vindas: "",
-        nome_aniversariante: "",
-        idade_aniversariante: "",
-        data_evento: new Date().toISOString().slice(0, 10),
-        pacote: FESTA_PACOTE_TIPO.COMPLETO,
-        status_pedido: FESTA_STATUS_PEDIDO.AGUARDANDO_SINAL,
-        tema_id: "",
-        nome_anfitriao: "",
-        telefone_anfitriao: "",
-        email_anfitriao: "",
-        cor_primaria: FESTA_CORES_PADRAO.PRIMARIA,
-        cor_secundaria: FESTA_CORES_PADRAO.SECUNDARIA,
-        galeria_publica: true,
-        moderacao_previa: false,
-        permite_envio_midias: true,
-        permite_video: false,
-        valor_pacote_reais: precoPadraoReais,
-        desconto_reais: 0,
-        valor_sinal_reais: sinalPadraoReais,
-        observacoes_internas: "",
-        extras: [],
-      });
-    }
-  }, [open, eventoId, precoPadraoReais, sinalPadraoReais, reset]);
+    reset(criarDefaultValuesEventoAdminForm(precoGaleriaReais, eventoEdicao));
+  }, [open, eventoId, precoGaleriaReais, reset]);
+
+  const recalcularValoresProdutos = (
+    galeriaAtiva: boolean,
+    conviteAtivo: boolean
+  ) => {
+    let somaCentavos = 0;
+    if (galeriaAtiva) somaCentavos += prodGaleria?.preco_centavos ?? 9700;
+    if (conviteAtivo) somaCentavos += prodConvite?.preco_centavos ?? 8990;
+    const precoReais = somaCentavos / 100;
+    const extrasAtuais = form.getValues("extras") ?? [];
+    const totalExtrasReais = extrasAtuais.reduce(
+      (acc, item) => acc + item.preco_unitario_reais * item.quantidade,
+      0
+    );
+    const descontoReais = form.getValues("desconto_reais") || 0;
+    const totalPedidoReais = Math.max(
+      0,
+      precoReais + totalExtrasReais - descontoReais
+    );
+    form.setValue("valor_pacote_reais", precoReais);
+    form.setValue("valor_sinal_reais", Number((totalPedidoReais / 2).toFixed(2)));
+  };
+
+  const alternarModuloProduto = (
+    modulo:
+      | typeof FESTA_CODIGO_MODULO.GALERIA
+      | typeof FESTA_CODIGO_MODULO.CONVITE,
+    ativo: boolean
+  ) => {
+    const galeriaAtual =
+      modulo === FESTA_CODIGO_MODULO.GALERIA
+        ? ativo
+        : form.getValues("inclui_galeria");
+    const conviteAtual =
+      modulo === FESTA_CODIGO_MODULO.CONVITE
+        ? ativo
+        : form.getValues("inclui_convite");
+
+    form.setValue("inclui_galeria", galeriaAtual);
+    form.setValue("inclui_convite", conviteAtual);
+    recalcularValoresProdutos(galeriaAtual, conviteAtual);
+  };
+
+  const aplicarKitGaleriaCompleta = () => {
+    form.setValue("inclui_galeria", true);
+    form.setValue("pacote", FESTA_PACOTE_TIPO.COMPLETO);
+    form.setValue("permite_video", true);
+
+    const extrasKit = extrasCatalogo
+      .filter(
+        (ex) =>
+          ex.efeito_tipo === FESTA_EFEITO_EXTRA.LIBERAR_TELAO ||
+          ex.efeito_tipo === FESTA_EFEITO_EXTRA.LIBERAR_VIDEO ||
+          ex.efeito_tipo === FESTA_EFEITO_EXTRA.MOLDURA_ADICIONAL ||
+          ex.efeito_tipo === FESTA_EFEITO_EXTRA.DIAS_GALERIA_ADICIONAIS ||
+          ex.slug.includes("qr")
+      )
+      .map((ex) => ({
+        extra_id: ex.id,
+        nome: ex.nome,
+        quantidade:
+          ex.efeito_tipo === FESTA_EFEITO_EXTRA.MOLDURA_ADICIONAL ? 2 : 1,
+        preco_unitario_reais: ex.preco_centavos / 100,
+      }));
+
+    form.setValue("extras", extrasKit);
+    recalcularValoresProdutos(true, form.getValues("inclui_convite"));
+    toast.success(
+      "Kit Galeria Completa aplicado! Você pode ajustar itens se desejar."
+    );
+  };
 
   const selecionarPacoteTipo = (tipo: EventoAdminFormValues["pacote"]) => {
     form.setValue("pacote", tipo);
-    const item = pacotes.find((p) => p.tipo_pacote === tipo);
-    if (item) {
-      const precoReais = item.preco_centavos / 100;
-      form.setValue("valor_pacote_reais", precoReais);
-      form.setValue("valor_sinal_reais", Number((precoReais / 2).toFixed(2)));
+    if (tipo === FESTA_PACOTE_TIPO.COMPLETO) {
+      aplicarKitGaleriaCompleta();
+    } else {
+      form.setValue("inclui_galeria", true);
+      form.setValue("extras", []);
+      recalcularValoresProdutos(true, form.getValues("inclui_convite"));
+    }
+  };
+
+  const enviarArquivoConvite = async (
+    file: File,
+    destino: FestaDestinoUploadExtra
+  ) => {
+    const prefixoAlvo =
+      eventoEdicao?.codigo_url || eventoEdicao?.slug || "convite-rascunho";
+    setEnviandoMidiaConvite(destino);
+    try {
+      const ext = file.name.split(".").pop()?.toLowerCase() || "jpg";
+      const storagePath = `${prefixoAlvo}/convite/${destino}-${gerarUuidLocal()}.${ext}`;
+      const publicUrl = await uploadBlobComProgresso(storagePath, file);
+      if (destino === FESTA_DESTINO_UPLOAD_EXTRA.CONVITE_FOTO) {
+        form.setValue("convite_foto_url", publicUrl);
+      } else if (destino === FESTA_DESTINO_UPLOAD_EXTRA.CONVITE_BANNER) {
+        form.setValue("convite_banner_topo_url", publicUrl);
+      } else if (destino === FESTA_DESTINO_UPLOAD_EXTRA.CONVITE_MUSICA) {
+        form.setValue("convite_musica_url", publicUrl);
+      } else if (destino === FESTA_DESTINO_UPLOAD_EXTRA.CONVITE_AUDIO_OBRIGADO) {
+        form.setValue("convite_audio_obrigado_url", publicUrl);
+      }
+      toast.success("Arquivo do convite enviado com sucesso!");
+    } catch (err) {
+      toast.error(
+        err instanceof Error ? err.message : "Erro ao enviar arquivo do convite"
+      );
+    } finally {
+      setEnviandoMidiaConvite(null);
     }
   };
 
   const onSubmit = form.handleSubmit(async (values) => {
+    if (!values.inclui_galeria && !values.inclui_convite) {
+      toast.error("Selecione pelo menos 1 produto (Galeria ou Convite).");
+      return;
+    }
+
     try {
-      const payload = {
-        slug: values.slug.trim().toLowerCase(),
-        titulo: values.titulo.trim(),
-        subtitulo: values.subtitulo?.trim() || null,
-        boas_vindas: values.boas_vindas?.trim() || null,
-        nome_aniversariante: values.nome_aniversariante?.trim() || null,
-        idade_aniversariante: values.idade_aniversariante?.trim() || null,
-        data_evento: values.data_evento || null,
-        pacote: values.pacote,
-        status_pedido: values.status_pedido,
-        tema_id: values.tema_id || null,
-        anfitriao: values.nome_anfitriao?.trim()
-          ? {
-              nome: values.nome_anfitriao.trim(),
-              telefone: values.telefone_anfitriao?.trim() || null,
-              email: values.email_anfitriao?.trim() || null,
-            }
-          : undefined,
-        cor_primaria: values.cor_primaria,
-        cor_secundaria: values.cor_secundaria,
-        galeria_publica: values.galeria_publica,
-        moderacao_previa: values.moderacao_previa,
-        permite_envio_midias: values.permite_envio_midias,
-        permite_video: values.permite_video,
-        valor_pacote_centavos: Math.round(values.valor_pacote_reais * 100),
-        desconto_centavos: Math.round(values.desconto_reais * 100),
-        valor_sinal_centavos: Math.round(values.valor_sinal_reais * 100),
-        observacoes_internas: values.observacoes_internas?.trim() || null,
-        extras: values.extras.map((item) => ({
-          extra_id: item.extra_id || null,
-          nome: item.nome.trim(),
-          quantidade: item.quantidade,
-          preco_unitario_centavos: Math.round(item.preco_unitario_reais * 100),
-        })),
-      };
+      const payload = montarPayloadEventoAdminForm(
+        values,
+        prodGaleria,
+        prodConvite
+      );
 
       if (eventoEdicao) {
         await atualizarMutation.mutateAsync({
@@ -252,11 +277,16 @@ export function useEventoAdminForm(
 
   return {
     form,
+    produtosCatalogo,
     pacotes,
     extrasCatalogo,
     temas,
     extrasArray,
+    enviandoMidiaConvite,
+    alternarModuloProduto,
+    aplicarKitGaleriaCompleta,
     selecionarPacoteTipo,
+    enviarArquivoConvite,
     onSubmit,
     isSubmitting: criarMutation.isPending || atualizarMutation.isPending,
   };

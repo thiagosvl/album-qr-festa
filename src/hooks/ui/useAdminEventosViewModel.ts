@@ -27,6 +27,7 @@ import type {
   FestaCatalogoExtraB2c,
   FestaCatalogoPacoteB2c,
   FestaCatalogoPlanoB2b,
+  FestaCatalogoProduto,
   FestaStatusPedidoEnum,
   FestaTemaCatalogo,
   ParceiroB2bAdminDto,
@@ -188,6 +189,14 @@ export function useAdminEventosViewModel() {
     openDialog(FESTA_DIALOG_NAMES.QRCODE_LINKS, { evento });
   };
 
+  const abrirConfirmacoesEventoDialog = (evento: EventoAdminDto) => {
+    openDialog(FESTA_DIALOG_NAMES.CONFIRMACOES_EVENTO, { evento });
+  };
+
+  const abrirEditarProdutoDialog = (produto: FestaCatalogoProduto) => {
+    openDialog(FESTA_DIALOG_NAMES.PRODUTO_B2C_FORM, { produto });
+  };
+
   const abrirEditarPacoteDialog = (pacote: FestaCatalogoPacoteB2c) => {
     openDialog(FESTA_DIALOG_NAMES.PACOTE_B2C_FORM, { pacote });
   };
@@ -286,6 +295,8 @@ export function useAdminEventosViewModel() {
     abrirMidiasAdminDialog,
     abrirExtrasAdminDialog,
     abrirQrCodeLinksDialog,
+    abrirConfirmacoesEventoDialog,
+    abrirEditarProdutoDialog,
     abrirEditarPacoteDialog,
     abrirNovoExtraDialog,
     abrirEditarExtraDialog,

@@ -52,11 +52,16 @@ export const FESTA_ROUTES = {
   HOME: "/",
   LOGIN: "/login",
   DEMO_CONVIDADO: "/e/demo",
+  DEMO_CONVITE: "/convite/demo",
   DEMO_TELAO: "/telao/demo",
   LEGACY_ADMIN: "/e/admin",
   LEGACY_PARCEIRO: "/e/parceiro",
-  EVENTO_CONVIDADO: "/e/:slug",
-  EVENTO_TELAO: "/telao/:slug",
+  EVENTO_CONVIDADO: "/e/:codigoUrl/:slug",
+  EVENTO_CONVIDADO_CURTO: "/e/:slug",
+  EVENTO_CONVITE: "/convite/:codigoUrl/:slug",
+  EVENTO_CONVITE_CURTO: "/convite/:slug",
+  EVENTO_TELAO: "/telao/:codigoUrl/:slug",
+  EVENTO_TELAO_CURTO: "/telao/:slug",
   GESTAO_PAI: "/gestao/:token",
   ADMIN_LOGIN: "/admin/login",
   ADMIN_DASHBOARD: "/admin",
@@ -70,6 +75,7 @@ export const STORAGE_KEYS = {
   CONVIDADO_NOME_AUTOR: "@festalgia:convidado_nome_autor",
   CONVIDADO_CURTIDAS: "@festalgia:convidado_curtidas",
   CONVIDADO_MINHAS_MIDIAS: "@festalgia:convidado_minhas_midias",
+  CONVITE_CONFIRMADO_POR_SLUG: "@festalgia:convite_confirmado_por_slug",
   ADMIN_FILTRO_STATUS: "@festalgia:admin_filtro_status",
   ADMIN_ABA_ATIVA: "@festalgia:admin_aba_ativa",
   GESTAO_DICA_DISPENSADA: "@festalgia:gestao_dica_dispensada",
@@ -86,6 +92,11 @@ export const FESTA_TIPO_PERFIL = {
 export const FESTA_PACOTE_TIPO = {
   BASICO: "BASICO",
   COMPLETO: "COMPLETO",
+} as const;
+
+export const FESTA_CODIGO_MODULO = {
+  GALERIA: "GALERIA",
+  CONVITE: "CONVITE",
 } as const;
 
 export const FESTA_STATUS_PEDIDO = {
@@ -174,6 +185,7 @@ export type FestaParceiroTab =
 
 export const FESTA_GESTAO_PAI_TABS = {
   MODERACAO: "MODERACAO",
+  CONVITE_CONFIRMADOS: "CONVITE_CONFIRMADOS",
   BRIEFING: "BRIEFING",
   ACESSO_QR: "ACESSO_QR",
 } as const;
@@ -257,6 +269,10 @@ export type FestaAcaoMoldura =
 export const FESTA_DESTINO_UPLOAD_EXTRA = {
   CAPA: "capa",
   PDF: "pdf",
+  CONVITE_FOTO: "convite-foto",
+  CONVITE_BANNER: "convite-banner",
+  CONVITE_MUSICA: "convite-musica",
+  CONVITE_AUDIO_OBRIGADO: "convite-audio-obrigado",
 } as const;
 
 export type FestaDestinoUploadExtra =
@@ -280,6 +296,7 @@ export const FESTA_DIALOG_NAMES = {
   MIDIA_VIEWER: "midiaViewerDialog",
   MIDIAS_EVENTO_ADMIN: "midiasEventoAdminDialog",
   EXTRAS_EVENTO_ADMIN: "extrasEventoAdminDialog",
+  PRODUTO_B2C_FORM: "produtoB2cFormDialog",
   PACOTE_B2C_FORM: "pacoteB2cFormDialog",
   EXTRA_B2C_FORM: "extraB2cFormDialog",
   TEMA_CATALOGO_FORM: "temaCatalogoFormDialog",
@@ -288,6 +305,8 @@ export const FESTA_DIALOG_NAMES = {
   EVENTO_PARCEIRO_B2B_FORM: "eventoParceiroB2bFormDialog",
   OPERADOR_PARCEIRO_FORM: "operadorParceiroFormDialog",
   RECUPERAR_SENHA: "recuperarSenhaDialog",
+  CONFIRMACAO_RSVP_FORM: "confirmacaoRsvpFormDialog",
+  CONFIRMACOES_EVENTO: "confirmacoesEventoDialog",
 } as const;
 
 export type FestaDialogName =

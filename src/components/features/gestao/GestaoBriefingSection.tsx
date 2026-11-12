@@ -1,6 +1,7 @@
 import { Save, Sparkles } from "lucide-react";
 import { GestaoBriefingSidebar } from "@/components/features/gestao/GestaoBriefingSidebar";
 import { GestaoBriefingVisualFields } from "@/components/features/gestao/GestaoBriefingVisualFields";
+import { GestaoConviteConfigSection } from "@/components/features/gestao/GestaoConviteConfigSection";
 import { Banner } from "@/components/ui/Banner";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -32,8 +33,15 @@ export function GestaoBriefingSection({
   temasCatalogo,
   onGerenciarMolduras,
 }: GestaoBriefingSectionProps) {
-  const { form, enviandoCapa, enviarFotoCapa, onSubmit, isSaving } =
-    useBriefingPaiForm(token, gestao);
+  const {
+    form,
+    enviandoCapa,
+    enviandoMidiaConvite,
+    enviarFotoCapa,
+    enviarArquivoConvite,
+    onSubmit,
+    isSaving,
+  } = useBriefingPaiForm(token, gestao);
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -142,13 +150,22 @@ export function GestaoBriefingSection({
                 temasCatalogo={temasCatalogo}
                 enviandoCapa={enviandoCapa}
                 onEnviarFotoCapa={enviarFotoCapa}
+                incluiGaleria={gestao.evento.inclui_galeria}
               />
+
+              {gestao.evento.inclui_convite && (
+                <GestaoConviteConfigSection
+                  form={form}
+                  enviandoMidiaConvite={enviandoMidiaConvite}
+                  onUploadArquivoConvite={enviarArquivoConvite}
+                />
+              )}
 
               <div className="flex justify-end">
                 <Button
                   type="submit"
                   loading={isSaving}
-                  disabled={enviandoCapa}
+                  disabled={enviandoCapa || Boolean(enviandoMidiaConvite)}
                 >
                   <Save className="w-4 h-4" />
                   <span>{isSaving ? "Salvando..." : "Salvar alterações"}</span>

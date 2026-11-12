@@ -57,7 +57,8 @@ export function useExtrasEventoArquivosForm(
     setEnviandoDestino(destino);
     try {
       const ext = file.name.split(".").pop() || "jpg";
-      const storagePath = `${evento.slug}/midias/${destino}-${gerarUuidLocal()}.${ext}`;
+      const prefixo = evento.codigo_url || evento.slug;
+      const storagePath = `${prefixo}/midias/${destino}-${gerarUuidLocal()}.${ext}`;
       const url = await uploadBlobComProgresso(
         storagePath,
         file

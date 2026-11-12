@@ -25,9 +25,13 @@ const BOTAO_BASE =
 const BOTAO_CLARO = `${BOTAO_BASE} bg-white/12 text-white hover:bg-white/20`;
 
 export function TelaoPage() {
-  const { slug = "demo" } = useParams<{ slug: string }>();
+  const { codigoUrl, slug = "demo" } = useParams<{
+    codigoUrl?: string;
+    slug?: string;
+  }>();
+  const identificador = codigoUrl ?? slug;
   const { openDialog } = useLayout();
-  const vm = useTelaoViewModel(slug);
+  const vm = useTelaoViewModel(identificador);
 
   if (vm.isLoading) {
     return (
@@ -61,7 +65,10 @@ export function TelaoPage() {
     );
   }
 
-  const urlPublica = gerarUrlPublicaEvento(vm.evento.slug);
+  const urlPublica = gerarUrlPublicaEvento(
+    vm.evento.slug,
+    vm.evento.codigo_url
+  );
   const customVars = {
     "--cor1": vm.evento.cor_primaria,
     "--cor2": vm.evento.cor_secundaria,

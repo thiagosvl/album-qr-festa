@@ -89,6 +89,8 @@ export function ParceiroB2bPlaceholderPage() {
           <ParceiroEventosSection
             eventos={vm.eventos}
             onAtivarEvento={vm.abrirAtivarEventoDialog}
+            onEditarEvento={vm.abrirEditarEventoParceiro}
+            onAbrirConfirmacoes={vm.abrirConfirmacoesEvento}
             onAbrirQrLinks={vm.abrirQrLinksEvento}
             onAbrirMolduras={vm.abrirMoldurasEvento}
             onAbrirMidias={vm.abrirMidiasEvento}

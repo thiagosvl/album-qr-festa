@@ -44,7 +44,8 @@ export function useMolduraForm(
     setEnviando(true);
     try {
       const idUnico = gerarUuidLocal();
-      const storagePath = `${evento.slug}/midias/molduras/${idUnico}.png`;
+      const prefixo = evento.codigo_url || evento.slug;
+      const storagePath = `${prefixo}/midias/molduras/${idUnico}.png`;
       await uploadBlobComProgresso(
         storagePath,
         values.arquivo

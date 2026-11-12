@@ -6,6 +6,7 @@ import { LayoutContextProvider } from "@/contexts/LayoutContext";
 import { AdminEventosPage } from "@/pages/AdminEventosPage";
 import { AdminLoginPage } from "@/pages/AdminLoginPage";
 import { ConvidadoPage } from "@/pages/ConvidadoPage";
+import ConvitePublicoPage from "@/pages/ConvitePublicoPage";
 import { GestaoPaiPage } from "@/pages/GestaoPaiPage";
 import { ImpersonateBridgePage } from "@/pages/ImpersonateBridgePage";
 import { ParceiroB2bPlaceholderPage } from "@/pages/ParceiroB2bPlaceholderPage";
@@ -45,7 +46,23 @@ export function App() {
                 path={FESTA_ROUTES.EVENTO_CONVIDADO}
                 element={<ConvidadoPage />}
               />
+              <Route
+                path={FESTA_ROUTES.EVENTO_CONVIDADO_CURTO}
+                element={<ConvidadoPage />}
+              />
+              <Route
+                path={FESTA_ROUTES.EVENTO_CONVITE}
+                element={<ConvitePublicoPage />}
+              />
+              <Route
+                path={FESTA_ROUTES.EVENTO_CONVITE_CURTO}
+                element={<ConvitePublicoPage />}
+              />
               <Route path={FESTA_ROUTES.EVENTO_TELAO} element={<TelaoPage />} />
+              <Route
+                path={FESTA_ROUTES.EVENTO_TELAO_CURTO}
+                element={<TelaoPage />}
+              />
               <Route
                 path={FESTA_ROUTES.GESTAO_PAI}
                 element={<GestaoPaiPage />}

@@ -18,6 +18,7 @@ interface GestaoBriefingVisualFieldsProps {
   temasCatalogo: FestaTemaCatalogo[];
   enviandoCapa: boolean;
   onEnviarFotoCapa: (file: File) => void;
+  incluiGaleria?: boolean;
 }
 
 export function GestaoBriefingVisualFields({
@@ -25,6 +26,7 @@ export function GestaoBriefingVisualFields({
   temasCatalogo,
   enviandoCapa,
   onEnviarFotoCapa,
+  incluiGaleria = true,
 }: GestaoBriefingVisualFieldsProps) {
   return (
     <>
@@ -182,29 +184,31 @@ export function GestaoBriefingVisualFields({
         )}
       />
 
-      <div className="flex flex-wrap gap-6 pt-1">
-        <label className="flex items-center gap-2 text-xs font-medium cursor-pointer">
-          <input
-            type="checkbox"
-            className="h-4 w-4 rounded accent-uva"
-            {...form.register("galeria_publica")}
-          />
-          <span>
-            Galeria pública: os convidados veem as fotos uns dos outros
-          </span>
-        </label>
+      {incluiGaleria && (
+        <div className="flex flex-wrap gap-6 pt-1">
+          <label className="flex items-center gap-2 text-xs font-medium cursor-pointer">
+            <input
+              type="checkbox"
+              className="h-4 w-4 rounded accent-uva"
+              {...form.register("galeria_publica")}
+            />
+            <span>
+              Galeria pública: os convidados veem as fotos uns dos outros
+            </span>
+          </label>
 
-        <label className="flex items-center gap-2 text-xs font-medium cursor-pointer">
-          <input
-            type="checkbox"
-            className="h-4 w-4 rounded accent-uva"
-            {...form.register("moderacao_previa")}
-          />
-          <span>
-            Aprovar as fotos antes de aparecerem no mural e no telão
-          </span>
-        </label>
-      </div>
+          <label className="flex items-center gap-2 text-xs font-medium cursor-pointer">
+            <input
+              type="checkbox"
+              className="h-4 w-4 rounded accent-uva"
+              {...form.register("moderacao_previa")}
+            />
+            <span>
+              Aprovar as fotos antes de aparecerem no mural e no telão
+            </span>
+          </label>
+        </div>
+      )}
     </>
   );
 }

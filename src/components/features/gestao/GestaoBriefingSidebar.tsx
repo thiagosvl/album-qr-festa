@@ -23,53 +23,55 @@ export function GestaoBriefingSidebar({
 
   return (
     <div className="space-y-6">
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between gap-2 pb-3">
-          <CardTitle className="text-base">
-            Molduras ({molduras.length}/{evento.limite_molduras})
-          </CardTitle>
-          {onGerenciarMolduras && (
-            <Button
-              type="button"
-              size="sm"
-              variant="tonal"
-              onClick={onGerenciarMolduras}
-            >
-              <Frame className="w-3.5 h-3.5" />
-              <span>Gerenciar</span>
-            </Button>
-          )}
-        </CardHeader>
-        <CardContent className="space-y-3">
-          {molduras.length === 0 ? (
-            <Banner
-              variant="neutral"
-              title="Nenhuma moldura enviada ainda"
-              description="Suas molduras aparecem aqui assim que a arte ficar pronta."
-            />
-          ) : (
-            <div className="grid grid-cols-2 gap-3">
-              {molduras.map((m) => (
-                <div
-                  key={m.id}
-                  className="rounded-xl border border-border/60 p-2 bg-muted/20 space-y-1.5"
-                >
-                  <div className="xadrez aspect-[9/16] rounded-lg overflow-hidden">
-                    <img
-                      src={m.arquivo_url}
-                      alt={m.nome}
-                      className="w-full h-full object-contain"
-                    />
+      {evento.inclui_galeria && (
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between gap-2 pb-3">
+            <CardTitle className="text-base">
+              Molduras ({molduras.length}/{evento.limite_molduras})
+            </CardTitle>
+            {onGerenciarMolduras && (
+              <Button
+                type="button"
+                size="sm"
+                variant="tonal"
+                onClick={onGerenciarMolduras}
+              >
+                <Frame className="w-3.5 h-3.5" />
+                <span>Gerenciar</span>
+              </Button>
+            )}
+          </CardHeader>
+          <CardContent className="space-y-3">
+            {molduras.length === 0 ? (
+              <Banner
+                variant="neutral"
+                title="Nenhuma moldura enviada ainda"
+                description="Suas molduras aparecem aqui assim que a arte ficar pronta."
+              />
+            ) : (
+              <div className="grid grid-cols-2 gap-3">
+                {molduras.map((m) => (
+                  <div
+                    key={m.id}
+                    className="rounded-xl border border-border/60 p-2 bg-muted/20 space-y-1.5"
+                  >
+                    <div className="xadrez aspect-[9/16] rounded-lg overflow-hidden">
+                      <img
+                        src={m.arquivo_url}
+                        alt={m.nome}
+                        className="w-full h-full object-contain"
+                      />
+                    </div>
+                    <p className="text-[11px] font-bold truncate text-center">
+                      {m.nome}
+                    </p>
                   </div>
-                  <p className="text-[11px] font-bold truncate text-center">
-                    {m.nome}
-                  </p>
-                </div>
-              ))}
-            </div>
-          )}
-        </CardContent>
-      </Card>
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      )}
 
       <Card>
         <CardHeader>

@@ -53,6 +53,17 @@ export function useGestaoPaiViewModel(token: string) {
   const temasCatalogo = catalogoQuery.data?.temas ?? [];
 
   useEffect(() => {
+    if (!evento) return;
+    if (!evento.inclui_galeria && evento.inclui_convite) {
+      setAbaAtiva((atual) =>
+        atual === FESTA_GESTAO_PAI_TABS.MODERACAO
+          ? FESTA_GESTAO_PAI_TABS.CONVITE_CONFIRMADOS
+          : atual
+      );
+    }
+  }, [evento?.id, evento?.inclui_galeria, evento?.inclui_convite]);
+
+  useEffect(() => {
     if (!evento?.id || !token) return;
     const channel = supabase
       .channel(`festa-gestao-pai-${evento.id}`)
@@ -126,10 +137,12 @@ export function useGestaoPaiViewModel(token: string) {
         token_gestao: token,
         anfitriao: null,
         tema: null,
+        produtos: gestao.produtos,
         extras: gestao.extras,
         molduras: gestao.molduras,
         valor_restante_centavos: gestao.valor_restante_centavos,
         total_midias: gestao.resumo_midias.total,
+        total_confirmados_pessoas: gestao.resumo_confirmacoes.total_pessoas,
       },
     });
   };

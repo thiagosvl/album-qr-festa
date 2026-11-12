@@ -111,7 +111,7 @@ export function ExtraB2cFormDialog({
               )}
             />
 
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
               <FormField
                 control={form.control}
                 name="preco_reais"
@@ -125,6 +125,19 @@ export function ExtraB2cFormDialog({
                         onBlur={field.onBlur}
                         name={field.name}
                       />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="custo_creditos_b2b"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Créditos B2B</FormLabel>
+                    <FormControl>
+                      <Input type="number" min={0} max={20} {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -176,7 +189,12 @@ export function ExtraB2cFormDialog({
               />
             </div>
 
-            <div className="flex items-center justify-between pt-1">
+            <div className="flex flex-wrap items-center gap-5 pt-1">
+              <label className="flex items-center gap-2 text-xs font-medium cursor-pointer">
+                <input type="checkbox" {...form.register("disponivel_b2b")} />
+                <span>Disponível no Portal Parceiro B2B</span>
+              </label>
+
               <label className="flex items-center gap-2 text-xs font-medium cursor-pointer">
                 <input type="checkbox" {...form.register("ativo")} />
                 <span>Ativo no Catálogo e na Landing Page</span>

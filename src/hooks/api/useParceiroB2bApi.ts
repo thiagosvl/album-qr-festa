@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/api";
 import type {
   EventoAdminDto,
+  FestaCodigoModuloEnum,
   FestaPacoteTipoEnum,
   FestaStatusAssinaturaB2bEnum,
   FestaTipoTransacaoCreditoEnum,
@@ -9,7 +10,7 @@ import type {
   ParceiroB2bAdminDto,
   PortalParceiroB2bDto,
 } from "@/types/festa.types";
-import { EVENTOS_QUERY_KEYS } from "./useEventosApi";
+import { type CamposConvitePayload, EVENTOS_QUERY_KEYS } from "./useEventosApi";
 
 export const PARCEIRO_B2B_QUERY_KEYS = {
   adminList: ["festa", "parceiros-b2b", "admin"] as const,
@@ -36,21 +37,32 @@ export interface RegistrarTransacaoCreditoPayload {
   observacao?: string | null;
 }
 
-export interface CriarEventoParceiroB2bPayload {
-  slug: string;
+export interface ItemExtraParceiroB2bInput {
+  extra_id: string;
+  quantidade: number;
+}
+
+export interface CriarEventoParceiroB2bPayload extends CamposConvitePayload {
+  slug?: string;
   titulo: string;
   subtitulo?: string | null;
   boas_vindas?: string | null;
   nome_aniversariante?: string | null;
   idade_aniversariante?: string | null;
   data_evento?: string | null;
-  pacote: FestaPacoteTipoEnum;
+  pacote?: FestaPacoteTipoEnum;
+  modulos?: FestaCodigoModuloEnum[];
+  extras?: ItemExtraParceiroB2bInput[];
   tema_id?: string | null;
   cor_primaria?: string;
   cor_secundaria?: string;
   nome_anfitriao?: string | null;
   telefone_anfitriao?: string | null;
 }
+
+export type AtualizarEventoParceiroB2bPayload = Partial<
+  Omit<CriarEventoParceiroB2bPayload, "slug">
+>;
 
 export function useParceirosB2bAdminQuery(enabled = true) {
   return useQuery({
@@ -193,6 +205,30 @@ export function useCriarEventoPortalParceiroMutation() {
     mutationFn: (payload: CriarEventoParceiroB2bPayload) =>
       apiRequest<EventoAdminDto>("/api/parceiro/eventos", {
         method: "POST",
+        requireAuth: true,
+        body: payload,
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: PARCEIRO_B2B_QUERY_KEYS.portal,
+      });
+      queryClient.invalidateQueries({ queryKey: EVENTOS_QUERY_KEYS.adminList });
+    },
+  });
+}
+
+export function useAtualizarEventoPortalParceiroMutation() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({
+      id,
+      payload,
+    }: {
+      id: string;
+      payload: AtualizarEventoParceiroB2bPayload;
+    }) =>
+      apiRequest<EventoAdminDto>(`/api/parceiro/eventos/${id}`, {
+        method: "PATCH",
         requireAuth: true,
         body: payload,
       }),
