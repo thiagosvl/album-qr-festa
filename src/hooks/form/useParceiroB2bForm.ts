@@ -4,12 +4,9 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { toast } from "sonner";
 import {
-  FESTA_BUCKET_MIDIAS,
   FESTA_ROUTES,
   FESTA_STATUS_ASSINATURA_B2B,
   FESTA_TIPO_TRANSACAO_CREDITO,
-  SUPABASE_ANON_KEY,
-  SUPABASE_URL,
 } from "@/constants";
 import { notificarErrosFormulario } from "@/components/ui/form";
 import {
@@ -172,9 +169,6 @@ export function useParceiroB2bForm(
       const ext = file.name.split(".").pop() || "png";
       const storagePath = `parceiros/midias/logo-${gerarUuidLocal()}.${ext}`;
       const url = await uploadBlobComProgresso(
-        SUPABASE_URL,
-        SUPABASE_ANON_KEY,
-        FESTA_BUCKET_MIDIAS,
         storagePath,
         file
       );

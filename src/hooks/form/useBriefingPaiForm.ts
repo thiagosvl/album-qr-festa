@@ -3,11 +3,6 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { toast } from "sonner";
-import {
-  FESTA_BUCKET_MIDIAS,
-  SUPABASE_ANON_KEY,
-  SUPABASE_URL,
-} from "@/constants";
 import { notificarErrosFormulario } from "@/components/ui/form";
 import { useAtualizarBriefingMutation } from "@/hooks/api/useGestaoApi";
 import { uploadBlobComProgresso } from "@/hooks/business/useComposicaoCanvas";
@@ -88,9 +83,6 @@ export function useBriefingPaiForm(
     try {
       const storagePath = `${gestao.evento.slug}/midias/capa-${gerarUuidLocal()}.jpg`;
       const publicUrl = await uploadBlobComProgresso(
-        SUPABASE_URL,
-        SUPABASE_ANON_KEY,
-        FESTA_BUCKET_MIDIAS,
         storagePath,
         file
       );

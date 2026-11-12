@@ -1,8 +1,5 @@
 import {
-  FESTA_BUCKET_MIDIAS,
   STORAGE_KEYS,
-  SUPABASE_ANON_KEY,
-  SUPABASE_URL,
 } from "@/constants";
 import {
   renderizarFotoComMoldura,
@@ -163,9 +160,6 @@ export async function validarEEnviarVideoCurto(
     : null;
 
   await uploadBlobComProgresso(
-    SUPABASE_URL,
-    SUPABASE_ANON_KEY,
-    FESTA_BUCKET_MIDIAS,
     pathFull,
     file,
     (pct) => onProgress?.(Math.max(10, Math.round(pct * 0.85)))
@@ -173,9 +167,6 @@ export async function validarEEnviarVideoCurto(
 
   if (thumbBlob && pathThumb) {
     await uploadBlobComProgresso(
-      SUPABASE_URL,
-      SUPABASE_ANON_KEY,
-      FESTA_BUCKET_MIDIAS,
       pathThumb,
       thumbBlob
     );
@@ -228,17 +219,11 @@ export async function comporEEnviarFotoConvidado(params: {
 
   await Promise.all([
     uploadBlobComProgresso(
-      SUPABASE_URL,
-      SUPABASE_ANON_KEY,
-      FESTA_BUCKET_MIDIAS,
       pathFull,
       composicao.fullBlob,
       (pct) => params.onProgress?.(Math.max(10, Math.round(pct * 0.85)))
     ),
     uploadBlobComProgresso(
-      SUPABASE_URL,
-      SUPABASE_ANON_KEY,
-      FESTA_BUCKET_MIDIAS,
       pathThumb,
       composicao.thumbBlob
     ),

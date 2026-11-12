@@ -3,11 +3,6 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { toast } from "sonner";
-import {
-  FESTA_BUCKET_MIDIAS,
-  SUPABASE_ANON_KEY,
-  SUPABASE_URL,
-} from "@/constants";
 import { notificarErrosFormulario } from "@/components/ui/form";
 import { useAtualizarPerfilPortalParceiroMutation } from "@/hooks/api/useParceiroB2bApi";
 import { uploadBlobComProgresso } from "@/hooks/business/useComposicaoCanvas";
@@ -67,9 +62,6 @@ export function useParceiroMarcaForm(parceiro: ParceiroB2bAdminDto | null) {
       const ext = file.name.split(".").pop() || "png";
       const storagePath = `parceiros/midias/logo-${gerarUuidLocal()}.${ext}`;
       const url = await uploadBlobComProgresso(
-        SUPABASE_URL,
-        SUPABASE_ANON_KEY,
-        FESTA_BUCKET_MIDIAS,
         storagePath,
         file
       );

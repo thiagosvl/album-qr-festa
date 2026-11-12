@@ -4,10 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { toast } from "sonner";
 import {
-  FESTA_BUCKET_MIDIAS,
   FESTA_CATEGORIA_TEMA,
-  SUPABASE_ANON_KEY,
-  SUPABASE_URL,
 } from "@/constants";
 import { notificarErrosFormulario } from "@/components/ui/form";
 import {
@@ -107,9 +104,6 @@ export function useTemaCatalogoForm(
       const ext = file.name.split(".").pop() || "png";
       const storagePath = `catalogo/midias/tema-${campo}-${gerarUuidLocal()}.${ext}`;
       const url = await uploadBlobComProgresso(
-        SUPABASE_URL,
-        SUPABASE_ANON_KEY,
-        FESTA_BUCKET_MIDIAS,
         storagePath,
         file
       );

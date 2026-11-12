@@ -5,15 +5,13 @@ export const API_BASE_URL =
 
 export const SUPABASE_URL =
   import.meta.env.VITE_SUPABASE_URL ||
-  "https://hcgerxgyqzxmnccwmhhg.supabase.co";
+  "https://ienvudutknvkqnhafzcs.supabase.co";
 
 export const SUPABASE_ANON_KEY =
   import.meta.env.VITE_SUPABASE_ANON_KEY || "";
 
 export const WHATSAPP_COMERCIAL =
   import.meta.env.VITE_WHATSAPP_COMERCIAL || "5511962508068";
-
-export const FESTA_BUCKET_MIDIAS = "festa-midias" as const;
 
 export const FESTA_CANVAS_CONFIG = {
   FULL_WIDTH: 1080,

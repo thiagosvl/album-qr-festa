@@ -4,10 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { toast } from "sonner";
 import {
-  FESTA_BUCKET_MIDIAS,
   FESTA_DESTINO_UPLOAD_EXTRA,
-  SUPABASE_ANON_KEY,
-  SUPABASE_URL,
   type FestaDestinoUploadExtra,
 } from "@/constants";
 import { notificarErrosFormulario } from "@/components/ui/form";
@@ -62,9 +59,6 @@ export function useExtrasEventoArquivosForm(
       const ext = file.name.split(".").pop() || "jpg";
       const storagePath = `${evento.slug}/midias/${destino}-${gerarUuidLocal()}.${ext}`;
       const url = await uploadBlobComProgresso(
-        SUPABASE_URL,
-        SUPABASE_ANON_KEY,
-        FESTA_BUCKET_MIDIAS,
         storagePath,
         file
       );
