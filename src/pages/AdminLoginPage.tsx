@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Eye, EyeOff, KeyRound, Lock, Sparkles } from "lucide-react";
+import { Eye, EyeOff, KeyRound, Lock } from "lucide-react";
 import { Banner } from "@/components/ui/Banner";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useAdminLoginForm } from "@/hooks/form/useAdminLoginForm";
-import { NOME_MARCA } from "@/constants";
+import { LogoFestalgia } from "@/components/ui/LogoFestalgia";
 
 export function AdminLoginPage() {
   const [mostrarSenha, setMostrarSenha] = useState(false);
@@ -24,10 +24,8 @@ export function AdminLoginPage() {
     <div className="min-h-screen flex items-center justify-center p-4">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center space-y-2">
-          <div className="w-12 h-12 rounded-2xl bg-primary/15 text-primary flex items-center justify-center mx-auto">
-            <Sparkles className="w-6 h-6" />
-          </div>
-          <CardTitle className="text-2xl">{NOME_MARCA} • Admin</CardTitle>
+          <LogoFestalgia className="h-14 w-auto mx-auto" />
+          <CardTitle className="text-2xl">Área administrativa</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <Banner

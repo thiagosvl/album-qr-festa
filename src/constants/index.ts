@@ -1,5 +1,17 @@
 export const NOME_MARCA = "Festalgia" as const;
 
+export const LOGO_VARIANTE = {
+  HORIZONTAL: "HORIZONTAL",
+  ICONE: "ICONE",
+} as const;
+export type LogoVariante = (typeof LOGO_VARIANTE)[keyof typeof LOGO_VARIANTE];
+
+export const LOGO_FUNDO = {
+  CLARO: "CLARO",
+  ESCURO: "ESCURO",
+} as const;
+export type LogoFundo = (typeof LOGO_FUNDO)[keyof typeof LOGO_FUNDO];
+
 export const API_BASE_URL =
   import.meta.env.VITE_API_URL || "http://localhost:3005";
 

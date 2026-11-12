@@ -6,13 +6,13 @@ import {
   LogOut,
   Package,
   Palette,
-  Sparkles,
   Tv,
 } from "lucide-react";
 import { Link } from "react-router-dom";
-import { NOME_MARCA } from "@/constants";
+import { LogoFestalgia } from "@/components/ui/LogoFestalgia";
 import {
   FESTA_ADMIN_TABS,
+  LOGO_FUNDO,
   FESTA_ROUTES,
   type FestaAdminTab,
 } from "@/constants";
@@ -73,18 +73,13 @@ export function AdminSidebar({
     <aside className="w-full lg:w-72 shrink-0 bg-ameixa text-white lg:min-h-screen flex flex-col justify-between border-b lg:border-b-0 lg:border-r border-white/10">
       <div className="p-5 space-y-6">
         <div className="flex items-center justify-between lg:justify-start gap-3">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-primary/20 text-primary flex items-center justify-center border border-primary/30">
-              <Sparkles className="w-5 h-5" />
-            </div>
-            <div>
-              <h1 className="font-display text-lg font-extrabold tracking-tight text-white">
-                {NOME_MARCA}
-              </h1>
-              <p className="text-[11px] text-white/60 font-medium">
-                Backoffice Admin • B2C & B2B
-              </p>
-            </div>
+          <div className="space-y-1.5">
+            <h1>
+              <LogoFestalgia fundo={LOGO_FUNDO.ESCURO} className="h-9 w-auto" />
+            </h1>
+            <p className="text-[11px] text-white/60 font-medium">
+              Backoffice Admin • B2C & B2B
+            </p>
           </div>
 
           <button

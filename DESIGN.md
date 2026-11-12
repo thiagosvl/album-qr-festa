@@ -19,6 +19,25 @@ Nas telas `/e/:slug` e `/telao/:slug`, `--cor1` e `--cor2` (cores do evento) man
 
 Os tokens shadcn (`--background`, `--primary`, `--muted`, `--border` etc.) em `src/index.css` seguem essa paleta; use-os em vez de hex.
 
+## Logo
+
+O símbolo é um "f" minúsculo de traço grosso e arredondado, com o braço levantado segurando uma faísca dourada. O nome vai sempre em minúsculo (**festalgia**), com uma estrelinha dourada no pingo do "i".
+
+| Cor do logo | Valor | Uso |
+|-------------|-------|-----|
+| Roxo ameixa | `#54074B` | "f" e nome sobre fundo claro |
+| Dourado | `#F7AF1F` | Faísca e estrelinha, nunca o nome |
+| Lilás claro | `#EFE6F6` | Fundo do ícone de app e do avatar social |
+
+As cores do logo são só da marca. A interface continua nos tokens da seção Cores.
+
+- **Componente:** `LogoFestalgia` (`src/components/ui/LogoFestalgia.tsx`), com `variante` (`LOGO_VARIANTE.HORIZONTAL` ou `ICONE`) e `fundo` (`LOGO_FUNDO.CLARO` ou `ESCURO`). Defina só a altura em `className`; a largura é automática.
+- **Fundo escuro** (sidebar, telão, rodapé): versão branca com faísca dourada.
+- **Sobre foto:** use a versão toda branca. Os arquivos estão em `src/assets/marca`.
+- **Tamanho mínimo:** 24 px de altura no logo horizontal e 16 px no ícone. O favicon usa o ícone ampliado e só com a faísca grande.
+- **Respiro:** pelo menos metade da altura do "f" em volta do logo.
+- **Não fazer:** recolorir, esticar, aplicar o "f" branco dentro de círculo ou quadrado de cor sólida (lembra logo de rede social), nem trocar a faísca por outro símbolo.
+
 ## Tipografia
 
 - **Bricolage Grotesque** (variável, self-hosted): títulos, números grandes e botões de destaque. Peso 800, entrelinha 1 a 1,1, espaçamento levemente negativo.

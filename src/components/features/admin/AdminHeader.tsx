@@ -1,11 +1,12 @@
-import { LogOut, Plus, Search, Sparkles } from "lucide-react";
+import { LogOut, Plus, Search } from "lucide-react";
 import { FESTA_FILTRO_STATUS_TODOS } from "@/constants";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { NativeSelect } from "@/components/ui/native-select";
 import { STATUS_PEDIDO_LABELS } from "@/hooks/business/useCalculosPedido";
 import type { FestaStatusPedidoEnum } from "@/types/festa.types";
-import { NOME_MARCA } from "@/constants";
+import { LOGO_VARIANTE, NOME_MARCA } from "@/constants";
+import { LogoFestalgia } from "@/components/ui/LogoFestalgia";
 
 interface AdminHeaderProps {
   busca: string;
@@ -31,9 +32,7 @@ export function AdminHeader({
       <div className="max-w-7xl mx-auto px-4 py-4 space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div className="flex items-center gap-3">
-            <div className="w-11 h-11 rounded-2xl bg-primary/15 text-primary flex items-center justify-center">
-              <Sparkles className="w-5 h-5" />
-            </div>
+            <LogoFestalgia variante={LOGO_VARIANTE.ICONE} className="w-11 h-11" />
             <div>
               <h1 className="font-display text-xl sm:text-2xl font-bold">
                 {NOME_MARCA} • Backoffice Admin
