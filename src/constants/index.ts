@@ -5,11 +5,10 @@ export const API_BASE_URL =
 
 export const SUPABASE_URL =
   import.meta.env.VITE_SUPABASE_URL ||
-  "https://jztyffakurtekwxurclw.supabase.co";
+  "https://hcgerxgyqzxmnccwmhhg.supabase.co";
 
 export const SUPABASE_ANON_KEY =
-  import.meta.env.VITE_SUPABASE_ANON_KEY ||
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp6dHlmZmFrdXJ0ZWt3eHVyY2x3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTY4NDkwNDMsImV4cCI6MjA3MjQyNTA0M30.n7PD7-FMXJ7ZmBUzpwu5rqHU4ak6g_pKm85pRWr551E";
+  import.meta.env.VITE_SUPABASE_ANON_KEY || "";
 
 export const WHATSAPP_COMERCIAL =
   import.meta.env.VITE_WHATSAPP_COMERCIAL || "5511962508068";
