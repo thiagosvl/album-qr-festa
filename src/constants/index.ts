@@ -292,3 +292,9 @@ export const FESTA_DIALOG_NAMES = {
 
 export type FestaDialogName =
   (typeof FESTA_DIALOG_NAMES)[keyof typeof FESTA_DIALOG_NAMES];
+
+export const FESTA_CORES_PADRAO = {
+  PRIMARIA: "#54074B",
+  SECUNDARIA: "#F7AF1F",
+  PARCEIRO_MARCA: "#54074B",
+} as const;

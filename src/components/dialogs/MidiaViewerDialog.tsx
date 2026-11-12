@@ -7,7 +7,7 @@ import {
   Trash2,
   User,
 } from "lucide-react";
-import { FESTA_TIPO_MIDIA } from "@/constants";
+import { FESTA_CORES_PADRAO, FESTA_TIPO_MIDIA } from "@/constants";
 import { BaseDialog } from "@/components/ui/BaseDialog";
 import { Button } from "@/components/ui/button";
 import { safeCloseDialog } from "@/hooks/ui/useDialogClose";
@@ -39,7 +39,7 @@ export function MidiaViewerDialog({
     vm.totalMidias > 1
       ? `Foto ${vm.indiceAtual + 1} de ${vm.totalMidias} • ${dataEnvioTexto}`
       : dataEnvioTexto;
-  const corDestaque = payload.corPrimaria || "#e6007e";
+  const corDestaque = payload.corPrimaria || FESTA_CORES_PADRAO.PRIMARIA;
 
   return (
     <BaseDialog

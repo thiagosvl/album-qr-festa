@@ -3,9 +3,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { toast } from "sonner";
-import {
-  FESTA_CATEGORIA_TEMA,
-} from "@/constants";
+import { FESTA_CATEGORIA_TEMA, FESTA_CORES_PADRAO } from "@/constants";
 import { notificarErrosFormulario } from "@/components/ui/form";
 import {
   useAtualizarTemaCatalogoMutation,
@@ -29,8 +27,8 @@ const temaSchema = z.object({
     FESTA_CATEGORIA_TEMA.ADULTO,
     FESTA_CATEGORIA_TEMA.CORPORATIVO,
   ]),
-  cor_primaria_padrao: z.string().default("#e6007e"),
-  cor_secundaria_padrao: z.string().default("#7b3fe4"),
+  cor_primaria_padrao: z.string().default(FESTA_CORES_PADRAO.PRIMARIA),
+  cor_secundaria_padrao: z.string().default(FESTA_CORES_PADRAO.SECUNDARIA),
   moldura_preview_url: z.string().optional(),
   thumb_url: z.string().optional(),
   ordem: z.coerce.number().int().min(0).default(1),
@@ -54,8 +52,8 @@ export function useTemaCatalogoForm(
       nome: "",
       slug: "",
       categoria: FESTA_CATEGORIA_TEMA.INFANTIL,
-      cor_primaria_padrao: "#e6007e",
-      cor_secundaria_padrao: "#7b3fe4",
+      cor_primaria_padrao: FESTA_CORES_PADRAO.PRIMARIA,
+      cor_secundaria_padrao: FESTA_CORES_PADRAO.SECUNDARIA,
       moldura_preview_url: "",
       thumb_url: "",
       ordem: 1,
@@ -85,8 +83,8 @@ export function useTemaCatalogoForm(
         nome: "",
         slug: "",
         categoria: FESTA_CATEGORIA_TEMA.INFANTIL,
-        cor_primaria_padrao: "#e6007e",
-        cor_secundaria_padrao: "#7b3fe4",
+        cor_primaria_padrao: FESTA_CORES_PADRAO.PRIMARIA,
+        cor_secundaria_padrao: FESTA_CORES_PADRAO.SECUNDARIA,
         moldura_preview_url: "",
         thumb_url: "",
         ordem: 1,

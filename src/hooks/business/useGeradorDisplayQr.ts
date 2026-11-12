@@ -1,4 +1,5 @@
 import QRCode from "qrcode";
+import { FESTA_CORES_PADRAO } from "@/constants";
 
 export interface DadosDisplayQrEvento {
   slug: string;
@@ -58,8 +59,8 @@ export async function baixarPlaquinhaQrCodePng(
   }
 
   const gradFundo = ctx.createLinearGradient(0, 0, largura, altura);
-  gradFundo.addColorStop(0, dados.cor_primaria || "#e6007e");
-  gradFundo.addColorStop(1, dados.cor_secundaria || "#7b3fe4");
+  gradFundo.addColorStop(0, dados.cor_primaria || FESTA_CORES_PADRAO.PRIMARIA);
+  gradFundo.addColorStop(1, dados.cor_secundaria || FESTA_CORES_PADRAO.SECUNDARIA);
   ctx.fillStyle = gradFundo;
   ctx.fillRect(0, 0, largura, altura);
 
@@ -90,7 +91,7 @@ export async function baixarPlaquinhaQrCodePng(
   const pillX = (largura - pillW) / 2;
   const pillY = 165;
   desenharRetanguloArredondado(ctx, pillX, pillY, pillW, pillH, 32);
-  ctx.fillStyle = dados.cor_primaria || "#e6007e";
+  ctx.fillStyle = dados.cor_primaria || FESTA_CORES_PADRAO.PRIMARIA;
   ctx.fill();
 
   ctx.fillStyle = "#FFFFFF";
@@ -107,7 +108,7 @@ export async function baixarPlaquinhaQrCodePng(
   ctx.fillText(tituloCurto, largura / 2, 330);
 
   if (dados.subtitulo) {
-    ctx.fillStyle = dados.cor_secundaria || "#7b3fe4";
+    ctx.fillStyle = dados.cor_secundaria || FESTA_CORES_PADRAO.SECUNDARIA;
     ctx.font = "700 34px Inter, sans-serif";
     ctx.fillText(dados.subtitulo.slice(0, 42), largura / 2, 392);
   }
@@ -128,7 +129,7 @@ export async function baixarPlaquinhaQrCodePng(
   ctx.fillStyle = "#FFFFFF";
   ctx.fill();
   ctx.lineWidth = 8;
-  ctx.strokeStyle = dados.cor_primaria || "#e6007e";
+  ctx.strokeStyle = dados.cor_primaria || FESTA_CORES_PADRAO.PRIMARIA;
   ctx.stroke();
 
   const qrDataUrl = await QRCode.toDataURL(dados.urlPublica, {

@@ -3,7 +3,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { toast } from "sonner";
-import { FESTA_PACOTE_TIPO } from "@/constants";
+import { FESTA_CORES_PADRAO, FESTA_PACOTE_TIPO } from "@/constants";
 import { notificarErrosFormulario } from "@/components/ui/form";
 import { useCriarEventoPortalParceiroMutation } from "@/hooks/api/useParceiroB2bApi";
 import { safeCloseDialog } from "@/hooks/ui/useDialogClose";
@@ -20,8 +20,8 @@ const schema = z.object({
   data_evento: z.string().optional(),
   pacote: z.enum([FESTA_PACOTE_TIPO.BASICO, FESTA_PACOTE_TIPO.COMPLETO]),
   tema_id: z.string().optional(),
-  cor_primaria: z.string().default("#e6007e"),
-  cor_secundaria: z.string().default("#7c3aed"),
+  cor_primaria: z.string().default(FESTA_CORES_PADRAO.PRIMARIA),
+  cor_secundaria: z.string().default(FESTA_CORES_PADRAO.SECUNDARIA),
   nome_anfitriao: z.string().optional(),
   telefone_anfitriao: z.string().optional(),
 });
@@ -45,8 +45,8 @@ export function useEventoParceiroB2bForm(
       data_evento: new Date().toISOString().slice(0, 10),
       pacote: FESTA_PACOTE_TIPO.COMPLETO,
       tema_id: "",
-      cor_primaria: parceiro?.cor_marca ?? "#e6007e",
-      cor_secundaria: "#7c3aed",
+      cor_primaria: parceiro?.cor_marca ?? FESTA_CORES_PADRAO.PRIMARIA,
+      cor_secundaria: FESTA_CORES_PADRAO.SECUNDARIA,
       nome_anfitriao: "",
       telefone_anfitriao: "",
     },
@@ -65,8 +65,8 @@ export function useEventoParceiroB2bForm(
       data_evento: new Date().toISOString().slice(0, 10),
       pacote: FESTA_PACOTE_TIPO.COMPLETO,
       tema_id: "",
-      cor_primaria: parceiro?.cor_marca ?? "#e6007e",
-      cor_secundaria: "#7c3aed",
+      cor_primaria: parceiro?.cor_marca ?? FESTA_CORES_PADRAO.PRIMARIA,
+      cor_secundaria: FESTA_CORES_PADRAO.SECUNDARIA,
       nome_anfitriao: "",
       telefone_anfitriao: "",
     });

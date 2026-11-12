@@ -3,7 +3,7 @@ import { useFieldArray, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { toast } from "sonner";
-import { FESTA_PACOTE_TIPO, FESTA_STATUS_PEDIDO } from "@/constants";
+import { FESTA_CORES_PADRAO, FESTA_PACOTE_TIPO, FESTA_STATUS_PEDIDO } from "@/constants";
 import { notificarErrosFormulario } from "@/components/ui/form";
 import { useCatalogoPublicoQuery } from "@/hooks/api/useCatalogoApi";
 import {
@@ -45,8 +45,8 @@ export const eventoAdminFormSchema = z.object({
   nome_anfitriao: z.string().optional(),
   telefone_anfitriao: z.string().optional(),
   email_anfitriao: z.string().optional(),
-  cor_primaria: z.string().default("#e6007e"),
-  cor_secundaria: z.string().default("#7b3fe4"),
+  cor_primaria: z.string().default(FESTA_CORES_PADRAO.PRIMARIA),
+  cor_secundaria: z.string().default(FESTA_CORES_PADRAO.SECUNDARIA),
   galeria_publica: z.boolean().default(true),
   moderacao_previa: z.boolean().default(false),
   permite_envio_midias: z.boolean().default(true),
@@ -97,8 +97,8 @@ export function useEventoAdminForm(
       nome_anfitriao: "",
       telefone_anfitriao: "",
       email_anfitriao: "",
-      cor_primaria: "#e6007e",
-      cor_secundaria: "#7b3fe4",
+      cor_primaria: FESTA_CORES_PADRAO.PRIMARIA,
+      cor_secundaria: FESTA_CORES_PADRAO.SECUNDARIA,
       galeria_publica: true,
       moderacao_previa: false,
       permite_envio_midias: true,
@@ -168,8 +168,8 @@ export function useEventoAdminForm(
         nome_anfitriao: "",
         telefone_anfitriao: "",
         email_anfitriao: "",
-        cor_primaria: "#e6007e",
-        cor_secundaria: "#7b3fe4",
+        cor_primaria: FESTA_CORES_PADRAO.PRIMARIA,
+        cor_secundaria: FESTA_CORES_PADRAO.SECUNDARIA,
         galeria_publica: true,
         moderacao_previa: false,
         permite_envio_midias: true,

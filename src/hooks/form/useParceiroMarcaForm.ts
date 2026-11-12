@@ -8,10 +8,11 @@ import { useAtualizarPerfilPortalParceiroMutation } from "@/hooks/api/useParceir
 import { uploadBlobComProgresso } from "@/hooks/business/useComposicaoCanvas";
 import { gerarUuidLocal } from "@/lib/utils";
 import type { ParceiroB2bAdminDto } from "@/types/festa.types";
+import { FESTA_CORES_PADRAO } from "@/constants";
 
 const parceiroMarcaSchema = z.object({
   nome_empresa: z.string().min(2, "Informe o nome fantasia da empresa"),
-  cor_marca: z.string().default("#a133d8"),
+  cor_marca: z.string().default(FESTA_CORES_PADRAO.PARCEIRO_MARCA),
   telefone: z.string().optional(),
   email: z
     .string()
@@ -32,7 +33,7 @@ export function useParceiroMarcaForm(parceiro: ParceiroB2bAdminDto | null) {
     resolver: zodResolver(parceiroMarcaSchema),
     defaultValues: {
       nome_empresa: "",
-      cor_marca: "#a133d8",
+      cor_marca: FESTA_CORES_PADRAO.PARCEIRO_MARCA,
       telefone: "",
       email: "",
       documento: "",
@@ -50,7 +51,7 @@ export function useParceiroMarcaForm(parceiro: ParceiroB2bAdminDto | null) {
         telefone: parceiro.telefone ?? "",
         email: parceiro.email ?? "",
         documento: parceiro.documento ?? "",
-        cor_marca: parceiro.cor_marca ?? "#a133d8",
+        cor_marca: parceiro.cor_marca ?? FESTA_CORES_PADRAO.PARCEIRO_MARCA,
         logo_url: parceiro.logo_url ?? "",
       });
     }

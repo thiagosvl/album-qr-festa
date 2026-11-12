@@ -4,6 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { toast } from "sonner";
 import {
+  FESTA_CORES_PADRAO,
   FESTA_ROUTES,
   FESTA_STATUS_ASSINATURA_B2B,
   FESTA_TIPO_TRANSACAO_CREDITO,
@@ -32,7 +33,7 @@ function criarParceiroSchema(ehCriacao: boolean) {
       email: z.string().email("Informe um e-mail válido para login do parceiro"),
       senha_acesso: z.string().optional(),
       logo_url: z.string().optional(),
-      cor_marca: z.string().default("#7c3aed"),
+      cor_marca: z.string().default(FESTA_CORES_PADRAO.PARCEIRO_MARCA),
       status_assinatura: z.enum([
         FESTA_STATUS_ASSINATURA_B2B.TRIAL,
         FESTA_STATUS_ASSINATURA_B2B.ATIVA,
@@ -104,7 +105,7 @@ export function useParceiroB2bForm(
       email: "",
       senha_acesso: "",
       logo_url: "",
-      cor_marca: "#7c3aed",
+      cor_marca: FESTA_CORES_PADRAO.PARCEIRO_MARCA,
       status_assinatura: FESTA_STATUS_ASSINATURA_B2B.ATIVA,
       plano_b2b_id: primeiroPlanoId,
       saldo_creditos: 6,
@@ -140,7 +141,7 @@ export function useParceiroB2bForm(
         email: parceiroEdicao.email_acesso ?? parceiroEdicao.email ?? "",
         senha_acesso: "",
         logo_url: parceiroEdicao.logo_url ?? "",
-        cor_marca: parceiroEdicao.cor_marca ?? "#7c3aed",
+        cor_marca: parceiroEdicao.cor_marca ?? FESTA_CORES_PADRAO.PARCEIRO_MARCA,
         status_assinatura: parceiroEdicao.status_assinatura,
         plano_b2b_id: parceiroEdicao.plano_b2b_id ?? "",
         saldo_creditos: parceiroEdicao.saldo_creditos,
@@ -154,7 +155,7 @@ export function useParceiroB2bForm(
         email: "",
         senha_acesso: "",
         logo_url: "",
-        cor_marca: "#7c3aed",
+        cor_marca: FESTA_CORES_PADRAO.PARCEIRO_MARCA,
         status_assinatura: FESTA_STATUS_ASSINATURA_B2B.ATIVA,
         plano_b2b_id: primeiroPlanoId,
         saldo_creditos: 6,

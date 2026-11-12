@@ -161,7 +161,7 @@ export function ConvidadoRevisaoView({
             type="button"
             disabled={enviando}
             onClick={onConfirmarEnvio}
-            style={{ backgroundColor: "var(--cor1, #e6007e)" }}
+            style={{ backgroundColor: "var(--cor1, #54074B)" }}
             className="relative flex h-12 w-full items-center justify-center gap-2 overflow-hidden rounded-full font-display text-base font-extrabold text-white transition active:scale-[0.98] disabled:pointer-events-none"
           >
             {enviando && (

@@ -8,6 +8,7 @@ import { useAtualizarBriefingMutation } from "@/hooks/api/useGestaoApi";
 import { uploadBlobComProgresso } from "@/hooks/business/useComposicaoCanvas";
 import { gerarUuidLocal } from "@/lib/utils";
 import type { EventoGestaoDto } from "@/types/festa.types";
+import { FESTA_CORES_PADRAO } from "@/constants";
 
 const briefingSchema = z.object({
   titulo: z.string().min(2, "Informe o título da festa"),
@@ -16,8 +17,8 @@ const briefingSchema = z.object({
   nome_aniversariante: z.string().optional(),
   idade_aniversariante: z.string().optional(),
   data_evento: z.string().optional(),
-  cor_primaria: z.string().default("#e6007e"),
-  cor_secundaria: z.string().default("#7b3fe4"),
+  cor_primaria: z.string().default(FESTA_CORES_PADRAO.PRIMARIA),
+  cor_secundaria: z.string().default(FESTA_CORES_PADRAO.SECUNDARIA),
   capa_url: z.string().optional(),
   tema_id: z.string().optional(),
   galeria_publica: z.boolean().default(true),
@@ -43,8 +44,8 @@ export function useBriefingPaiForm(
       nome_aniversariante: "",
       idade_aniversariante: "",
       data_evento: "",
-      cor_primaria: "#e6007e",
-      cor_secundaria: "#7b3fe4",
+      cor_primaria: FESTA_CORES_PADRAO.PRIMARIA,
+      cor_secundaria: FESTA_CORES_PADRAO.SECUNDARIA,
       capa_url: "",
       tema_id: "",
       galeria_publica: true,

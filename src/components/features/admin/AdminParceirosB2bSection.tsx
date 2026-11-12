@@ -8,7 +8,7 @@ import {
   Plus,
 } from "lucide-react";
 import { toast } from "sonner";
-import { FESTA_ROUTES } from "@/constants";
+import { FESTA_CORES_PADRAO, FESTA_ROUTES } from "@/constants";
 import { Banner } from "@/components/ui/Banner";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -110,7 +110,7 @@ export function AdminParceirosB2bSection({
                         <span
                           className="w-3.5 h-3.5 rounded-full"
                           style={{
-                            backgroundColor: parceiro.cor_marca ?? "#7c3aed",
+                            backgroundColor: parceiro.cor_marca ?? FESTA_CORES_PADRAO.PARCEIRO_MARCA,
                           }}
                         />
                         <Badge

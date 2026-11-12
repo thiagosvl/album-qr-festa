@@ -7,7 +7,7 @@ import {
   Plus,
   Users,
 } from "lucide-react";
-import { FESTA_PARCEIRO_TABS, type FestaParceiroTab } from "@/constants";
+import { FESTA_CORES_PADRAO, FESTA_PARCEIRO_TABS, type FestaParceiroTab } from "@/constants";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import type { ParceiroB2bAdminDto } from "@/types/festa.types";
@@ -41,7 +41,7 @@ export function ParceiroSidebar({
             <div
               className="w-10 h-10 rounded-2xl overflow-hidden flex items-center justify-center text-white font-bold shadow-md shrink-0"
               style={{
-                backgroundColor: parceiro?.cor_marca ?? "#a133d8",
+                backgroundColor: parceiro?.cor_marca ?? FESTA_CORES_PADRAO.PARCEIRO_MARCA,
               }}
             >
               {parceiro?.logo_url ? (
