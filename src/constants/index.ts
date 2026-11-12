@@ -80,7 +80,31 @@ export const STORAGE_KEYS = {
   ADMIN_ABA_ATIVA: "@festalgia:admin_aba_ativa",
   GESTAO_DICA_DISPENSADA: "@festalgia:gestao_dica_dispensada",
   PARCEIRO_IMPERSONATING: "@festalgia:parceiro_is_impersonating",
+  TEMA: "@festalgia:tema",
 } as const;
+
+export const TEMA = {
+  CLARO: "CLARO",
+  ESCURO: "ESCURO",
+  SISTEMA: "SISTEMA",
+} as const;
+export type Tema = (typeof TEMA)[keyof typeof TEMA];
+
+export const TEMA_CLASSE_ESCURO = "dark" as const;
+
+export const TEMA_COR_BARRA = {
+  CLARO: "#54074B",
+  ESCURO: "#150716",
+} as const;
+
+/** Só admin, parceiro e gestão dos pais aceitam tema escuro. Convidado, convite e telão ficam sempre claros. */
+export const TEMA_ROTAS_PREFIXOS = [
+  "/admin",
+  "/parceiro",
+  "/gestao",
+  "/login",
+  "/impersonate-bridge",
+] as const;
 
 export const FESTA_TIPO_PERFIL = {
   ADMIN: "ADMIN",

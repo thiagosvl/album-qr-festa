@@ -1,6 +1,6 @@
 # Festalgia: guia visual
 
-Uma só identidade para landing, convidado, telão e gestão dos pais: **ingresso de festa com foto e legenda**. O admin e o portal do parceiro usam os mesmos tokens e ganham o tratamento completo numa segunda fase.
+Uma só identidade para landing, convidado, telão e gestão dos pais: **ingresso de festa com foto e legenda**. Admin, portal do parceiro e gestão dos pais usam os mesmos tokens e têm tema claro e escuro (seção Tema).
 
 ## Cores
 
@@ -65,3 +65,29 @@ A interface usa os mesmos roxo e dourado do logo (Uva e Gema na seção Cores). 
 ## Acessibilidade
 
 Foco visível nos botões, `aria-pressed` e `aria-selected` nos seletores, rótulos em botões só com ícone, `tabular-nums` nos contadores.
+
+## Tema claro e escuro
+
+- **Onde vale:** só admin (`/admin`), portal do parceiro (`/parceiro`, `/login`) e gestão dos pais (`/gestao`). Álbum do convidado, convite e telão ficam sempre claros. A lista de rotas está em `TEMA_ROTAS_PREFIXOS` (`src/constants`); fora dela o `TemaProvider` remove a classe `dark` do `<html>`.
+- **Escolha da pessoa:** claro, do aparelho (padrão) ou escuro, guardada em `localStorage` (`STORAGE_KEYS.TEMA`). O botão é o `AlternadorTema` (sidebar do admin e do parceiro, header da gestão, telas de login). Um script no `index.html` aplica o tema antes da pintura para não piscar.
+- **Como funciona:** os tokens `:root` são o claro; `.dark` em `src/index.css` troca os valores. Use sempre tokens, nunca `bg-white`, `text-ameixa`, `emerald-*` ou hex nas telas internas.
+- **Escuro:** fundo ameixa profundo (`--background`), cartões um degrau acima (`--card`), ação primária vira Gema (`--primary`) com texto ameixa. A sidebar é escura nos dois temas.
+
+| Token | Claro | Escuro | Uso |
+|-------|-------|--------|-----|
+| `background` / `card` | creme rosado / branco | ameixa 6% / ameixa 10% | Página e cartões |
+| `primary` | Uva | Gema | Ação principal, abas ativas |
+| `secondary`, `muted`, `accent` | lilás claro | ameixa 14 a 18% | Botões suaves, trilhos, hover |
+| `foreground` / `muted-foreground` | Ameixa / Ameixa suave | lilás-branco / lilás 70% | Texto |
+| `bar` | Papel | ameixa 8% | Headers fixos com blur |
+| `success`, `warning`, `info`, `danger` (+ `-soft`, `-border`) | texto escuro sobre fundo pastel | texto claro sobre fundo translúcido | Selos, banners, ícones de KPI |
+
+Exceções que ficam brancas de propósito: o ladrilho do QR Code (precisa de contraste para a câmera) e o selo de situação sobre foto.
+
+## Telas internas
+
+- **Sidebar** (`SidebarNavItem`): item ativo com fundo branco a 10%, ícone Gema e barra Gema à esquerda no desktop; contador em pílula. Nomes em caixa de frase.
+- **Título de página** (`TituloPagina`, ou o `AdminHeader` na lista de pedidos): título em Bricolage 800 e uma linha de apoio; a ação principal (Novo pedido) fica à direita.
+- **Cartão de pedido:** selos, título, link em mono, total com barra de pagamento (`success`), e a fileira de ações separada por linha. Excluir é ícone `destructive`.
+- **KPIs:** ícone em chip `*-soft`, valor em Bricolage 800.
+- **Saldo do parceiro:** número grande em Gema na sidebar.

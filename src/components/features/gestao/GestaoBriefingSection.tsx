@@ -67,7 +67,7 @@ export function GestaoBriefingSection({
                   name="titulo"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-sm font-semibold text-ameixa-suave">
+                      <FormLabel className="text-sm font-semibold text-muted-foreground">
                         Título da festa *
                       </FormLabel>
                       <FormControl>
@@ -82,7 +82,7 @@ export function GestaoBriefingSection({
                   name="subtitulo"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-sm font-semibold text-ameixa-suave">
+                      <FormLabel className="text-sm font-semibold text-muted-foreground">
                         Subtítulo
                       </FormLabel>
                       <FormControl>
@@ -103,7 +103,7 @@ export function GestaoBriefingSection({
                   name="nome_aniversariante"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-sm font-semibold text-ameixa-suave">
+                      <FormLabel className="text-sm font-semibold text-muted-foreground">
                         Nome do aniversariante
                       </FormLabel>
                       <FormControl>
@@ -118,7 +118,7 @@ export function GestaoBriefingSection({
                   name="idade_aniversariante"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-sm font-semibold text-ameixa-suave">
+                      <FormLabel className="text-sm font-semibold text-muted-foreground">
                         Idade
                       </FormLabel>
                       <FormControl>
@@ -133,7 +133,7 @@ export function GestaoBriefingSection({
                   name="data_evento"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-sm font-semibold text-ameixa-suave">
+                      <FormLabel className="text-sm font-semibold text-muted-foreground">
                         Data da festa
                       </FormLabel>
                       <FormControl>

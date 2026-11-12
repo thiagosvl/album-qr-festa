@@ -12,8 +12,10 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { LOGO_FUNDO } from "@/constants";
 import { useAdminLoginForm } from "@/hooks/form/useAdminLoginForm";
 import { LogoFestalgia } from "@/components/ui/LogoFestalgia";
+import { TelaLogin } from "@/components/ui/TelaLogin";
 
 export function AdminLoginPage() {
   const [mostrarSenha, setMostrarSenha] = useState(false);
@@ -21,17 +23,18 @@ export function AdminLoginPage() {
     useAdminLoginForm();
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4">
+    <TelaLogin>
       <Card className="w-full max-w-md">
         <CardHeader className="text-center space-y-2">
-          <LogoFestalgia className="h-14 w-auto mx-auto" />
-          <CardTitle className="text-2xl">Área administrativa</CardTitle>
+          <LogoFestalgia className="mx-auto h-14 w-auto dark:hidden" />
+          <LogoFestalgia fundo={LOGO_FUNDO.ESCURO} className="mx-auto hidden h-14 w-auto dark:block" />
+          <CardTitle className="text-2xl">Painel administrativo</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <Banner
             variant="neutral"
-            title="Acesso restrito à gestão comercial"
-            description="Entre com sua conta administrativa vinculada em festa_usuarios."
+            title="Acesso restrito à equipe"
+            description="Entre com o e-mail e a senha da sua conta administrativa."
           />
 
           <Form {...form}>
@@ -105,6 +108,6 @@ export function AdminLoginPage() {
           </Form>
         </CardContent>
       </Card>
-    </div>
+    </TelaLogin>
   );
 }

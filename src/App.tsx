@@ -1,5 +1,11 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
+import {
+  BrowserRouter,
+  Navigate,
+  Route,
+  Routes,
+  useLocation,
+} from "react-router-dom";
 import { Toaster } from "sonner";
 import { FESTA_ROUTES } from "@/constants";
 import { LayoutContextProvider } from "@/contexts/LayoutContext";
@@ -13,6 +19,15 @@ import { ParceiroB2bPlaceholderPage } from "@/pages/ParceiroB2bPlaceholderPage";
 import { ParceiroLoginPage } from "@/pages/ParceiroLoginPage";
 import { TelaoPage } from "@/pages/TelaoPage";
 import { LayoutProvider } from "@/providers/LayoutProvider";
+import { rotaAceitaTema } from "@/lib/tema";
+import { TemaProvider, useTema } from "@/providers/TemaProvider";
+
+function ToasterDoTema() {
+  const { escuro } = useTema();
+  const { pathname } = useLocation();
+  const tema = escuro && rotaAceitaTema(pathname) ? "dark" : "light";
+  return <Toaster position="top-center" richColors closeButton theme={tema} />;
+}
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -27,6 +42,7 @@ export function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
+        <TemaProvider>
         <LayoutContextProvider>
           <LayoutProvider>
             <Routes>
@@ -96,9 +112,10 @@ export function App() {
                 element={<Navigate to={FESTA_ROUTES.DEMO_CONVIDADO} replace />}
               />
             </Routes>
-            <Toaster position="top-center" richColors closeButton />
+            <ToasterDoTema />
           </LayoutProvider>
         </LayoutContextProvider>
+        </TemaProvider>
       </BrowserRouter>
     </QueryClientProvider>
   );

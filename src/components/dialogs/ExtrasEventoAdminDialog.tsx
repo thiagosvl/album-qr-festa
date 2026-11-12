@@ -73,7 +73,7 @@ export function ExtrasEventoAdminDialog({
             />
 
             <div className="space-y-2.5">
-              <p className="text-sm font-semibold text-ameixa-suave">
+              <p className="text-sm font-semibold text-muted-foreground">
                 Checklist de extras contratados ({vm.extrasLocais.length})
               </p>
               {vm.extrasLocais.length === 0 ? (

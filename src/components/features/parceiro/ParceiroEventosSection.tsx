@@ -39,11 +39,11 @@ export function ParceiroEventosSection({
     <Card>
       <CardHeader className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3">
         <CardTitle className="text-lg">
-          Eventos dos Clientes ({eventos.length})
+          Eventos dos clientes ({eventos.length})
         </CardTitle>
         <Button type="button" size="sm" onClick={onAtivarEvento}>
           <Plus className="w-4 h-4" />
-          <span>Ativar Novo Evento (Usar Créditos)</span>
+          <span>Ativar evento</span>
         </Button>
       </CardHeader>
 
@@ -51,29 +51,29 @@ export function ParceiroEventosSection({
         {eventos.length === 0 ? (
           <Banner
             variant="info"
-            title="Nenhum evento ativado nesta conta parceira"
-            description="Clique em 'Ativar Novo Evento' para consumir créditos e liberar Galeria QR Code, Convite Interativo + RSVP ou ambos."
+            title="Nenhum evento ativado ainda"
+            description="Use Ativar evento para gastar créditos e liberar a galeria com QR Code, o convite com RSVP ou os dois."
           />
         ) : (
           eventos.map((ev) => (
             <div
               key={ev.id}
-              className="rounded-2xl border border-border/70 p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-card"
+              className="flex flex-col gap-4 rounded-2xl border border-border/70 bg-card p-4 transition-colors hover:border-primary/40"
             >
               <div className="space-y-1">
                 <div className="flex flex-wrap items-center gap-2">
-                  <Badge variant="success">Ativo B2B</Badge>
+                  <Badge variant="success">Ativo</Badge>
                   {ev.inclui_galeria && (
                     <Badge variant="secondary">Galeria QR</Badge>
                   )}
                   {ev.inclui_convite && (
-                    <Badge variant="secondary">Convite + RSVP</Badge>
+                    <Badge variant="secondary">Convite e RSVP</Badge>
                   )}
                   <span className="text-xs font-mono text-muted-foreground">
                     /{ev.codigo_url}/{ev.slug}
                   </span>
                 </div>
-                <h4 className="font-display text-base font-bold">
+                <h4 className="font-display text-lg font-extrabold tracking-tight">
                   {ev.titulo}
                 </h4>
                 <p className="text-xs text-muted-foreground">
@@ -87,7 +87,7 @@ export function ParceiroEventosSection({
                 </p>
               </div>
 
-              <div className="flex flex-wrap items-center gap-1.5">
+              <div className="flex flex-wrap items-center gap-1.5 border-t border-border/60 pt-4">
                 <Button
                   type="button"
                   size="sm"
@@ -95,7 +95,7 @@ export function ParceiroEventosSection({
                   onClick={() => onAbrirQrLinks(ev)}
                 >
                   <QrCode className="w-3.5 h-3.5" />
-                  <span>QR & Links</span>
+                  <span>QR e links</span>
                 </Button>
 
                 {ev.inclui_convite && (
@@ -140,13 +140,13 @@ export function ParceiroEventosSection({
                   onClick={() => onEditarEvento(ev)}
                 >
                   <Edit3 className="w-3.5 h-3.5" />
-                  <span>Editar / Upgrade</span>
+                  <span>Editar ou ampliar</span>
                 </Button>
 
                 <Button variant="outline" size="sm" asChild>
                   <Link to={`/gestao/${ev.token_gestao}`} target="_blank">
                     <Settings2 className="w-3.5 h-3.5" />
-                    <span>Painel Pais</span>
+                    <span>Painel dos pais</span>
                   </Link>
                 </Button>
 
@@ -159,7 +159,7 @@ export function ParceiroEventosSection({
                     }
                     target="_blank"
                   >
-                    <ExternalLink className="w-4 h-4" />
+                    <ExternalLink className="w-4 h-4" aria-label="Abrir página pública" />
                   </Link>
                 </Button>
               </div>

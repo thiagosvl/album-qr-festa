@@ -96,8 +96,8 @@ export function GestaoModeracaoSection({
               onClick={() => onChangeFiltro(id)}
               className={`rounded-3xl p-4 text-left transition ${
                 ativo
-                  ? "bg-ameixa text-white shadow-suave"
-                  : "bg-white text-ameixa shadow-card hover:-translate-y-0.5"
+                  ? "bg-primary text-primary-foreground shadow-suave"
+                  : "border border-border/60 bg-card text-foreground shadow-card hover:-translate-y-0.5"
               }`}
             >
               <span className="block font-display text-4xl font-extrabold leading-none tabular-nums">
@@ -105,7 +105,7 @@ export function GestaoModeracaoSection({
               </span>
               <span
                 className={`mt-2 block text-sm font-semibold ${
-                  ativo ? "text-white/75" : "text-ameixa-suave"
+                  ativo ? "text-primary-foreground/75" : "text-muted-foreground"
                 }`}
               >
                 {rotulo}
@@ -116,7 +116,7 @@ export function GestaoModeracaoSection({
       </div>
 
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <p className="text-sm text-ameixa-suave">
+        <p className="text-sm text-muted-foreground">
           Toque numa foto para ampliar. Antes da festa, limpe as fotos de teste.
         </p>
         <div className="flex flex-wrap gap-2">
@@ -125,7 +125,7 @@ export function GestaoModeracaoSection({
               type="button"
               disabled={moderandoLote}
               onClick={onAprovarTodasPendentes}
-              className={`${BOTAO} bg-uva text-white`}
+              className={`${BOTAO} bg-primary text-primary-foreground`}
             >
               {moderandoLote ? (
                 <Loader2 className="h-3.5 w-3.5 animate-spin" />
@@ -138,7 +138,7 @@ export function GestaoModeracaoSection({
           <button
             type="button"
             onClick={onLimparFotosTeste}
-            className={`${BOTAO} bg-white text-ameixa ring-1 ring-ameixa/15 hover:ring-ameixa/30`}
+            className={`${BOTAO} bg-card text-foreground ring-1 ring-border hover:ring-foreground/30`}
           >
             <FlaskConical className="h-3.5 w-3.5" />
             Limpar fotos de teste
@@ -147,7 +147,7 @@ export function GestaoModeracaoSection({
       </div>
 
       {selecionadasIds.size > 0 && (
-        <div className="fixed bottom-4 inset-x-4 z-40 mx-auto flex max-w-xl flex-wrap items-center gap-2 rounded-3xl sm:rounded-full bg-ameixa p-2.5 sm:pl-5 text-white shadow-palco">
+        <div className="fixed bottom-4 inset-x-4 z-40 mx-auto flex max-w-xl flex-wrap items-center gap-2 rounded-3xl sm:rounded-full bg-sidebar p-2.5 text-white shadow-palco ring-1 ring-white/15 sm:pl-5">
           <span className="mr-auto pl-2 sm:pl-0 text-sm font-semibold">
             {selecionadasIds.size === 1
               ? "1 foto selecionada"
@@ -191,14 +191,14 @@ export function GestaoModeracaoSection({
       )}
 
       {midias.length === 0 ? (
-        <div className="mx-auto max-w-sm rounded-card bg-white p-8 text-center shadow-card">
-          <div className="mx-auto grid h-14 w-14 -rotate-6 place-items-center rounded-2xl bg-uva-claro text-uva">
+        <div className="mx-auto max-w-sm rounded-card border border-border/60 bg-card p-8 text-center shadow-card">
+          <div className="mx-auto grid h-14 w-14 -rotate-6 place-items-center rounded-2xl bg-secondary text-secondary-foreground">
             <Images className="h-7 w-7" />
           </div>
           <p className="mt-4 font-display text-xl font-extrabold tracking-tight">
             Nenhuma foto neste filtro
           </p>
-          <p className="mt-1.5 text-sm text-ameixa-suave">
+          <p className="mt-1.5 text-sm text-muted-foreground">
             Quando os convidados enviarem fotos, elas aparecem aqui.
           </p>
         </div>

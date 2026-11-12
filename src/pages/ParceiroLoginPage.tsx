@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Building2, Eye, EyeOff, KeyRound, Lock } from "lucide-react";
+import { Eye, EyeOff, KeyRound, Lock } from "lucide-react";
 import { Banner } from "@/components/ui/Banner";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -12,6 +12,9 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { LogoFestalgia } from "@/components/ui/LogoFestalgia";
+import { TelaLogin } from "@/components/ui/TelaLogin";
+import { LOGO_FUNDO } from "@/constants";
 import { useParceiroLoginForm } from "@/hooks/form/useParceiroLoginForm";
 
 export function ParceiroLoginPage() {
@@ -20,23 +23,20 @@ export function ParceiroLoginPage() {
     useParceiroLoginForm();
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4">
+    <TelaLogin>
       <Card className="w-full max-w-md">
         <CardHeader className="text-center space-y-2">
-          <div className="w-12 h-12 rounded-2xl bg-primary/15 text-primary flex items-center justify-center mx-auto">
-            <Building2 className="w-6 h-6" />
-          </div>
-          <CardTitle className="text-2xl">
-            Portal do Parceiro B2B
-          </CardTitle>
-          <p className="text-xs text-muted-foreground">
-            Buffets, Casas de Festas e Estúdios Fotográficos
+          <LogoFestalgia className="mx-auto h-12 w-auto dark:hidden" />
+          <LogoFestalgia fundo={LOGO_FUNDO.ESCURO} className="mx-auto hidden h-12 w-auto dark:block" />
+          <CardTitle className="text-2xl">Portal do parceiro</CardTitle>
+          <p className="text-sm text-muted-foreground">
+            Para buffets, casas de festas e estúdios fotográficos.
           </p>
         </CardHeader>
         <CardContent className="space-y-4">
           <Banner
             variant="neutral"
-            title="Acesso exclusivo para parceiros credenciados"
+            title="Acesso para parceiros credenciados"
             description="Entre com o e-mail e a senha do seu buffet ou estúdio para ativar festas e acompanhar seus créditos."
           />
 
@@ -113,6 +113,6 @@ export function ParceiroLoginPage() {
           </Form>
         </CardContent>
       </Card>
-    </div>
+    </TelaLogin>
   );
 }

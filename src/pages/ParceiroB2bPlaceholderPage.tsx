@@ -18,7 +18,7 @@ export function ParceiroB2bPlaceholderPage() {
   if (vm.isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="w-10 h-10 rounded-full border-4 border-primary border-t-transparent animate-spin" />
+        <div className="h-10 w-10 animate-spin rounded-full border-4 border-primary border-t-transparent" />
       </div>
     );
   }
@@ -45,7 +45,7 @@ export function ParceiroB2bPlaceholderPage() {
         {vm.emModoImpersonating && (
           <Banner
             variant="warning"
-            title="Modo Suporte Admin (Acessando como Parceiro B2B)"
+            title="Modo suporte: você está vendo a conta de um parceiro"
             description="Você entrou nesta conta através de um link administrativo temporário."
           />
         )}
@@ -54,7 +54,7 @@ export function ParceiroB2bPlaceholderPage() {
           <Card>
             <CardContent className="p-3.5 sm:p-4">
               <p className="text-xs text-muted-foreground">
-                Créditos prontos para uso
+                Créditos disponíveis
               </p>
               <p className="font-display text-xl sm:text-2xl font-extrabold text-primary mt-1 tabular-nums">
                 {parceiro?.saldo_creditos ?? 0} festas
@@ -78,7 +78,7 @@ export function ParceiroB2bPlaceholderPage() {
               <p className="text-xs text-muted-foreground">
                 Fotos capturadas nos eventos
               </p>
-              <p className="font-display text-xl sm:text-2xl font-extrabold text-emerald-600 mt-1 tabular-nums">
+              <p className="font-display text-xl sm:text-2xl font-extrabold text-success mt-1 tabular-nums">
                 {vm.totalMidiasCapturadas} fotos
               </p>
             </CardContent>

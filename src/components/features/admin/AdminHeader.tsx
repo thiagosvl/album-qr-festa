@@ -1,12 +1,10 @@
-import { LogOut, Plus, Search } from "lucide-react";
+import { Plus, Search } from "lucide-react";
 import { FESTA_FILTRO_STATUS_TODOS } from "@/constants";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { NativeSelect } from "@/components/ui/native-select";
 import { STATUS_PEDIDO_LABELS } from "@/hooks/business/useCalculosPedido";
 import type { FestaStatusPedidoEnum } from "@/types/festa.types";
-import { LOGO_VARIANTE, NOME_MARCA } from "@/constants";
-import { LogoFestalgia } from "@/components/ui/LogoFestalgia";
 
 interface AdminHeaderProps {
   busca: string;
@@ -16,7 +14,6 @@ interface AdminHeaderProps {
     status: FestaStatusPedidoEnum | typeof FESTA_FILTRO_STATUS_TODOS
   ) => void;
   onNovoEvento: () => void;
-  onLogout: () => void;
 }
 
 export function AdminHeader({
@@ -25,55 +22,41 @@ export function AdminHeader({
   filtroStatus,
   onChangeFiltroStatus,
   onNovoEvento,
-  onLogout,
 }: AdminHeaderProps) {
   return (
-    <header className="glass-surface border-b border-border/60 sticky top-0 z-30">
-      <div className="max-w-7xl mx-auto px-4 py-4 space-y-4">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-          <div className="flex items-center gap-3">
-            <LogoFestalgia variante={LOGO_VARIANTE.ICONE} className="w-11 h-11" />
-            <div>
-              <h1 className="font-display text-xl sm:text-2xl font-bold">
-                {NOME_MARCA} • Backoffice Admin
-              </h1>
-              <p className="text-xs text-muted-foreground">
-                Gestão comercial de pedidos B2C, sinal 50%, molduras PNG e links
-                dos pais
-              </p>
-            </div>
+    <header className="glass-surface sticky top-0 z-30 border-b border-border/60">
+      <div className="mx-auto max-w-6xl space-y-4 px-4 py-5">
+        <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
+          <div className="min-w-0">
+            <h1 className="font-display text-2xl font-extrabold leading-tight tracking-tight sm:text-3xl">
+              Pedidos e eventos
+            </h1>
+            <p className="mt-0.5 text-sm text-muted-foreground">
+              Sinal de 50%, molduras e links dos pais de cada festa.
+            </p>
           </div>
 
-          <div className="flex items-center gap-2">
-            <Button type="button" onClick={onNovoEvento}>
-              <Plus className="w-4 h-4" />
-              <span>Novo Pedido / Evento</span>
-            </Button>
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={onLogout}
-            >
-              <LogOut className="w-4 h-4" />
-              <span>Sair</span>
-            </Button>
-          </div>
+          <Button type="button" size="lg" onClick={onNovoEvento}>
+            <Plus className="h-4 w-4" />
+            Novo pedido
+          </Button>
         </div>
 
-        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+        <div className="flex flex-col items-stretch gap-3 sm:flex-row sm:items-center">
           <div className="relative flex-1">
-            <Search className="w-4 h-4 text-muted-foreground absolute left-3.5 top-1/2 -translate-y-1/2" />
+            <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
-              placeholder="Buscar por nome da festa, aniversariante, slug ou responsável..."
+              placeholder="Buscar por festa, aniversariante, link ou responsável"
+              aria-label="Buscar pedidos"
               value={busca}
               onChange={(e) => onChangeBusca(e.target.value)}
-              className="pl-9"
+              className="pl-10"
             />
           </div>
 
           <NativeSelect
             wrapperClassName="sm:w-60"
+            aria-label="Filtrar por situação"
             value={filtroStatus}
             onChange={(e) =>
               onChangeFiltroStatus(
@@ -83,7 +66,7 @@ export function AdminHeader({
               )
             }
           >
-            <option value={FESTA_FILTRO_STATUS_TODOS}>Todos os Status</option>
+            <option value={FESTA_FILTRO_STATUS_TODOS}>Todas as situações</option>
             {(Object.keys(STATUS_PEDIDO_LABELS) as FestaStatusPedidoEnum[]).map(
               (st) => (
                 <option key={st} value={st}>

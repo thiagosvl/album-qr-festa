@@ -5,6 +5,7 @@ import { AdminHeader } from "@/components/features/admin/AdminHeader";
 import { AdminKpiCards } from "@/components/features/admin/AdminKpiCards";
 import { AdminParceirosB2bSection } from "@/components/features/admin/AdminParceirosB2bSection";
 import { AdminSidebar } from "@/components/features/admin/AdminSidebar";
+import { TituloPagina } from "@/components/ui/TituloPagina";
 import { AdminTemasSection } from "@/components/features/admin/AdminTemasSection";
 import { useAdminEventosViewModel } from "@/hooks/ui/useAdminEventosViewModel";
 
@@ -14,7 +15,7 @@ export function AdminEventosPage() {
   if (vm.verificandoSessao) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="w-10 h-10 rounded-full border-4 border-primary border-t-transparent animate-spin" />
+        <div className="h-10 w-10 animate-spin rounded-full border-4 border-primary border-t-transparent" />
       </div>
     );
   }
@@ -41,7 +42,6 @@ export function AdminEventosPage() {
             filtroStatus={vm.filtroStatus}
             onChangeFiltroStatus={vm.setFiltroStatus}
             onNovoEvento={vm.abrirNovoEventoDialog}
-            onLogout={vm.fazerLogout}
           />
         )}
 
@@ -63,6 +63,25 @@ export function AdminEventosPage() {
                 onExcluir={vm.confirmarExclusaoEvento}
               />
             </>
+          )}
+
+          {vm.abaAtiva === FESTA_ADMIN_TABS.CATALOGO_B2C && (
+            <TituloPagina
+              titulo="Catálogo e extras"
+              descricao="Produtos, pacotes e opcionais que aparecem nos pedidos."
+            />
+          )}
+          {vm.abaAtiva === FESTA_ADMIN_TABS.TEMAS && (
+            <TituloPagina
+              titulo="Vitrine de temas"
+              descricao="Temas prontos com paleta sugerida e moldura de exemplo."
+            />
+          )}
+          {vm.abaAtiva === FESTA_ADMIN_TABS.PARCEIROS_B2B && (
+            <TituloPagina
+              titulo="Parceiros e planos"
+              descricao="Buffets e fotógrafos, créditos e acessos."
+            />
           )}
 
           {vm.abaAtiva === FESTA_ADMIN_TABS.CATALOGO_B2C && (

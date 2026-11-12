@@ -11,6 +11,7 @@ import {
   UserCheck,
 } from "lucide-react";
 import { Link } from "react-router-dom";
+import { AlternadorTema } from "@/components/ui/AlternadorTema";
 import { FESTA_GESTAO_PAI_TABS } from "@/constants";
 import { STATUS_PEDIDO_LABELS } from "@/hooks/business/useCalculosPedido";
 import type { AbaGestaoPai } from "@/hooks/ui/useGestaoPaiViewModel";
@@ -79,20 +80,21 @@ export function GestaoPaiHeader({
   ];
 
   return (
-    <header className="sticky top-0 z-30 border-b border-ameixa/10 bg-papel/90 backdrop-blur-md">
+    <header className="sticky top-0 z-30 border-b border-border/70 bg-bar/90 backdrop-blur-md">
       <div className="mx-auto max-w-6xl space-y-4 px-4 pb-3 pt-4">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
           <div className="min-w-0">
-            <p className="flex flex-wrap items-center gap-2 text-sm font-semibold text-ameixa-suave">
+            <div className="flex flex-wrap items-center gap-2 text-sm font-semibold text-muted-foreground">
               Painel dos anfitriões
               <span className="rounded-full bg-gema px-2.5 py-0.5 text-xs font-bold text-ameixa">
                 {STATUS_PEDIDO_LABELS[evento.status_pedido]}
               </span>
-            </p>
-            <h1 className="mt-1 font-display text-3xl font-extrabold leading-none tracking-tight text-ameixa sm:text-4xl">
+              <AlternadorTema className="sm:hidden" />
+            </div>
+            <h1 className="mt-1 font-display text-3xl font-extrabold leading-none tracking-tight text-foreground sm:text-4xl">
               {evento.titulo}
             </h1>
-            <p className="mt-2 text-sm text-ameixa-suave">
+            <p className="mt-2 text-sm text-muted-foreground">
               {formatarDataBr(evento.data_evento)} •{" "}
               {[
                 evento.inclui_galeria ? "Galeria QR Code" : null,
@@ -104,6 +106,7 @@ export function GestaoPaiHeader({
           </div>
 
           <div className="flex flex-wrap items-center gap-2">
+            <AlternadorTema className="hidden sm:inline-flex" />
             {evento.inclui_galeria && (
               <>
                 <button
@@ -113,7 +116,7 @@ export function GestaoPaiHeader({
                   className={`${BOTAO} flex-1 sm:flex-initial ${
                     envioPausado
                       ? "bg-rosa text-white"
-                      : "bg-white text-ameixa ring-1 ring-ameixa/15 hover:ring-ameixa/30"
+                      : "bg-card text-foreground ring-1 ring-border hover:ring-foreground/30"
                   }`}
                 >
                   {pausandoEnvios ? (
@@ -132,7 +135,7 @@ export function GestaoPaiHeader({
                   type="button"
                   disabled={totalMidias === 0 || baixandoZip}
                   onClick={onBaixarZip}
-                  className={`${BOTAO} flex-1 sm:flex-initial bg-uva-claro text-uva hover:bg-uva hover:text-white`}
+                  className={`${BOTAO} flex-1 sm:flex-initial bg-secondary text-secondary-foreground hover:bg-primary hover:text-primary-foreground`}
                 >
                   {baixandoZip ? (
                     <Loader2 className="h-4 w-4 shrink-0 animate-spin" />
@@ -151,7 +154,7 @@ export function GestaoPaiHeader({
                       : `/e/${evento.codigo_url}/${evento.slug}`
                   }
                   target="_blank"
-                  className={`${BOTAO} w-full sm:w-auto bg-ameixa text-white`}
+                  className={`${BOTAO} w-full sm:w-auto bg-primary text-primary-foreground hover:bg-primary-hover`}
                 >
                   <ExternalLink className="h-4 w-4 shrink-0" />
                   <span>Abrir álbum</span>
@@ -167,7 +170,7 @@ export function GestaoPaiHeader({
                     : `/convite/${evento.codigo_url}/${evento.slug}`
                 }
                 target="_blank"
-                className={`${BOTAO} w-full sm:w-auto bg-uva text-white hover:bg-uva/90`}
+                className={`${BOTAO} w-full sm:w-auto bg-primary text-primary-foreground hover:bg-primary-hover`}
               >
                 <MailOpen className="h-4 w-4 shrink-0" />
                 <span>Ver Convite</span>
@@ -177,7 +180,7 @@ export function GestaoPaiHeader({
         </div>
 
         <div
-          className="no-scrollbar flex gap-1 overflow-x-auto rounded-full bg-ameixa/[0.06] p-1"
+          className="no-scrollbar flex gap-1 overflow-x-auto rounded-full bg-muted p-1"
           role="tablist"
         >
           {abas.map(({ id, rotulo, Icone }) => {
@@ -191,11 +194,11 @@ export function GestaoPaiHeader({
                 onClick={() => onChangeAba(id)}
                 className={`flex h-9 shrink-0 items-center gap-1.5 rounded-full px-4 text-[13px] font-semibold transition sm:flex-1 sm:justify-center ${
                   ativa
-                    ? "bg-white text-ameixa shadow-sm"
-                    : "text-ameixa-suave hover:text-ameixa"
+                    ? "bg-card text-foreground shadow-sm dark:bg-accent"
+                    : "text-muted-foreground hover:text-foreground"
                 }`}
               >
-                <Icone className={`h-3.5 w-3.5 ${ativa ? "text-uva" : ""}`} />
+                <Icone className={`h-3.5 w-3.5 ${ativa ? "text-primary" : ""}`} />
                 {rotulo}
               </button>
             );

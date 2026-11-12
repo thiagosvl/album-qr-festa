@@ -45,10 +45,10 @@ export function GestaoConviteConfigSection({
   return (
     <div className="space-y-4 pt-4 border-t border-border/60">
       <div>
-        <h3 className="text-base font-bold text-ameixa">
+        <h3 className="text-base font-bold text-foreground">
           Detalhes do Convite Interativo
         </h3>
-        <p className="text-xs text-ameixa-suave">
+        <p className="text-xs text-muted-foreground">
           Personalize local, horário, música e sugestões de presentes do seu
           convite.
         </p>
@@ -60,7 +60,7 @@ export function GestaoConviteConfigSection({
           name="convite_horario_inicio"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="text-xs font-semibold text-ameixa-suave">
+              <FormLabel className="text-xs font-semibold text-muted-foreground">
                 Horário de Início (Contagem)
               </FormLabel>
               <FormControl>
@@ -75,7 +75,7 @@ export function GestaoConviteConfigSection({
           name="convite_horario_texto"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="text-xs font-semibold text-ameixa-suave">
+              <FormLabel className="text-xs font-semibold text-muted-foreground">
                 Texto do Horário
               </FormLabel>
               <FormControl>
@@ -90,7 +90,7 @@ export function GestaoConviteConfigSection({
           name="convite_texto_prazo_rsvp"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="text-xs font-semibold text-ameixa-suave">
+              <FormLabel className="text-xs font-semibold text-muted-foreground">
                 Aviso de Prazo (RSVP)
               </FormLabel>
               <FormControl>
@@ -108,7 +108,7 @@ export function GestaoConviteConfigSection({
           name="convite_nome_local"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="text-xs font-semibold text-ameixa-suave">
+              <FormLabel className="text-xs font-semibold text-muted-foreground">
                 Nome do Local / Espaço
               </FormLabel>
               <FormControl>
@@ -123,7 +123,7 @@ export function GestaoConviteConfigSection({
           name="convite_endereco"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="text-xs font-semibold text-ameixa-suave">
+              <FormLabel className="text-xs font-semibold text-muted-foreground">
                 Endereço Completo (Google Maps e Waze)
               </FormLabel>
               <FormControl>
@@ -143,7 +143,7 @@ export function GestaoConviteConfigSection({
         name="convite_texto_chamada"
         render={({ field }) => (
           <FormItem>
-            <FormLabel className="text-xs font-semibold text-ameixa-suave">
+            <FormLabel className="text-xs font-semibold text-muted-foreground">
               Frase de Convite
             </FormLabel>
             <FormControl>
@@ -164,7 +164,7 @@ export function GestaoConviteConfigSection({
           name="convite_foto_url"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="text-xs font-semibold text-ameixa-suave">
+              <FormLabel className="text-xs font-semibold text-muted-foreground">
                 Foto de Destaque do Convite
               </FormLabel>
               <div className="flex gap-1.5">
@@ -207,7 +207,7 @@ export function GestaoConviteConfigSection({
           name="convite_musica_url"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="text-xs font-semibold text-ameixa-suave">
+              <FormLabel className="text-xs font-semibold text-muted-foreground">
                 Música de Fundo MP3 (Opcional)
               </FormLabel>
               <div className="flex gap-1.5">
